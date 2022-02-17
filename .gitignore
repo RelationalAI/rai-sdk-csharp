@@ -1,0 +1,9 @@
+RAILib.Test/bin
+RAILib.Test/obj
+RAILib.Examples/bin
+RAILib.Examples/obj
+RAILib/bin
+RAILib/obj
+launch.json
+tasks.jaon
+.vscode
