@@ -129,7 +129,7 @@ namespace RAILib
         public string ListDatabases(string state = null)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-            if(state != null)
+            if(null != state)
                 parameters.Add("state", state);
             
             return ListCollections(Api.PathDatabae, "databases", parameters);
@@ -173,7 +173,7 @@ namespace RAILib
                 // to return the formatted JSON
                 var json = JObject.Parse(response);
                 JToken result = json;
-                if(key != null && json.ContainsKey(key))
+                if(null != key && json.ContainsKey(key))
                     result = json.GetValue(key);
 
                 return result.ToString();
@@ -260,11 +260,11 @@ namespace RAILib
             {
                 if (config != null)
                 {
-                    Host = (config.ContainsKey("host") && config["host"] != null) ? (string)config["host"] : null;
-                    Port = (config.ContainsKey("port") && config["port"] != null) ? (string)config["port"] : null;
-                    Scheme = (config.ContainsKey("scheme") && config["scheme"] != null) ? (string)config["scheme"] : null;
-                    Region = (config.ContainsKey("region") && config["region"] != null) ? (string)config["region"] : null;
-                    Credentials = (config.ContainsKey("credentials") && config["credentials"] != null) ?
+                    Host = (config.ContainsKey("host") && null != config["host"]) ? (string)config["host"] : null;
+                    Port = (config.ContainsKey("port") && null != config["port"]) ? (string)config["port"] : null;
+                    Scheme = (config.ContainsKey("scheme") && null != config["scheme"]) ? (string)config["scheme"] : null;
+                    Region = (config.ContainsKey("region") && null != config["region"]) ? (string)config["region"] : null;
+                    Credentials = (config.ContainsKey("credentials") && null != config["credentials"]) ?
                         (ICredentials)config["credentials"] : null;
                 }
             }

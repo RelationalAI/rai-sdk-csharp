@@ -113,7 +113,7 @@ namespace RAILib
             Dictionary<string, string> headers, Dictionary<string, string> parameters = null)
         {
             var uriBuilder = new UriBuilder(uri);
-            if(parameters != null)
+            if(null != parameters)
                 uriBuilder.Query = EncodeQueryString(parameters);
 
             headers = GetDefaultHeaders(uri, headers);
@@ -121,7 +121,7 @@ namespace RAILib
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(headers["accept"]));
             request.Content = content;
             // HttpClient does not allow to set content-type header if there is no body
-            if(content != null)
+            if(null != content)
                 request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse(headers["content-type"]);
 
             request.Headers.Host = headers["host"];
