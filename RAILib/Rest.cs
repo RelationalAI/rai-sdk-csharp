@@ -90,6 +90,7 @@ namespace RAILib
         }
         private string GetUserAgent()
         {
+            // TODO: add version here
             return "rai-sdk-csharp";
         }
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)

@@ -137,7 +137,7 @@ namespace RAILib
         public string ListEngines(string state = null)
         {
             Dictionary<string, string> parameters = new Dictionary<string, string>();
-            if(state != null)
+            if(null != state)
                 parameters.Add("state", state);
             
             return ListCollections(Api.PathEngine, "computes", parameters);
@@ -258,7 +258,7 @@ namespace RAILib
             }
             public Context(Dictionary<string, object> config)
             {
-                if (config != null)
+                if (null != config)
                 {
                     Host = (config.ContainsKey("host") && null != config["host"]) ? (string)config["host"] : null;
                     Port = (config.ContainsKey("port") && null != config["port"]) ? (string)config["port"] : null;

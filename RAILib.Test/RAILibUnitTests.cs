@@ -14,11 +14,7 @@ namespace RAILib.Test
         [Fact]
         public void Test1()
         {
-            Dictionary<string, object> config = Config.Read();
-            Api.Context context = new Api.Context(config);
-            Api api = new Api(context);
-            Console.WriteLine(api.ListDatabases());
             
-       }
+        }
     }
 }
