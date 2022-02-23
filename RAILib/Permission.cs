@@ -4,38 +4,29 @@ namespace RAILib
 {
     public enum Permission
     {
-        // access keys
         CreateAccessKey,
         ListAccessKeys,
-        // credits
         ReadCreditsUsage,
-        // databases
         CreateDatabase,
         DeleteDatabase,
         ListDatabases,
         UpdateDatabase,
-        // engines
         CreateCompute,
         DeleteCompute,
         ListComputes,
         ReadCompute,
-        // oauth clients
         CreateOAuthClient,
         DeleteOAuthClient,
         ListOAuthClient,
         ReadOAuthClient,
         RotateOAuthClientSecret,
         UpdateOAuthClient,
-        // permissions
         ListPermissions,
-        // roles
         ListRoles,
         ReadRole,
-        // transactions
         RunTransaction,
         ReadTransaction,
         DeleteTransaction,
-        // users
         CreateUser,
         ListUsers,
         ReadUser,

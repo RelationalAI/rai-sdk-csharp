@@ -10,7 +10,7 @@ namespace RAILib
 
     static class Roles 
     {
-        public static String Value(this Role role)
+        public static string Value(this Role role)
         {
             switch (role)
             {
@@ -19,7 +19,7 @@ namespace RAILib
                 case Role.Admin:
                     return "admin";
                 default:
-                    throw new SystemException(String.Format("role '{0}' not supported", role));     
+                    throw new SystemException(string.Format("role '{0}' not supported", role));
             }
         }
     }

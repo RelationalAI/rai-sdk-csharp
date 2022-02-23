@@ -8,14 +8,14 @@ using RAILib;
 
 namespace RAILib.Examples
 {
-    public class GetOAuthClient
-    {   
+    public class DisableUser
+    {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetOAuthClient", "--id <Client ID> --profile <Profile name>"){
+            var cmd = new Command("DisableUser", "--id <User ID>  --profile <Profile name>"){
                 new Option<string>("--id"){
                     IsRequired = true,
-                    Description = "oAuth client's id to get the details."
+                    Description = "User's ID to disable."
                 },
 
                 new Option<string>("--profile"){
@@ -23,7 +23,7 @@ namespace RAILib.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Gets an oAuth client's details by id.";
+            cmd.Description = "Disables a user by ID.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
             
             return cmd;
@@ -34,7 +34,7 @@ namespace RAILib.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.GetOAuthClient(id));
+            Console.WriteLine(api.DisableUser(id));
         }
 
     }

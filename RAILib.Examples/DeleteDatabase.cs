@@ -5,17 +5,16 @@ using System.CommandLine.NamingConventionBinder;
 
 using RAILib;
 
-
 namespace RAILib.Examples
 {
-    public class GetOAuthClient
-    {   
+    public class DeleteDatabase
+    {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetOAuthClient", "--id <Client ID> --profile <Profile name>"){
-                new Option<string>("--id"){
+            var cmd = new Command("GetDatabase", "--database <Database name> --profile <Profile name>"){
+                new Option<string>("--database"){
                     IsRequired = true,
-                    Description = "oAuth client's id to get the details."
+                    Description = "Database name to delete."
                 },
 
                 new Option<string>("--profile"){
@@ -23,18 +22,18 @@ namespace RAILib.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Gets an oAuth client's details by id.";
+            cmd.Description = "Deletes a database by name.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
             
             return cmd;
         }
 
-        private static void Run(string id, string profile = "default")
+        private static void Run(string database, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.GetOAuthClient(id));
+            Console.WriteLine(api.DeleteDatabase(database));
         }
 
     }

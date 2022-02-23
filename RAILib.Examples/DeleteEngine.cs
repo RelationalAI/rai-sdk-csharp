@@ -2,20 +2,19 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
-
 using RAILib;
 
 
 namespace RAILib.Examples
 {
-    public class GetOAuthClient
-    {   
+    public class DeleteEngine
+    {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetOAuthClient", "--id <Client ID> --profile <Profile name>"){
-                new Option<string>("--id"){
+            var cmd = new Command("DeleteEngine", "--engine <Engine name> --profile <Profile name>"){
+                new Option<string>("--engine"){
                     IsRequired = true,
-                    Description = "oAuth client's id to get the details."
+                    Description = "Engine name to delete."
                 },
 
                 new Option<string>("--profile"){
@@ -23,18 +22,18 @@ namespace RAILib.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Gets an oAuth client's details by id.";
+            cmd.Description = "Deletes an engine by name.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
             
             return cmd;
         }
 
-        private static void Run(string id, string profile = "default")
+        private static void Run(string engine, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.GetOAuthClient(id));
+            Console.WriteLine(api.DeleteEngine(engine));
         }
 
     }

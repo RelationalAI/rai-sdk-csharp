@@ -12,7 +12,7 @@ namespace RAILib
 
     static class UserStatuses 
     {
-        public static String Value(this UserStatus status)
+        public static string Value(this UserStatus status)
         {
             switch (status)
             {
