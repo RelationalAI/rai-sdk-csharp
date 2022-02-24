@@ -71,7 +71,7 @@ namespace RAILib
             Dictionary<string, string> parameters = null)
         {
             Dictionary<string, string> caseInsensitiveHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-            if(headers != null)
+            if (headers != null)
             {
                 foreach (var kv in headers)
                 {
@@ -234,9 +234,9 @@ namespace RAILib
                 // Create the POST request
                 var request = this.PrepareHttpRequest(method, client.BaseAddress, this.EncodeContent(data), headers, parameters);
                 // Get the result back or throws an exception.
-                var httpRespTask = client.SendAsync(request); 
+                var httpRespTask = client.SendAsync(request);
                 httpRespTask.Wait();
-                var resultTask = httpRespTask.Result.Content.ReadAsStringAsync(); 
+                var resultTask = httpRespTask.Result.Content.ReadAsStringAsync();
                 resultTask.Wait();
 
                 return resultTask.Result;
