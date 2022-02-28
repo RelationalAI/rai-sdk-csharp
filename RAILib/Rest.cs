@@ -18,6 +18,17 @@ namespace RAILib
             this.context = context;
         }
 
+        public static string EncodeQueryString(Dictionary<string, string> parameters)
+        {
+            if (parameters == null)
+            {
+                return string.Empty;
+            }
+
+            return string.Join("&", parameters.Select(kvp =>
+                string.Format("{0}={1}", HttpUtility.UrlEncode(kvp.Key), HttpUtility.UrlEncode(kvp.Value))));
+        }
+
         public string Delete(
             string url,
             object data = null,
@@ -81,17 +92,6 @@ namespace RAILib
 
             caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", this.GetAccessToken(this.GetHost(url))));
             return this.RequestHelper(method, url, data, caseInsensitiveHeaders, parameters);
-        }
-
-        private string EncodeQueryString(Dictionary<string, string> parameters)
-        {
-            if (parameters == null)
-            {
-                return string.Empty;
-            }
-
-            return string.Join("&", parameters.Select(kvp =>
-                string.Format("{0}={1}", HttpUtility.UrlEncode(kvp.Key), HttpUtility.UrlEncode(kvp.Value))));
         }
 
         private HttpContent EncodeContent(object body)
@@ -173,7 +173,7 @@ namespace RAILib
             var uriBuilder = new UriBuilder(uri);
             if (parameters != null)
             {
-                uriBuilder.Query = this.EncodeQueryString(parameters);
+                uriBuilder.Query = Rest.EncodeQueryString(parameters);
             }
 
             headers = this.GetDefaultHeaders(uri, headers);

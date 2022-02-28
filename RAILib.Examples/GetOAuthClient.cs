@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Gets an oAuth client's details by id.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

@@ -24,7 +24,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Deletes a database by name.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

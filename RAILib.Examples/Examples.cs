@@ -22,10 +22,14 @@ namespace RAILib.Examples
             root.AddCommand(GetOAuthClient.GetCommand());
             root.AddCommand(GetUser.GetCommand());
             root.AddCommand(GetUserID.GetCommand());
+            root.AddCommand(EnableUser.GetCommand());
+            root.AddCommand(DisableUser.GetCommand());
+            root.AddCommand(DeleteUser.GetCommand());
             root.AddCommand(ListDatabases.GetCommand());
             root.AddCommand(ListEngines.GetCommand());
             root.AddCommand(ListOAuthClients.GetCommand());
             root.AddCommand(ListUsers.GetCommand());
+            root.AddCommand(RunQuery.GetCommand());
             //return the root command
             return root;
         }

@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "List databases";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 
@@ -34,7 +33,11 @@ namespace RAILib.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.ListDatabases(state));
+            List<Database> databases = api.ListDatabases(state);
+            foreach(var database in databases) 
+            {
+                Console.WriteLine(database);
+            }
         }
 
     }

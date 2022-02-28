@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Gets a user's details by ID.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

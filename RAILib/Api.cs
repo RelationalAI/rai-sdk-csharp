@@ -2,6 +2,8 @@ namespace RAILib
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RAILib.Credentials;
 
@@ -22,167 +24,173 @@ namespace RAILib
             this.rest = new Rest(context);
         }
 
-        public string CreateDatabase(string database, string source = null)
+        public Database CreateDatabase(string database, string engine)
         {
-            var data = new Dictionary<string, string>() { { "name", database } };
-            return FormatResponse(this.rest.Put(this.MakeUrl(Api.PathDatabae), data));
+            return this.CreateDatabase(database, engine, false);
         }
 
-        public string CreateEngine(string engine, EngineSize size = EngineSize.XS)
+        public Database CreateDatabase(string database, string engine, bool overwrite)
+        {
+            var mode = CreateMode(null, overwrite);
+            var transaction = new Transaction(this.context.Region, database, engine, mode);
+            string resp = this.rest.Post(this.MakeUrl(Api.PathTransaction), transaction.Payload(null), null, transaction.QueryParams());
+            return this.GetDatabase(database);
+        }
+
+        public Database GetDatabase(string database)
+        {
+            var parameters = new Dictionary<string, string>()
+            {
+                { "name", database },
+            };
+
+            string resp = this.GetResource(Api.PathDatabae, null, parameters);
+            List<Database> dbs = Json<GetDatabaseResponse>.Deserialize(resp).Databases;
+            return dbs.Count > 0 ? dbs[0] : throw new SystemException("not found");
+        }
+
+        public List<Database> ListDatabases(string state = null)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (state != null)
+            {
+                parameters.Add("state", state);
+            }
+            string resp = this.ListCollections(Api.PathDatabae, null, parameters);
+            return Json<ListDatabasesResponse>.Deserialize(resp).Databases;
+        }
+
+        public DeleteDatabaseResponse DeleteDatabase(string database)
         {
             var data = new Dictionary<string, string>()
             {
-                {"region", context.Region},
-                {"name", engine},
-                {"size", size.ToString()}
+                { "name", database },
             };
-            return FormatResponse(this.rest.Put(this.MakeUrl(Api.PathEngine), data));
+            string resp = this.rest.Delete(this.MakeUrl(Api.PathDatabae), data);
+            return Json<DeleteDatabaseResponse>.Deserialize(resp);
         }
 
-        public string CreateOAuthClient(string name, List<Permission> permissions = null)
+        public Engine CreateEngine(string engine, EngineSize size = EngineSize.XS)
+        {
+            var data = new Dictionary<string, string>()
+            {
+                { "region", this.context.Region },
+                { "name", engine },
+                { "size", size.ToString() },
+            };
+            string resp = this.rest.Put(this.MakeUrl(Api.PathEngine), data);
+            return Json<CreateEngineResponse>.Deserialize(resp).Engine;
+        }
+
+        public Engine CreateEngineWait(string engine, EngineSize size = EngineSize.XS)
+        {
+            var resp = this.CreateEngine(engine, size);
+            while (!IsTerminalState(resp.State, "PROVISIONED"))
+            {
+                Thread.Sleep(2000);
+                resp = this.GetEngine(resp.Name);
+            }
+            return resp;
+        }
+
+        public Engine GetEngine(string engine)
+        {
+            var parameters = new Dictionary<string, string>()
+            {
+                { "name", engine },
+                { "deleted_on", string.Empty },
+            };
+            var resp = this.GetResource(Api.PathEngine, null, parameters);
+            List<Engine> engines = Json<GetEngineResponse>.Deserialize(resp).Engines;
+            return engines.Count > 0 ? engines[0] : throw new SystemException("not found");
+        }
+
+        public List<Engine> ListEngines(string state = null)
+        {
+            Dictionary<string, string> parameters = new Dictionary<string, string>();
+            if (state != null)
+            {
+                parameters.Add("state", state);
+            }
+            string resp = this.ListCollections(Api.PathEngine, null, parameters);
+            return Json<ListEnginesResponse>.Deserialize(resp).Engines;
+        }
+
+        public DeleteEngineResponse DeleteEngine(string engine)
+        {
+            var data = new Dictionary<string, string>()
+            {
+                { "name", engine },
+            };
+            string resp = this.rest.Delete(this.MakeUrl(Api.PathEngine), data);
+            return Json<DeleteEngineResponse>.Deserialize(resp);
+        }
+
+        public OAuthClient CreateOAuthClient(string name, List<Permission> permissions = null)
         {
             HashSet<string> uniquePermissions = new HashSet<string>();
             if (permissions != null)
             {
                 permissions.ForEach(p => uniquePermissions.Add(p.Value()));
             }
-
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                {"name", name},
-                {"permissions", uniquePermissions}
+                { "name", name },
+                { "permissions", uniquePermissions },
             };
-
-            return FormatResponse(this.rest.Post(this.MakeUrl(Api.PathOAuthClients), data), "clients");
+            string resp = this.rest.Post(this.MakeUrl(Api.PathOAuthClients), data);
+            return Json<CreateOAuthClientResponse>.Deserialize(resp).OAuthClient;
         }
 
-        public string CreateUser(string email, List<Role> roles = null)
+        public OAuthClient FindOAuthClient(string name)
+        {
+            List<OAuthClient> clients = this.ListOAuthClients();
+            foreach (var client in clients)
+            {
+                if (client.Name == name)
+                {
+                    return client;
+                }
+            }
+
+            throw new SystemException("not found");
+        }
+
+        public OAuthClientEx GetOAuthClient(string id)
+        {
+            string resp = this.GetResource(string.Format("{0}/{1}", Api.PathOAuthClients, id));
+            return Json<GetOAuthClientResponse>.Deserialize(resp).Client;
+        }
+
+        public List<OAuthClient> ListOAuthClients()
+        {
+            string resp = this.ListCollections(Api.PathOAuthClients);
+            return Json<ListOAuthClientResponse>.Deserialize(resp).Clients;
+        }
+
+        public DeleteOAuthClientResponse DeleteOAuthClient(string id)
+        {
+            string resp = this.rest.Delete(this.MakeUrl(string.Format("{0}/{1}", Api.PathOAuthClients, id)));
+            return Json<DeleteOAuthClientResponse>.Deserialize(resp);
+        }
+
+        public User CreateUser(string email, List<Role> roles = null)
         {
             HashSet<string> uniqueRoles = new HashSet<string>();
             if (roles != null)
             {
                 roles.ForEach(r => uniqueRoles.Add(r.Value()));
             }
-
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
-                {"email", email},
-                {"roles", uniqueRoles}
+                { "email", email },
+                { "roles", uniqueRoles },
             };
-
-            return FormatResponse(this.rest.Post(this.MakeUrl(Api.PathUsers), data));
+            string resp = this.rest.Post(this.MakeUrl(Api.PathUsers), data);
+            return Json<CreateUserResponse>.Deserialize(resp).User;
         }
 
-        public string DeleteDatabase(string database)
-        {
-            var data = new Dictionary<string, string>()
-            {
-                {"name", database} 
-            };
-            return FormatResponse(this.rest.Delete(this.MakeUrl(Api.PathDatabae), data));
-        }
-
-        public string DeleteEngine(string engine)
-        {
-            var data = new Dictionary<string, string>()
-            {
-                {"name", engine} 
-            };
-            return FormatResponse(this.rest.Delete(this.MakeUrl(Api.PathEngine), data));
-        }
-
-        public string DeleteOAuthClient(string id)
-        {
-            return FormatResponse(this.rest.Delete(this.MakeUrl(String.Format("{0}/{1}", Api.PathOAuthClients, id))));
-        }
-
-        public string DeleteTransaction(string id)
-        {
-            return FormatResponse(this.rest.Delete(this.MakeUrl(String.Format("{0}/{1}", Api.PathTransactions, id))));
-        }
-
-        public string DeleteUser(string id)
-        {
-            return FormatResponse(this.rest.Delete(this.MakeUrl(String.Format("{0}/{1}", Api.PathUsers, id))));
-        }
-
-        public string DisableUser(string id)
-        {
-            return FormatResponse(this.UpdateUser(id, UserStatus.InActive));
-        }
-
-        public string EnableUser(string id)
-        {
-            return FormatResponse(this.UpdateUser(id, UserStatus.Active));
-        }
-
-        public string GetDatabase(string database)
-        {
-            var parameters = new Dictionary<string, string>() 
-            {
-                {"name", database}
-            };
-            return this.GetResource(Api.PathDatabae, "databases", parameters);
-        }
-
-        public string GetEngine(string engine)
-        {
-            var parameters = new Dictionary<string, string>()
-            {
-                {"name", engine},
-                {"deleted_on", ""}
-            };
-            return this.GetResource(Api.PathEngine, "computes", parameters);
-        }
-
-        public string GetOAuthClient(string id)
-        {
-            return this.GetResource(String.Format("{0}/{1}", Api.PathOAuthClients, id), "client");
-        }
-
-        public string GetTransaction(string id)
-        {
-            return this.GetResource(String.Format("{0}/{1}", Api.PathTransactions, id), "transaction");
-        }
-
-        public string GetUser(string userId)
-        {
-            return this.GetResource(String.Format("{0}/{1}", Api.PathUsers, userId));
-        }
-
-        public string ListDatabases(string state = null)
-        {
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            if (state != null)
-            {
-                parameters.Add("state", state);
-            }
-
-            return this.ListCollections(Api.PathDatabae, "databases", parameters);
-        }
-
-        public string ListEngines(string state = null)
-        {
-            Dictionary<string, string> parameters = new Dictionary<string, string>();
-            if (state != null)
-            {
-                parameters.Add("state", state);
-            }
-
-            return this.ListCollections(Api.PathEngine, "computes", parameters);
-        }
-
-        public string ListOAuthClients()
-        {
-            return this.ListCollections(Api.PathOAuthClients, "clients");
-        }
-
-        public string ListUsers()
-        {
-            return this.ListCollections(Api.PathUsers, "users");
-        }
-
-        public string UpdateUser(string id, UserStatus status = UserStatus.None, List<Role> roles = null)
+        public User UpdateUser(string id, UserStatus status = UserStatus.None, List<Role> roles = null)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
             if (roles != null)
@@ -191,13 +199,96 @@ namespace RAILib
                 roles.ForEach(r => uniqueRoles.Add(r.Value()));
                 data.Add("roles", uniqueRoles);
             }
-
             if (status != UserStatus.None)
             {
                 data.Add("status", status.Value());
             }
+            string resp = this.rest.Patch(this.MakeUrl(string.Format("{0}/{1}", Api.PathUsers, id)), data);
+            return Json<UpdateUserResponse>.Deserialize(resp).User;
+        }
 
-            return FormatResponse(this.rest.Patch(this.MakeUrl(String.Format("{0}/{1}", Api.PathUsers, id)), data));
+        public User FindUser(string email)
+        {
+            List<User> users = this.ListUsers();
+            foreach (var user in users)
+            {
+                if (user.Email == email)
+                {
+                    return user;
+                }
+            }
+
+            throw new SystemException("not found");
+        }
+
+        public User GetUser(string userId)
+        {
+            string resp = this.GetResource(string.Format("{0}/{1}", Api.PathUsers, userId));
+            return Json<GetUserResponse>.Deserialize(resp).User;
+        }
+
+        public List<User> ListUsers()
+        {
+            string resp = this.ListCollections(Api.PathUsers);
+            return Json<ListUsersResponse>.Deserialize(resp).Users;
+        }
+
+        public DeleteUserResponse DeleteUser(string id)
+        {
+            string resp = this.rest.Delete(this.MakeUrl(string.Format("{0}/{1}", Api.PathUsers, id)));
+            return Json<DeleteUserResponse>.Deserialize(resp);
+        }
+
+        public User DisableUser(string id)
+        {
+            return this.UpdateUser(id, UserStatus.InActive);
+        }
+
+        public User EnableUser(string id)
+        {
+            return this.UpdateUser(id, UserStatus.Active);
+        }
+
+        public string GetTransaction(string id)
+        {
+            return this.GetResource(this.MakeUrl(string.Format("{0}/{1}", Api.PathTransactions, id)), "transaction");
+        }
+
+        public string DeleteTransaction(string id)
+        {
+            return FormatResponse(this.rest.Delete(this.MakeUrl(string.Format("{0}/{1}", Api.PathTransactions, id))));
+        }
+
+        private static string CreateMode(string source, bool overwrite)
+        {
+            if (source != null)
+            {
+                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+            }
+            else
+            {
+                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+            }
+        }
+
+        // Query
+        public TransactionResult Execute(
+            string database,
+            string engine,
+            string source,
+            bool readOnly = false,
+            Dictionary<string, string> inputs = null)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN", readOnly);
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeQueryAction(source, inputs) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Api.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        private static bool IsTerminalState(string state, string targetState)
+        {
+            return state == "FAILED" || state == targetState;
         }
 
         private static string FormatResponse(string response, string key = null)
@@ -207,7 +298,7 @@ namespace RAILib
                 // to return the formatted JSON
                 var json = JObject.Parse(response);
                 JToken result = json;
-                if (key != null  && json.ContainsKey(key))
+                if (key != null && json.ContainsKey(key))
                 {
                     result = json.GetValue(key);
                 }

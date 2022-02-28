@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Lists engines.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 
@@ -34,7 +33,12 @@ namespace RAILib.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.ListEngines(state));
+            List<Engine> engines = api.ListEngines(state);
+            foreach(var engine in engines)
+            {
+                Console.WriteLine(engine.ToString(true));
+            } 
+            
         }
 
     }

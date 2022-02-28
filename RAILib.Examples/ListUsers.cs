@@ -20,7 +20,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Lists Users.";
             cmd.Handler = CommandHandler.Create<string>(Run);
-            
             return cmd;
         }
 
@@ -29,7 +28,11 @@ namespace RAILib.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.ListUsers());
+            List<User> users = api.ListUsers();
+            foreach(var user in users)
+            {
+                Console.WriteLine(user.ToString(true));
+            }
         }
 
     }

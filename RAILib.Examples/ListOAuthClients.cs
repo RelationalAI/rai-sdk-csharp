@@ -20,7 +20,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Lists OAuthClients.";
             cmd.Handler = CommandHandler.Create<string>(Run);
-            
             return cmd;
         }
 

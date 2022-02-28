@@ -24,7 +24,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Gets an engine's details by name.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Deletes an oAuth client by id.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Deletes a user by ID.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

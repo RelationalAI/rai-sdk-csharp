@@ -25,7 +25,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Disables a user by ID.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 

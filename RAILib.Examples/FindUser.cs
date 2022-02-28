@@ -23,7 +23,6 @@ namespace RAILib.Examples
             };
             cmd.Description = "Gets a user's ID by email.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
-            
             return cmd;
         }
 
@@ -33,20 +32,7 @@ namespace RAILib.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            List<object> users = 
-                (List<object>) JsonConvert.DeserializeObject(api.ListUsers(), typeof(List<object>));
-            foreach (var user in users)
-            {
-                if (user.ToString().Contains(email))
-                {
-                    Dictionary<object, object> dict = 
-                        ((Dictionary<object, object>)JsonConvert.DeserializeObject(user.ToString(), typeof(Dictionary<object, object>)));
-                    Console.WriteLine (dict["id"]);
-                    return;
-                }
-            }
-
-            Console.WriteLine("[]");
+            Console.WriteLine(api.FindUser(email));
         }
     }
 }
