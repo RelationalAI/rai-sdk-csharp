@@ -21,7 +21,7 @@ namespace RAILib.Examples
             root.AddCommand(GetEngine.GetCommand());
             root.AddCommand(GetOAuthClient.GetCommand());
             root.AddCommand(GetUser.GetCommand());
-            root.AddCommand(GetUserID.GetCommand());
+            root.AddCommand(FindUser.GetCommand());
             root.AddCommand(EnableUser.GetCommand());
             root.AddCommand(DisableUser.GetCommand());
             root.AddCommand(DeleteUser.GetCommand());

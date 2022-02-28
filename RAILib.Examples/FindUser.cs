@@ -6,11 +6,11 @@ namespace RAILib.Examples
     using System.CommandLine.NamingConventionBinder;
     using Newtonsoft.Json;
     using RAILib;
-    public class GetUserID
+    public class FindUser
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetUserID", "--email <Email> --profile <Profile name>"){
+            var cmd = new Command("FindUser", "--email <Email> --profile <Profile name>"){
                 new Option<string>("--email"){
                     IsRequired = true,
                     Description = "User's email to get the details."
