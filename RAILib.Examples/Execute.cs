@@ -8,11 +8,11 @@ using RAILib;
 
 namespace RAILib.Examples
 {
-    public class RunQuery
+    public class Execute
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("RunQuery", "--database <Database name> --engine <Compute name> --query <Query> --profile <Profile name>"){
+            var cmd = new Command("Execute", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
                 new Option<string>("--database"){
                     IsRequired = true,
                     Description = "Database to run query."
@@ -23,9 +23,9 @@ namespace RAILib.Examples
                     Description = "Compute name of the database."
                 },
 
-                new Option<string>("--query"){
+                new Option<string>("--command"){
                     IsRequired = true,
-                    Description = "Query to run."
+                    Description = "Command to execute."
                 },
 
                 new Option<string>("--profile"){
@@ -38,12 +38,12 @@ namespace RAILib.Examples
             return cmd;
         }
 
-        private static void Run(string database, string engine, string query, string profile = "default")
+        private static void Run(string database, string engine, string command, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Api.Context context = new Api.Context(config);
             Api api = new Api(context);
-            Console.WriteLine(api.Execute(database, engine, query));
+            Console.WriteLine(api.Execute(database, engine, command));
         }
 
     }

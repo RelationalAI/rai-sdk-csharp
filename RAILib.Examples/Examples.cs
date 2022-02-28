@@ -29,7 +29,7 @@ namespace RAILib.Examples
             root.AddCommand(ListEngines.GetCommand());
             root.AddCommand(ListOAuthClients.GetCommand());
             root.AddCommand(ListUsers.GetCommand());
-            root.AddCommand(RunQuery.GetCommand());
+            root.AddCommand(Execute.GetCommand());
             //return the root command
             return root;
         }
