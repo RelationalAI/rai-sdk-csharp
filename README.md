@@ -8,10 +8,21 @@ REST APIs from C#.
 * You can learn more about RelationalAI at <https://relational.ai>
 
 ## Getting started
+Building: 
+    - cd rai-sdk-csharp
+    - dotnet build
+
+Running Examples:
+    - cd rai-sdk-csharp/RelationalAI.Examples
+    - dotnet run ListUsers --profile latest 
+    - dotnet run CreateEngine --engine csharp-sdk-test --profile latest
+    - dotnet run DeleteEngine --engine csharp-sdk-test --profile latest
+
+
 
 ### Requirements
 
-==todo==
+.Net Core 3.1
 
 ### Installing the SDK
 

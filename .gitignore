@@ -1,0 +1,9 @@
+RelationalAI.Test/bin
+RelationalAI.Test/obj
+RelationalAI.Examples/bin
+RelationalAI.Examples/obj
+RelationalAI/bin
+RelationalAI/obj
+launch.json
+tasks.json
+.vscode
