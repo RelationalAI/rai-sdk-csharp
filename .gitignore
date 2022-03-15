@@ -1,9 +1,9 @@
-RAILib.Test/bin
-RAILib.Test/obj
-RAILib.Examples/bin
-RAILib.Examples/obj
-RAILib/bin
-RAILib/obj
+RelationalAI.Test/bin
+RelationalAI.Test/obj
+RelationalAI.Examples/bin
+RelationalAI.Examples/obj
+RelationalAI/bin
+RelationalAI/obj
 launch.json
 tasks.json
 .vscode

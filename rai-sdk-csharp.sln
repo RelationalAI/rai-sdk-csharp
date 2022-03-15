@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAILib", "RAILib\RAILib.csproj", "{E4242EE4-EFF0-4679-A2DA-21C9692C7D47}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RelationalAI", "RelationalAI\RelationalAI.csproj", "{E4242EE4-EFF0-4679-A2DA-21C9692C7D47}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAILib.Examples", "RAILib.Examples\RAILib.Examples.csproj", "{E7E6C065-67C1-49EC-B276-3A5BACDD4D0B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RelationalAI.Examples", "RelationalAI.Examples\RelationalAI.Examples.csproj", "{E7E6C065-67C1-49EC-B276-3A5BACDD4D0B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAILib.Test", "RAILib.Test\RAILib.Test.csproj", "{EC06B6A7-56A0-4A13-A6F0-BABA7EF2A352}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RelationalAI.Test", "RelationalAI.Test\RelationalAI.Test.csproj", "{EC06B6A7-56A0-4A13-A6F0-BABA7EF2A352}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
