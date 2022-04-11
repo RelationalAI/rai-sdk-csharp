@@ -3,16 +3,13 @@ using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 
-using RelationalAI;
-
-
 namespace RelationalAI.Examples
 {
-    public class Execute
+    public class ExecuteAsync
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("Execute", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
+            var cmd = new Command("ExecuteAsync", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
                 new Option<string>("--database"){
                     IsRequired = true,
                     Description = "Database to run query."
@@ -33,7 +30,7 @@ namespace RelationalAI.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Execute a synchronous transaction.";
+            cmd.Description = "Execute an asynchronous transaction.";
             cmd.Handler = CommandHandler.Create<string, string, string, string>(Run);
             return cmd;
         }
@@ -43,7 +40,7 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.Execute(database, engine, command));
+            Console.WriteLine(client.ExecuteAsync(database, engine, command));
         }
 
     }

@@ -124,7 +124,7 @@ namespace RelationalAI
             return result;
         }
 
-        private static DbAction MakeQueryActionInput(string name, string value)
+        public static DbAction MakeQueryActionInput(string name, string value)
         {
             string[,] columns = { { value } };
             var typename = Reltype(value);
