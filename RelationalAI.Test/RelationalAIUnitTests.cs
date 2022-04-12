@@ -9,12 +9,10 @@ namespace RelationalAI.Test
 {
     public class RelationalAIUnitTests : IDisposable
     {
-        //string UUID = Guid.NewGuid().ToString();
-
-        static string UUID = "1";
-        static string dbname = $"csharp-sdk-{UUID}";
-        static string engineName = $"csharp-sdk-{UUID}";
-        static string userEmail = $"csharp-sdk-{UUID}@relational.ai";
+        static string UUID = Guid.NewGuid().ToString();
+        static string Dbname = $"csharp-sdk-{UUID}";
+        static string EngineName = $"csharp-sdk-{UUID}";
+        static string UserEmail = $"csharp-sdk-{UUID}@relational.ai";
         static string OAuthClientName =  $"csharp-sdk-{UUID}";
 
         public void Dispose()
@@ -22,8 +20,8 @@ namespace RelationalAI.Test
             Dictionary<string, object> config = Config.Read("", "default");
             Client.Context ctx = new Client.Context(config);
             Client client = new Client(ctx);
-            try { client.DeleteDatabase(dbname); } catch {}
-            try { client.DeleteEngineWait(engineName); } catch {}
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
 
         [Fact]
@@ -35,7 +33,7 @@ namespace RelationalAI.Test
             List<User> users = client.ListUsers();
             Console.WriteLine(users[0]);
             Console.WriteLine(client.GetUser(users[0].ID));
-            User user = client.CreateUser(userEmail, new List<Role>(){ Role.Admin });
+            User user = client.CreateUser(UserEmail, new List<Role>(){ Role.Admin });
             Console.WriteLine(user);
             Console.WriteLine(client.GetUser(user.ID));
             Console.WriteLine(client.DisableUser(user.ID));
@@ -51,9 +49,9 @@ namespace RelationalAI.Test
             Client client = new Client(ctx);
             //List<Engine> engines = client.ListEngines();
             //Console.WriteLine(engines[0]);
-            Engine engine = client.CreateEngineWait(engineName, EngineSize.XS);
+            Engine engine = client.CreateEngineWait(EngineName, EngineSize.XS);
             Console.WriteLine(client.GetEngine(engine.Name));
-            Console.WriteLine(client.DeleteEngine(engineName));
+            Console.WriteLine(client.DeleteEngine(EngineName));
         }
 
         [Fact]
@@ -79,11 +77,11 @@ namespace RelationalAI.Test
             Client.Context ctx = new Client.Context(config);
             Client client = new Client(ctx);
 
-            client.CreateEngineWait(engineName);
-            client.CreateDatabase(dbname, engineName);
+            client.CreateEngineWait(EngineName);
+            client.CreateDatabase(Dbname, EngineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = client.ExecuteAsyncWait(dbname, engineName, query, true);
+            var rsp = client.ExecuteAsyncWait(Dbname, EngineName, query, true);
 
             JObject expected = new JObject()
             {
