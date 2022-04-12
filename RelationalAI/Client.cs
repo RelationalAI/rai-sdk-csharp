@@ -141,6 +141,18 @@ namespace RelationalAI
             return Json<DeleteEngineResponse>.Deserialize(resp);
         }
 
+        public DeleteEngineResponse DeleteEngineWait(string engine)
+        {
+            var resp = this.DeleteEngine(engine);
+            var status = resp.Status.State;
+            while (!IsTerminalState(status, "DELETED"))
+            {
+                Thread.Sleep(2000);
+                status = this.GetEngine(resp.Status.Name).State;
+            }
+            return resp;
+        }
+
         public OAuthClient CreateOAuthClient(string name, List<Permission> permissions = null)
         {
             HashSet<string> uniquePermissions = new HashSet<string>();
@@ -264,15 +276,34 @@ namespace RelationalAI
             return this.UpdateUser(id, UserStatus.Active);
         }
 
-        public string GetTransaction(string id)
+        public object GetTransaction(string id)
         {
-            return this.GetResource(this.MakeUrl(string.Format("{0}/{1}", Client.PathTransactions, id)), "transaction");
+            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}", Client.PathTransactions, id)));
+            return JsonConvert.DeserializeObject(rsp);
         }
 
+        public object GetTransactionResults(string id)
+        {
+            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/results", Client.PathTransactions, id)));
+            return JsonConvert.DeserializeObject(rsp);
+        }
+
+        public object GetTransactionMetadata(string id)
+        {
+            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id)));
+            return JsonConvert.DeserializeObject(rsp);
+        }
+
+        public object GetTransactionProblems(string id)
+        {
+            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/problems", Client.PathTransactions, id)));
+            return JsonConvert.DeserializeObject(rsp);
+        }
         public string DeleteTransaction(string id)
         {
             return FormatResponse(this.rest.Delete(this.MakeUrl(string.Format("{0}/{1}", Client.PathTransactions, id))));
         }
+
 
         private static string CreateMode(string source, bool overwrite)
         {
@@ -299,6 +330,49 @@ namespace RelationalAI
             var body = tx.Payload(actions);
             var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
             return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        public object ExecuteAsyncWait(
+            string database,
+            string engine,
+            string source,
+            bool readOnly = false,
+            Dictionary<string, string> inputs = null)
+        {
+            var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
+
+            var id = rsp.GetType().Equals(typeof(JObject)) ?
+                (rsp as JObject).SelectToken("$.id").ToString() :
+                (rsp as JArray).SelectToken("$.[0].id").ToString();
+
+            var transaction = (GetTransaction(id) as JObject).GetValue("transaction");
+
+            while( !((transaction as JObject).GetValue("state").ToString()).Equals("COMPLETED") )
+            {
+                Thread.Sleep(2000);
+                transaction = (GetTransaction(id) as JObject).GetValue("transaction");
+            }
+
+            var output = new JObject();
+            output.Add("results", GetTransactionResults(id) as JArray);
+            output.Add("metadata", GetTransactionMetadata(id) as JArray);
+            output.Add("problems", GetTransactionProblems(id) as JArray);
+
+            return output;
+        }
+
+        public object ExecuteAsync(
+            string database,
+            string engine,
+            string source,
+            bool readOnly = false,
+            Dictionary<string, string> inputs = null)
+        {
+            var tx = new TransactionAsync(database, engine, readOnly, source, inputs);
+            var body = tx.Payload();
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransactions), body, null, tx.QueryParams());
+
+            return JsonConvert.DeserializeObject(resp);
         }
 
         private static bool IsTerminalState(string state, string targetState)

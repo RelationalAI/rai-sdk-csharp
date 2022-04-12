@@ -15,15 +15,20 @@
  */
 namespace RelationalAI
 {
+    using Apache.Arrow;
+    using Apache.Arrow.Ipc;
+    using HttpMultipartParser;
+    using Microsoft.Data.Analysis;
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using RelationalAI.Credentials;
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.IO;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web;
-    using Newtonsoft.Json;
-    using RelationalAI.Credentials;
-
     public class Rest
     {
         private Rest.Context context;
@@ -251,13 +256,81 @@ namespace RelationalAI
                 // Get the result back or throws an exception.
                 var httpRespTask = client.SendAsync(request);
                 httpRespTask.Wait();
-                var resultTask = httpRespTask.Result.Content.ReadAsStringAsync();
+                var resultTask = httpRespTask.Result.Content.ReadAsByteArrayAsync();
+                var contentType = httpRespTask.Result.Content.Headers.ContentType.MediaType;
                 resultTask.Wait();
 
-                return resultTask.Result;
+                if ("application/json".Equals(contentType.ToLower()))
+                {
+                    return System.Text.Encoding.UTF8.GetString(resultTask.Result, 0, resultTask.Result.Length);
+                }
+                else if ("multipart/form-data".Equals(contentType.ToLower()))
+                {
+                    var rsp = ParseMultipartResponse(resultTask.Result);
+                    return JsonConvert.SerializeObject(rsp);
+                }
+                else
+                {
+                    throw new SystemException($"unsupported content-type: {contentType}");
+                }
             }
         }
 
+        public object ParseMultipartResponse(byte[] content)
+        {
+            var result = new JArray();
+
+            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
+
+            foreach (var file in parser.Files)
+            {
+                MemoryStream memoryStream = new MemoryStream();
+                file.Data.CopyTo(memoryStream);
+                byte[] buffer = memoryStream.ToArray();
+
+                if ("application/json".Equals(file.ContentType.ToLower()))
+                {
+                    var rsp = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+                    result.Add(JsonConvert.DeserializeObject(rsp));
+                }
+                else if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
+                {
+                    result.Add(ParseArrowResponse(memoryStream));
+                }
+                else
+                {
+                    throw new SystemException($"unsupported content-type: {file.ContentType}");
+                }
+            }
+
+            return result;
+        }
+
+        public object ParseArrowResponse(MemoryStream memoryStream)
+        {
+            JObject output = new JObject();
+
+            memoryStream.Position = 0;
+            ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
+            RecordBatch recordBatch = reader.ReadNextRecordBatch();
+
+            while (recordBatch != null)
+            {
+                var dataframe = DataFrame.FromArrowRecordBatch(recordBatch);
+                foreach(var col in dataframe.Columns)
+                {
+                    JArray values = new JArray();
+                    for (int i=0; i < col.Length; i++)
+                    {
+                        values.Add(col[i]);
+                    }
+                    output.Add(col.Name, values);
+                }
+                recordBatch = reader.ReadNextRecordBatch();
+            }
+
+            return output;
+        }
         public class Context
         {
             private ICredentials credentials;

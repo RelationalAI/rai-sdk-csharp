@@ -16,6 +16,5 @@
   <ItemGroup>
     <ProjectReference Include="..\RelationalAI\RelationalAI.csproj" />
   </ItemGroup>
-  
 
 </Project>
