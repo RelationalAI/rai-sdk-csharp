@@ -13,14 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace RelationalAI
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class GetUserResponse : Entity
+    public class Edb : Entity
     {
-        [JsonProperty("user", Required = Required.Always)]
-        public User User { get; set; }
+        [JsonProperty("name", Required = Required.Always)]
+        public string name;
+
+        [JsonProperty("keys", Required = Required.Always)]
+        public List<string> keys;
+
+        [JsonProperty("values", Required = Required.Always)]
+        public List<string> values;
     }
 }

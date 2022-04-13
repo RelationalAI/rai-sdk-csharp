@@ -317,6 +317,72 @@ namespace RelationalAI
             }
         }
 
+        public List<Edb> ListEdbs(string database, string engine)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN");
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeListEdbAction() };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).actions;
+            if (actionsResp.Count == 0)
+                return new List<Edb>();
+            return actionsResp[0].result.rels;
+        }
+
+        public TransactionResult LoadModel(
+            string database,
+            string engine,
+            string name,
+            string model)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN", false);
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeInstallAction(name, model) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        public TransactionResult LoadModels(
+            string database,
+            string engine,
+            Dictionary<string,string> models)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN", false);
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeInstallAction(models) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        public List<Model> ListModels(string database, string engine)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN");
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeListModelsAction() };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).actions;
+            if (actionsResp.Count == 0)
+                return new List<Model>();
+            return actionsResp[0].result.models;
+        }
+
+        public List<string> ListModelNames(string database, string engine)
+        {
+            var models = ListModels(database, engine);
+            List<string> result = new List<string>();
+            for (var i = 0; i < models.Count; i ++)
+                result.Add(models[i].name);
+            return result;
+        }
+
+        public Model GetModel(string database, string engine, string name)
+        {
+            var models = ListModels(database, engine);
+            foreach (var model in models)
+                if (model.name.Equals(name))
+                    return model;
+            throw new SystemException($"model {name} not found.");
+        }
         // Query
         public TransactionResult Execute(
             string database,
@@ -373,6 +439,33 @@ namespace RelationalAI
             var resp = this.rest.Post(this.MakeUrl(Client.PathTransactions), body, null, tx.QueryParams());
 
             return JsonConvert.DeserializeObject(resp);
+        }
+
+        public TransactionResult LoadJson(
+            string database,
+            string engine,
+            string relation,
+            string data)
+        {
+            var inputs = new Dictionary<string, string>();
+            inputs.Add("data", data);
+            var source = $@"""
+                def config:data = data
+                def insert:{relation} = load_json[config]
+            """;
+            return Execute(database, engine, source, false, inputs);
+        }
+
+        public Database CloneDatabase(
+            string database,
+            string engine,
+            string source,
+            bool overwrite = false)
+        {
+            var mode = CreateMode(source, overwrite);
+            var tx = new Transaction(this.context.Region, database, engine, mode, false, source);
+            string resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), tx.Payload(null), null, tx.QueryParams());
+            return this.GetDatabase(database);
         }
 
         private static bool IsTerminalState(string state, string targetState)
