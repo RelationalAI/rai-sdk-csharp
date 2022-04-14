@@ -21,12 +21,12 @@ namespace RelationalAI
     public class Edb : Entity
     {
         [JsonProperty("name", Required = Required.Always)]
-        public string name;
+        public string Name;
 
         [JsonProperty("keys", Required = Required.Always)]
-        public List<string> keys;
+        public List<string> Keys;
 
         [JsonProperty("values", Required = Required.Always)]
-        public List<string> values;
+        public List<string> Values;
     }
 }

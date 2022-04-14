@@ -48,7 +48,7 @@ namespace RelationalAI
             return result;
         }
 
-        private static DbAction MakeDeleteModelAction(string name)
+        public static DbAction MakeDeleteModelAction(string name)
         {
             return MakeDeleteModelsAction(new string[] { name });
         }

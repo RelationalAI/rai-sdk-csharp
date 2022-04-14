@@ -43,7 +43,7 @@ namespace RelationalAI.Test
             Assert.Empty(databases);
 
             var edbs = client.ListEdbs(Dbname, EngineName);
-            var edb = edbs.Find( item => item.name.Equals("rel"));
+            var edb = edbs.Find( item => item.Name.Equals("rel"));
             Assert.NotNull(edb);
 
             var modelNames = client.ListModelNames(Dbname, EngineName);
@@ -51,12 +51,12 @@ namespace RelationalAI.Test
             Assert.NotNull(name);
 
             var models = client.ListModels(Dbname, EngineName);
-            var model = models.Find( m => m.name.Equals("stdlib") );
+            var model = models.Find( m => m.Name.Equals("stdlib") );
             Assert.NotNull(model);
 
             model = client.GetModel(Dbname, EngineName, "stdlib");
             Assert.NotNull(model);
-            Assert.True(model.value.Length > 0);
+            Assert.True(model.Value.Length > 0);
 
             var deleteRsp = client.DeleteDatabase(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
@@ -77,7 +77,7 @@ namespace RelationalAI.Test
         public void DatabaseCloneTest()
         {
             Client client = CreateClient();
-            //client.CreateEngineWait(EngineName, size: EngineSize.XS);
+            client.CreateEngineWait(EngineName, size: EngineSize.XS);
 
             Assert.Throws<SystemException>( () => client.DeleteDatabase(Dbname) );
 
@@ -87,7 +87,6 @@ namespace RelationalAI.Test
             Assert.Equal("CREATED", createRsp.State);
 
             // load some data and model
-            // FIXME
             var loadRsp = client.LoadJson(Dbname, EngineName, "test_data", testJson);
             Assert.Equal(false, loadRsp.Aborted);
             Assert.Equal(0, loadRsp.Output.Length);
@@ -138,12 +137,12 @@ namespace RelationalAI.Test
             Assert.NotNull(name);
 
             var models = client.ListModels(databaseCloneName, EngineName);
-            var model = models.Find( m => m.name.Equals("test_model") );
+            var model = models.Find( m => m.Name.Equals("test_model") );
             Assert.NotNull(model);
 
             model = client.GetModel(databaseCloneName, EngineName, "test_model");
             Assert.NotNull(model);
-            Assert.True(model.value.Length > 0);
+            Assert.True(model.Value.Length > 0);
 
             // cleanup
             var deleteRsp = client.DeleteDatabase(databaseCloneName);
