@@ -32,11 +32,9 @@ namespace RelationalAI.Test
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.Null(engine);
 
-            client.DeleteEngineWait(EngineName);
+            Assert.Throws<SystemException>( () => client.DeleteEngineWait(EngineName) );
 
-            var rsp = client.GetEngine(EngineName);
-            Assert.Equal(rsp.Name, EngineName);
-            Assert.Equal("DELETED", rsp.State);
+            Assert.Throws<SystemException>( () => client.GetEngine(EngineName) );
 
             engines = client.ListEngines();
             engine = engines.Find( item => item.Name.Equals(EngineName) );
