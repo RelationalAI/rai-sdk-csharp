@@ -1,3 +1,10 @@
+# General
+
+| Workflow | Status |
+| --------------------------- | ---------------------------------------------------------------------- |
+| Continuous Integration (CI) | ![build](https://github.com/RelationalAI/rai-sdk-csharp/actions/workflows/dotnet-build.yaml/badge.svg) |
+| Publish to Nuget | ![publish](https://github.com/RelationalAI/rai-sdk-csharp/actions/workflows/dotnet-build.yaml/badge.svg) |
+
 # The RelationalAI Software Development Kit for C#
 
 The RelationalAI (RAI) SDK for C# enables developers to access the RAI
