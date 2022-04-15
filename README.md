@@ -15,17 +15,19 @@ REST APIs from C#.
 * You can learn more about RelationalAI at <https://relational.ai>
 
 ## Getting started
-Building: 
-    - cd rai-sdk-csharp
-    - dotnet build
+Building:
+```shell
+cd rai-sdk-csharp
+dotnet build
+```
 
 Running Examples:
-    - cd rai-sdk-csharp/RelationalAI.Examples
-    - dotnet run ListUsers --profile latest 
-    - dotnet run CreateEngine --engine csharp-sdk-test --profile latest
-    - dotnet run DeleteEngine --engine csharp-sdk-test --profile latest
-
-
+```shell
+cd rai-sdk-csharp/RelationalAI.Examples
+dotnet run ListUsers --profile latest
+dotnet run CreateEngine --engine csharp-sdk-test --profile latest
+dotnet run DeleteEngine --engine csharp-sdk-test --profile latest
+```
 
 ### Requirements
 
@@ -33,7 +35,9 @@ Running Examples:
 
 ### Installing the SDK
 
-==todo==
+```shell
+dotnet build
+```
 
 ### Create a configuration file
 
@@ -56,7 +60,10 @@ Client credentials can be created using the RAI console at https://console.relat
 
 ## Examples
 
-==todo==
+shell```
+cd rai-sdk-csharp/RelationalAI.Examples
+dotnet run ListUsers --profile latest
+```
 
 ## Support
 
