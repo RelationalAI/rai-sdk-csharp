@@ -60,7 +60,7 @@ Client credentials can be created using the RAI console at https://console.relat
 
 ## Examples
 
-shell```
+```shell
 cd rai-sdk-csharp/RelationalAI.Examples
 dotnet run ListUsers --profile latest
 ```
