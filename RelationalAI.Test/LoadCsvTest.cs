@@ -6,6 +6,9 @@ namespace RelationalAI.Test
 {
     public class LoadCsvTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         string sample = "" +
             "cocktail,quantity,price,date\n" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
@@ -305,6 +308,14 @@ namespace RelationalAI.Test
             );
             Assert.Equal(1, rel.RelKey.Values.Length);
             Assert.Equal("String", rel.RelKey.Values[0]);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

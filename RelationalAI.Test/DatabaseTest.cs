@@ -8,6 +8,9 @@ namespace RelationalAI.Test
 {
     public class DatabaseTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         [Fact]
         public void DatabaseTest()
         {
@@ -147,6 +150,14 @@ namespace RelationalAI.Test
             // cleanup
             var deleteRsp = client.DeleteDatabase(databaseCloneName);
             Assert.Equal(databaseCloneName, deleteRsp.Name);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

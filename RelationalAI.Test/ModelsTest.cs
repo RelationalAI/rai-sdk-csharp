@@ -5,6 +5,9 @@ namespace RelationalAI.Test
 {
     public class ModelsTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         string testModel = "def R = \"hello\", \"world\"";
 
         [Fact]
@@ -44,6 +47,14 @@ namespace RelationalAI.Test
             models = client.ListModels(Dbname, EngineName);
             model = models.Find( item => item.Name.Equals("test_model") );
             Assert.Null(model);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

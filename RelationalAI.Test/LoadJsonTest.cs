@@ -5,6 +5,9 @@ namespace RelationalAI.Test
 {
     public class LoadJsonTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         string sample = "{" +
             "\"name\":\"Amira\",\n" +
             "\"age\":32,\n" +
@@ -47,6 +50,14 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(new object [][] { new object [] { 1L, 2L }, new object [] { "dog", "rabbit" } }, rel.Columns);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

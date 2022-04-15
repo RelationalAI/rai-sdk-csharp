@@ -556,7 +556,6 @@ namespace RelationalAI
             builder.Append("\n def config:data = data\n");
             builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
 
-            Console.WriteLine(builder.ToString());
             return builder.ToString();
         }
         public TransactionResult LoadCsv(

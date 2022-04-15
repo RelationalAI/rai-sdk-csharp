@@ -6,6 +6,8 @@ namespace RelationalAI.Test
 {
     public class EngineTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string EngineName = $"csharp-sdk-{UUID}";
 
         [Fact]
         public void EnginetTest()
@@ -39,6 +41,13 @@ namespace RelationalAI.Test
             engines = client.ListEngines();
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.Equal(engine.State, "DELETED");
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

@@ -5,6 +5,10 @@ namespace RelationalAI.Test
 {
     public class ExecuteTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
+
         [Fact]
         public void ExecuteATest()
         {
@@ -35,6 +39,14 @@ namespace RelationalAI.Test
             };
 
             Assert.Equal(expected, columns);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

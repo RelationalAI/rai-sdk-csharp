@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 using Newtonsoft.Json.Linq;
 
@@ -5,6 +6,9 @@ namespace RelationalAI.Test
 {
     public class ExecuteAsyncTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         [Fact]
         public void ExecuteAsyncTest()
         {
@@ -49,6 +53,14 @@ namespace RelationalAI.Test
             };
 
             Assert.Equal(rsp, expected);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteDatabase(Dbname); } catch {}
+            try { client.DeleteEngineWait(EngineName); } catch {}
         }
     }
 }

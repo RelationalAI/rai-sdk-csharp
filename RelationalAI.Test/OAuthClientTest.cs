@@ -5,6 +5,8 @@ namespace RelationalAI.Test
 {
     public class OAuthClientTests : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string OAuthClientName = $"csharp-sdk-{UUID}";
         [Fact]
         public void OAuthClientTest()
         {
@@ -35,6 +37,13 @@ namespace RelationalAI.Test
             Assert.Equal(clientId, deleteRsp.ID);
 
             Assert.Throws<SystemException>( () => client.FindOAuthClient(OAuthClientName) );
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteOAuthClient(client.FindOAuthClient(OAuthClientName).ID); } catch {}
         }
     }
 }

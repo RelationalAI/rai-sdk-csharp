@@ -6,6 +6,8 @@ namespace RelationalAI.Test
 {
     public class UserTest : UnitTest
     {
+        public static string UUID = Guid.NewGuid().ToString();
+        public static string UserEmail = $"csharp-sdk-{UUID}@relational.ai";
         [Fact]
         public void TestUser()
         {
@@ -55,6 +57,13 @@ namespace RelationalAI.Test
             // cleanup
             var deleteRsp = client.DeleteUser(userId);
             Assert.Equal(userId, rsp.ID);
+        }
+
+        public override void Dispose()
+        {
+            var client = CreateClient();
+
+            try { client.DeleteUser(client.FindUser(UserEmail).ID); } catch {}
         }
     }
 }
