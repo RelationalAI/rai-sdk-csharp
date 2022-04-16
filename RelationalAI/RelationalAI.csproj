@@ -1,7 +1,21 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
+    <Version>0.0.1-alpha</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <PackageId>RAI</PackageId>
+    <Authors>RelationalAI</Authors>
+    <Company>RelationalAI</Company>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <RepositoryUrl>https://github.com/RelationalAI/rai-sdk-csharp</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/RelationalAI/rai-sdk-csharp</PackageProjectUrl>
+    <Description>
+        This is the RelationalAI C# client SDK and you can use it to connect to the RelationalAI infrastructure.
+    </Description>
   </PropertyGroup>
 
   <ItemGroup>
