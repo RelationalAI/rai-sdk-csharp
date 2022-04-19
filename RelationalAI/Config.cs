@@ -25,12 +25,23 @@ namespace RelationalAI
     
     public class Config
     {
-        private static readonly FileIniDataParser parser = new FileIniDataParser();
-
         public static Dictionary<string, object> Read(string path = null, string profile = "default")
         {
             IniData data = Config.LoadIniConfig(path);
 
+            return ReadConfigFromInitData(data, profile);
+        }
+
+        public static Dictionary<string, object> Read(MemoryStream stream, string profile = "default")
+        {
+            FileIniDataParser parser = new FileIniDataParser();
+            IniData data = parser.ReadData(new StreamReader(stream));
+
+            return ReadConfigFromInitData(data, profile);
+        }
+
+        private static Dictionary<string, object> ReadConfigFromInitData(IniData data, string profile)
+        {
             string[] keys = { "host", "port", "scheme", "region" };
             Dictionary<string, object> config = new Dictionary<string, object>();
             foreach (string key in keys)
@@ -60,7 +71,7 @@ namespace RelationalAI
             return null;
         }
 
-        private static string GetRAIConfigPath()
+        public static string GetRAIConfigPath()
         {
             return Path.Combine(GetRAIDir(), "config");
         }
@@ -80,6 +91,8 @@ namespace RelationalAI
 
         private static IniData LoadIniConfig(string path)
         {
+            FileIniDataParser parser = new FileIniDataParser();
+
             path = !string.IsNullOrEmpty(path) ? path : Config.GetRAIConfigPath();
             if (!File.Exists(path))
             {

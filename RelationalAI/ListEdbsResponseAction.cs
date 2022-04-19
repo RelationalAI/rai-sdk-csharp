@@ -16,11 +16,12 @@
 
 namespace RelationalAI
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class GetUserResponse : Entity
+    public class ListEdbsResponseAction : Entity
     {
-        [JsonProperty("user", Required = Required.Always)]
-        public User User { get; set; }
+        [JsonProperty("result", Required = Required.Always)]
+        public ListEdbsResponseResult result { get; set; }
     }
 }

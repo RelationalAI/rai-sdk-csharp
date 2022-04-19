@@ -1,3 +1,10 @@
+# General
+
+| Workflow | Status |
+| --------------------------- | ---------------------------------------------------------------------- |
+| Continuous Integration (CI) | ![build](https://github.com/RelationalAI/rai-sdk-csharp/actions/workflows/dotnet-build.yaml/badge.svg) |
+| Publish to Nuget | ![publish](https://github.com/RelationalAI/rai-sdk-csharp/actions/workflows/nuget-pack.yaml/badge.svg) |
+
 # The RelationalAI Software Development Kit for C#
 
 The RelationalAI (RAI) SDK for C# enables developers to access the RAI
@@ -8,17 +15,19 @@ REST APIs from C#.
 * You can learn more about RelationalAI at <https://relational.ai>
 
 ## Getting started
-Building: 
-    - cd rai-sdk-csharp
-    - dotnet build
+Building:
+```shell
+cd rai-sdk-csharp
+dotnet build
+```
 
 Running Examples:
-    - cd rai-sdk-csharp/RelationalAI.Examples
-    - dotnet run ListUsers --profile latest 
-    - dotnet run CreateEngine --engine csharp-sdk-test --profile latest
-    - dotnet run DeleteEngine --engine csharp-sdk-test --profile latest
-
-
+```shell
+cd rai-sdk-csharp/RelationalAI.Examples
+dotnet run ListUsers --profile latest
+dotnet run CreateEngine --engine csharp-sdk-test --profile latest
+dotnet run DeleteEngine --engine csharp-sdk-test --profile latest
+```
 
 ### Requirements
 
@@ -26,7 +35,9 @@ Running Examples:
 
 ### Installing the SDK
 
-==todo==
+```shell
+dotnet build
+```
 
 ### Create a configuration file
 
@@ -49,7 +60,10 @@ Client credentials can be created using the RAI console at https://console.relat
 
 ## Examples
 
-==todo==
+```shell
+cd rai-sdk-csharp/RelationalAI.Examples
+dotnet run ListUsers --profile latest
+```
 
 ## Support
 

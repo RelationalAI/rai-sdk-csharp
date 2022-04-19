@@ -48,7 +48,7 @@ namespace RelationalAI
             return result;
         }
 
-        private static DbAction MakeDeleteModelAction(string name)
+        public static DbAction MakeDeleteModelAction(string name)
         {
             return MakeDeleteModelsAction(new string[] { name });
         }
@@ -61,7 +61,7 @@ namespace RelationalAI
         }
 
         // Return a DbAction for installing the single named model. 
-        private static DbAction MakeInstallAction(string name, string model)
+        public static DbAction MakeInstallAction(string name, string model)
         {
             var result = new DbAction("InstallAction");
             result.Add("sources", new DbAction[] { MakeQuerySource(name, model) });
@@ -69,7 +69,7 @@ namespace RelationalAI
         }
 
         // Return a DbAction for isntalling the set of name => model pairs.
-        private static DbAction MakeInstallAction(Dictionary<string, string> models)
+        public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
             int i = 0;
             var size = models.Count;
@@ -83,12 +83,12 @@ namespace RelationalAI
             return result;
         }
 
-        private static DbAction MakeListModelsAction()
+        public static DbAction MakeListModelsAction()
         {
             return new DbAction("ListSourceAction");
         }
 
-        private static DbAction MakeListEdbAction()
+        public static DbAction MakeListEdbAction()
         {
             return new DbAction("ListEdbAction");
         }

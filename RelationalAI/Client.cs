@@ -16,6 +16,7 @@
 namespace RelationalAI
 {
     using System;
+    using System.Text;
     using System.Collections.Generic;
     using System.Threading;
     using Newtonsoft.Json;
@@ -317,6 +318,82 @@ namespace RelationalAI
             }
         }
 
+        public List<Edb> ListEdbs(string database, string engine)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN");
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeListEdbAction() };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).actions;
+            if (actionsResp.Count == 0)
+                return new List<Edb>();
+            return actionsResp[0].result.rels;
+        }
+
+        public TransactionResult LoadModel(
+            string database,
+            string engine,
+            string name,
+            string model)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN", false);
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeInstallAction(name, model) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        public TransactionResult LoadModels(
+            string database,
+            string engine,
+            Dictionary<string,string> models)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN", false);
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeInstallAction(models) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
+        public List<Model> ListModels(string database, string engine)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN");
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeListModelsAction() };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).actions;
+            if (actionsResp.Count == 0)
+                return new List<Model>();
+            return actionsResp[0].result.models;
+        }
+
+        public List<string> ListModelNames(string database, string engine)
+        {
+            var models = ListModels(database, engine);
+            List<string> result = new List<string>();
+            for (var i = 0; i < models.Count; i ++)
+                result.Add(models[i].Name);
+            return result;
+        }
+
+        public Model GetModel(string database, string engine, string name)
+        {
+            var models = ListModels(database, engine);
+            foreach (var model in models)
+                if (model.Name.Equals(name))
+                    return model;
+            throw new SystemException($"model {name} not found.");
+        }
+
+        public TransactionResult DeleteModel(string database, string engine, string name)
+        {
+            var tx = new Transaction(this.context.Region, database, engine, "OPEN");
+            List<DbAction> actions = new List<DbAction>() { DbAction.MakeDeleteModelAction(name) };
+            var body = tx.Payload(actions);
+            var resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams());
+            return Json<TransactionResult>.Deserialize(resp);
+        }
+
         // Query
         public TransactionResult Execute(
             string database,
@@ -373,6 +450,137 @@ namespace RelationalAI
             var resp = this.rest.Post(this.MakeUrl(Client.PathTransactions), body, null, tx.QueryParams());
 
             return JsonConvert.DeserializeObject(resp);
+        }
+
+        private string GenLoadJson(string relation)
+        {
+            var builder = new StringBuilder();
+            builder.Append("\ndef config:data = data\n");
+            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
+            return builder.ToString();
+        }
+        public TransactionResult LoadJson(
+            string database,
+            string engine,
+            string relation,
+            string data)
+        {
+            var inputs = new Dictionary<string, string>();
+            inputs.Add("data", data);
+            var source = GenLoadJson(relation);
+            return Execute(database, engine, source, false, inputs);
+        }
+
+        private void GenSchemaConfig(StringBuilder builder, CsvOptions options)
+        {
+            if (options == null)
+                return;
+            var schema = options.Schema;
+
+            if (schema == null)
+                return;
+
+            var isEmpty = true;
+
+            foreach(var entry in schema)
+                isEmpty = false;
+
+            if (isEmpty)
+                return;
+
+            var count = 0;
+            builder.Append("def config:schema =");
+            foreach (var entry in schema)
+            {
+                if (count > 0)
+                    builder.Append(';');
+                builder.AppendFormat("\n    :{0}, \"{1}\"", entry.Key, entry.Value);
+                count ++;
+            }
+
+            builder.Append('\n');
+        }
+
+        private string GenLiteral(Int32 value)
+        {
+            return value.ToString();
+        }
+
+        private string GenLiteral(char value)
+        {
+            if (value == '\'')
+                return "'\\''";
+            return $"'{value}'";
+        }
+        private string GenLiteral(object value)
+        {
+            if (value == null)
+                throw new SystemException("Cannot generate literal from null value");
+
+            if (
+                value is int
+                || value is Int16
+                || value is Int32
+                || value is Int64
+            )
+                return GenLiteral(Convert.ToInt32(value));
+
+            if (value is char)
+                return GenLiteral(Convert.ToChar(value));
+
+            throw new SystemException($"Cannot generate type from {value.GetType()} value");
+        }
+        private void GenSyntaxOption(StringBuilder builder, string name, object value)
+        {
+            if (value == null)
+                return;
+
+            var lit = GenLiteral(value);
+            var def = $"def config:syntax:{name} = {lit}\n";
+            builder.Append(def);
+        }
+        private void GenSyntaxConfig(StringBuilder builder, CsvOptions options)
+        {
+            if (options == null)
+                return;
+            GenSyntaxOption(builder, "header_row", options.HeaderRow);
+            GenSyntaxOption(builder, "delim", options.Delim);
+            GenSyntaxOption(builder, "escapechar", options.EscapeChar);
+            GenSyntaxOption(builder, "quotechar", options.QuoteChar);
+        }
+        private string GenLoadCsv(string relation, CsvOptions options)
+        {
+            var builder = new StringBuilder();
+            GenSchemaConfig(builder, options);
+            GenSyntaxConfig(builder, options);
+            builder.Append("\n def config:data = data\n");
+            builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
+
+            return builder.ToString();
+        }
+        public TransactionResult LoadCsv(
+            string database,
+            string engine,
+            string relation,
+            string data,
+            CsvOptions options = null)
+        {
+            var source = GenLoadCsv(relation, options);
+            var inputs = new Dictionary<string, string>();
+            inputs.Add("data", data);
+            return Execute(database, engine, source, false, inputs);
+        }
+
+        public Database CloneDatabase(
+            string database,
+            string engine,
+            string source,
+            bool overwrite = false)
+        {
+            var mode = CreateMode(source, overwrite);
+            var tx = new Transaction(this.context.Region, database, engine, mode, false, source);
+            string resp = this.rest.Post(this.MakeUrl(Client.PathTransaction), tx.Payload(null), null, tx.QueryParams());
+            return this.GetDatabase(database);
         }
 
         private static bool IsTerminalState(string state, string targetState)
