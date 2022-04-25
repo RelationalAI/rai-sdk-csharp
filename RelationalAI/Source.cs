@@ -17,18 +17,16 @@ namespace RelationalAI
 {
     using Newtonsoft.Json;
 
-    public class TransactionAsyncCompactResponse : Entity
+    public class Source : Entity
     {
-        [JsonProperty("id", Required = Required.Always)]
-        public string ID { get; set; }
+        [JsonProperty("rel_key", Required = Required.Always)]
+        public RelKey RelKey { get; set; }
 
-        [JsonProperty("state", Required = Required.Always)]
-        public string State { get; set; }
+        [JsonProperty("source", Required = Required.Always)]
+        public string Src { get; set; }
 
-        public TransactionAsyncCompactResponse(string id, string state)
-        {
-            this.ID = id;
-            this.State = state;
-        }
+        [JsonProperty("type", Required = Required.Always)]
+        public string Type { get; set; }
+
     }
 }

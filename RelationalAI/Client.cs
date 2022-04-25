@@ -72,6 +72,7 @@ namespace RelationalAI
             {
                 parameters.Add("state", state);
             }
+
             string resp = this.ListCollections(Client.PathDatabae, null, parameters);
             return Json<ListDatabasesResponse>.Deserialize(resp).Databases;
         }
@@ -106,6 +107,7 @@ namespace RelationalAI
                 Thread.Sleep(2000);
                 resp = this.GetEngine(resp.Name);
             }
+
             return resp;
         }
 
@@ -128,6 +130,7 @@ namespace RelationalAI
             {
                 parameters.Add("state", state);
             }
+
             string resp = this.ListCollections(Client.PathEngine, null, parameters);
             return Json<ListEnginesResponse>.Deserialize(resp).Engines;
         }
@@ -298,20 +301,35 @@ namespace RelationalAI
         public List<TransactionMetadataResponse> GetTransactionMetadata(string id)
         {
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id))) as string;
-            return JsonConvert.DeserializeObject<List<TransactionMetadataResponse>>(rsp);
+            return Json<List<TransactionMetadataResponse>>.Deserialize(rsp);
         }
 
-        public object GetTransactionProblems(string id)
+        public List<object> GetTransactionProblems(string id)
         {
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/problems", Client.PathTransactions, id))) as string;
-            return JsonConvert.DeserializeObject(rsp);
+            var output = new List<object>();
+
+            var problems = JsonConvert.DeserializeObject(rsp);
+            foreach(var problem in problems as JArray)
+            {
+                var data = JsonConvert.SerializeObject(problem);
+                try
+                {
+                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
+                }
+                catch
+                {
+                    output.Add(Json<ClientProblem>.Deserialize(data));
+                }
+            }
+
+            return output;
         }
 
         public string DeleteTransaction(string id)
         {
             return FormatResponse(this.rest.Delete(this.MakeUrl(string.Format("{0}/{1}", Client.PathTransactions, id))) as string);
         }
-
 
         private static string CreateMode(string source, bool overwrite)
         {
@@ -378,7 +396,7 @@ namespace RelationalAI
         {
             var models = ListModels(database, engine);
             List<string> result = new List<string>();
-            for (var i = 0; i < models.Count; i ++)
+            for (var i = 0; i < models.Count; i++)
                 result.Add(models[i].Name);
             return result;
         }
@@ -460,7 +478,7 @@ namespace RelationalAI
 
             if (rsp is string)
             {
-                var txn = JsonConvert.DeserializeObject<TransactionAsyncCompactResponse>(rsp as string);
+                var txn = Json<TransactionAsyncCompactResponse>.Deserialize(rsp as string);
                 return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionMetadataResponse>(), new List<object>());
             }
 
@@ -478,19 +496,19 @@ namespace RelationalAI
             {
                 throw new SystemException("transaction part not found");
             }
-            transactionResult = JsonConvert.DeserializeObject<TransactionAsyncCompactResponse>(this.rest.readJson(transaction.Data));
+            transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.readJson(transaction.Data));
 
             List<TransactionMetadataResponse> metadataResult = null;
             if (metadata == null)
             {
                 throw new SystemException("metadata part not found");
             }
-            metadataResult = JsonConvert.DeserializeObject<List<TransactionMetadataResponse>>(this.rest.readJson(metadata.Data));
+            metadataResult = Json<List<TransactionMetadataResponse>>.Deserialize(this.rest.readJson(metadata.Data));
 
             object problemsResult = null;
             if (problems != null)
             {
-                problemsResult = JsonConvert.DeserializeObject(this.rest.readJson(problems.Data));
+                problemsResult = Json<ClientProblem>.Deserialize(this.rest.readJson(problems.Data));
             }
 
             var results = this.rest.readArrowFiles(files);
@@ -548,7 +566,7 @@ namespace RelationalAI
                 if (count > 0)
                     builder.Append(';');
                 builder.AppendFormat("\n    :{0}, \"{1}\"", entry.Key, entry.Value);
-                count ++;
+                count++;
             }
 
             builder.Append('\n');

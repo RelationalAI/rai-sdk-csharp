@@ -15,20 +15,16 @@
  */
 namespace RelationalAI
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class TransactionAsyncCompactResponse : Entity
+    public class IntegrityConstraintViolation : Entity
     {
-        [JsonProperty("id", Required = Required.Always)]
-        public string ID { get; set; }
+        [JsonProperty("type", Required = Required.Always)]
+        public string Type { get; set; }
 
-        [JsonProperty("state", Required = Required.Always)]
-        public string State { get; set; }
+        [JsonProperty("sources", Required = Required.Always)]
+        public List<Source> Sources { get; set; }
 
-        public TransactionAsyncCompactResponse(string id, string state)
-        {
-            this.ID = id;
-            this.State = state;
-        }
     }
 }

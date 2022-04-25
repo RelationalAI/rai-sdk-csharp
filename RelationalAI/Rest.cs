@@ -330,8 +330,6 @@ namespace RelationalAI
         {
             private ICredentials credentials;
             private string region;
-            private string service = "transaction";
-
             public Context(string region = null, ICredentials credentials = null)
             {
                 this.Region = region;
