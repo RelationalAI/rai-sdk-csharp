@@ -307,6 +307,11 @@ namespace RelationalAI
         public List<object> GetTransactionProblems(string id)
         {
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/problems", Client.PathTransactions, id))) as string;
+            return ParseProblemsResult(rsp);
+        }
+
+        private List<object> ParseProblemsResult(string rsp)
+        {
             var output = new List<object>();
 
             var problems = JsonConvert.DeserializeObject(rsp);
@@ -505,10 +510,11 @@ namespace RelationalAI
             }
             metadataResult = Json<List<TransactionMetadataResponse>>.Deserialize(this.rest.readJson(metadata.Data));
 
-            object problemsResult = null;
+            List<object> problemsResult = null;
             if (problems != null)
             {
-                problemsResult = Json<ClientProblem>.Deserialize(this.rest.readJson(problems.Data));
+                
+                problemsResult = ParseProblemsResult(this.rest.readJson(problems.Data));
             }
 
             var results = this.rest.readArrowFiles(files);
