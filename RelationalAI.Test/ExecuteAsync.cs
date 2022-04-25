@@ -8,8 +8,8 @@ namespace RelationalAI.Test
     public class ExecuteAsyncTests : UnitTest
     {
         public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-${UUID}";
-        public static string EngineName = $"csharp-sdk-${UUID}";
+        public static string Dbname = $"csharp-sdk-{UUID}";
+        public static string EngineName = $"csharp-sdk-{UUID}";
         [Fact]
         public void ExecuteAsyncTest()
         {
