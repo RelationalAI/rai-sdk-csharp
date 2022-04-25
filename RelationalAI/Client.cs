@@ -322,7 +322,7 @@ namespace RelationalAI
                 {
                     output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
                 }
-                catch
+                catch (SystemException)
                 {
                     output.Add(Json<ClientProblem>.Deserialize(data));
                 }
