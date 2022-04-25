@@ -1,14 +1,15 @@
 using System;
 using Xunit;
 using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace RelationalAI.Test
 {
     public class ExecuteAsyncTests : UnitTest
     {
         public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
+        public static string Dbname = $"csharp-sdk-${UUID}";
+        public static string EngineName = $"csharp-sdk-${UUID}";
         [Fact]
         public void ExecuteAsyncTest()
         {
@@ -20,39 +21,24 @@ namespace RelationalAI.Test
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = client.ExecuteAsyncWait(Dbname, EngineName, query, true);
 
-            JObject expected = new JObject()
+            var results = new List<ArrowRelation>
             {
-                {
-                    "results",
-                    new JArray()
-                    {
-                        new JObject()
-                        {
-                            {"v1", new JArray() {1, 2, 3, 4, 5} },
-                            {"v2", new JArray() {1, 4, 9, 16, 25} },
-                            {"v3", new JArray() {1, 8, 27, 64, 125} },
-                            {"v4", new JArray() {1, 16, 81, 256, 625} }
-                        }
-                    }
-                },
-                {
-                    "metadata",
-                    new JArray()
-                    {
-                        new JObject()
-                        {
-                            {"relationId", "/:output/Int64/Int64/Int64/Int64"},
-                            {"types", new JArray() {":output", "Int64", "Int64", "Int64", "Int64"} }
-                        }
-                    }
-                },
-                {
-                    "problems",
-                    new JArray()
-                }
+                new ArrowRelation("v1", new List<object> {1L, 2L, 3L, 4L, 5L} ),
+                new ArrowRelation("v2", new List<object> {1L, 4L, 9L, 16L, 25L} ),
+                new ArrowRelation("v3", new List<object> {1L, 8L, 27L, 64L, 125L} ),
+                new ArrowRelation("v4", new List<object> {1L, 16L, 81L, 256L, 625L} )
             };
 
-            Assert.Equal(rsp, expected);
+            var metadata = new List<TransactionMetadataResponse>
+            {
+                new TransactionMetadataResponse("/:output/Int64/Int64/Int64/Int64", new List<string> {":output", "Int64", "Int64", "Int64", "Int64"})
+            };
+
+            var problems = new JArray();
+
+            Assert.Equal(rsp.Results, results);
+            Assert.Equal(rsp.Metadata, metadata);
+            Assert.Equal(rsp.Problems, problems);
         }
 
         public override void Dispose()

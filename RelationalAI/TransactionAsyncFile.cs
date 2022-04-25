@@ -14,28 +14,28 @@
  * limitations under the License.
  */
 
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System;
-    using Newtonsoft.Json;
-    
-    public class Json<T>
+    public class TransactionAsyncFile
     {
-        public static T Deserialize(string data, string key = null)
-        {
-            if (string.IsNullOrEmpty(data) || data == "[]")
-            {
-                throw new SystemException("404 not found");
-            }
+        public string Name { get; set; }
+        public byte[] Data { get; set; }
+        public string Filename { get; set; }
+        public string ContentType { get; set; }
 
-            try
-            {
-                return JsonConvert.DeserializeObject<T>(data);
-            }
-            catch
-            {
-                throw new SystemException(data);
-            }
+        public TransactionAsyncFile(string name, byte[] data, string filename, string contentType)
+        {
+            this.Name = name;
+            this.Data = data;
+            this.Filename = filename;
+            this.ContentType = contentType;
+        }
+
+        public override string ToString()
+        {
+            return JsonConvert.SerializeObject(this);
         }
     }
 }

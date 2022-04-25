@@ -13,29 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 namespace RelationalAI
 {
-    using System;
     using Newtonsoft.Json;
-    
-    public class Json<T>
-    {
-        public static T Deserialize(string data, string key = null)
-        {
-            if (string.IsNullOrEmpty(data) || data == "[]")
-            {
-                throw new SystemException("404 not found");
-            }
 
-            try
-            {
-                return JsonConvert.DeserializeObject<T>(data);
-            }
-            catch
-            {
-                throw new SystemException(data);
-            }
-        }
+    public class TransactionAsyncSingleResponse : Entity
+    {
+
+        [JsonProperty("transaction", Required = Required.Always)]
+        public TransactionAsyncResponse Transaction { get; set; }
     }
 }

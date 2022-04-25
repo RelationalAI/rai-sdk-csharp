@@ -20,7 +20,6 @@ namespace RelationalAI
     using HttpMultipartParser;
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
     using RelationalAI.Credentials;
     using System;
     using System.Collections.Generic;
@@ -49,7 +48,7 @@ namespace RelationalAI
                 string.Format("{0}={1}", HttpUtility.UrlEncode(kvp.Key), HttpUtility.UrlEncode(kvp.Value))));
         }
 
-        public string Delete(
+        public object Delete(
             string url,
             object data = null,
             Dictionary<string, string> headers = null,
@@ -58,7 +57,7 @@ namespace RelationalAI
             return this.Request("DELETE", url, data, headers, parameters);
         }
 
-        public string Get(
+        public object Get(
         string url,
         object data = null,
         Dictionary<string, string> headers = null,
@@ -67,7 +66,7 @@ namespace RelationalAI
             return this.Request("GET", url, data, headers, parameters);
         }
 
-        public string Patch(
+        public object Patch(
         string url,
         object data = null, 
         Dictionary<string, string> headers = null,
@@ -76,7 +75,7 @@ namespace RelationalAI
             return this.Request("PATCH", url, data, headers, parameters);
         }
 
-        public string Post(
+        public object Post(
         string url,
         object data = null, 
         Dictionary<string, string> headers = null,
@@ -85,7 +84,7 @@ namespace RelationalAI
             return this.Request("POST", url, data, headers, parameters);
         }
 
-        public string Put(
+        public object Put(
         string url,
         object data = null, 
         Dictionary<string, string> headers = null,
@@ -94,7 +93,7 @@ namespace RelationalAI
             return this.Request("PUT", url, data, headers, parameters);
         }
 
-        public string Request(
+        public object Request(
             string method,
             string url,
             object data = null,
@@ -153,8 +152,7 @@ namespace RelationalAI
 
         private string GetUserAgent()
         {
-            // TODO: add version here
-            return "rai-sdk-csharp";
+            return $"rai-sdk-csharp/{SdkProperties.Version}";
         }
 
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
@@ -232,14 +230,14 @@ namespace RelationalAI
                 {"audience", String.Format("https://{0}", host)},
                 {"grant_type", "client_credentials"}
             };
-            string resp = this.RequestHelper("POST", creds.ClientCredentialsURL, data);
+            string resp = (this.RequestHelper("POST", creds.ClientCredentialsURL, data) as string);
             Dictionary<string, string> result =
                 (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
-        public string RequestHelper(
+        public object RequestHelper(
             string method,
             string url,
             object data = null,
@@ -262,12 +260,11 @@ namespace RelationalAI
 
                 if ("application/json".Equals(contentType.ToLower()))
                 {
-                    return System.Text.Encoding.UTF8.GetString(resultTask.Result, 0, resultTask.Result.Length);
+                    return readJson(resultTask.Result);
                 }
                 else if ("multipart/form-data".Equals(contentType.ToLower()))
                 {
-                    var rsp = ParseMultipartResponse(resultTask.Result);
-                    return JsonConvert.SerializeObject(rsp);
+                    return ParseMultipartResponse(resultTask.Result);
                 }
                 else
                 {
@@ -276,9 +273,9 @@ namespace RelationalAI
             }
         }
 
-        public object ParseMultipartResponse(byte[] content)
+        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
         {
-            var result = new JArray();
+            var output = new List<TransactionAsyncFile>();
 
             var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
 
@@ -287,50 +284,48 @@ namespace RelationalAI
                 MemoryStream memoryStream = new MemoryStream();
                 file.Data.CopyTo(memoryStream);
                 byte[] buffer = memoryStream.ToArray();
-
-                if ("application/json".Equals(file.ContentType.ToLower()))
-                {
-                    var rsp = System.Text.Encoding.UTF8.GetString(buffer, 0, buffer.Length);
-                    result.Add(JsonConvert.DeserializeObject(rsp));
-                }
-                else if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                {
-                    result.Add(ParseArrowResponse(memoryStream));
-                }
-                else
-                {
-                    throw new SystemException($"unsupported content-type: {file.ContentType}");
-                }
+                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
+                output.Add(txnAsyncFile);
             }
-
-            return result;
+            return output;
         }
 
-        public object ParseArrowResponse(MemoryStream memoryStream)
+        public string readJson(byte[] data)
         {
-            JObject output = new JObject();
+            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
+        }
 
-            memoryStream.Position = 0;
-            ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
-            RecordBatch recordBatch = reader.ReadNextRecordBatch();
-
-            while (recordBatch != null)
+        public List<ArrowRelation> readArrowFiles(List<TransactionAsyncFile> files)
+        {
+            var output = new List<ArrowRelation> ();
+            foreach(var file in files)
             {
-                var dataframe = DataFrame.FromArrowRecordBatch(recordBatch);
-                foreach(var col in dataframe.Columns)
+                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
                 {
-                    JArray values = new JArray();
-                    for (int i=0; i < col.Length; i++)
+                    MemoryStream memoryStream = new MemoryStream(file.Data);
+                    memoryStream.Position = 0;
+
+                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
+                    RecordBatch recordBatch;
+                    while((recordBatch = reader.ReadNextRecordBatch()) != null)
                     {
-                        values.Add(col[i]);
+                       var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                       foreach(var col in df.Columns)
+                       {
+                           List<Object> values = new List<object>();
+                           for (var i = 0; i < col.Length; i++)
+                           {
+                               values.Add(col[i]);
+                           }
+                           output.Add(new ArrowRelation(col.Name, values));
+                       }
                     }
-                    output.Add(col.Name, values);
                 }
-                recordBatch = reader.ReadNextRecordBatch();
-            }
+            } 
 
             return output;
         }
+
         public class Context
         {
             private ICredentials credentials;
