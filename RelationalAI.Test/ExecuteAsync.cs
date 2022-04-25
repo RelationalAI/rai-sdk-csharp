@@ -34,7 +34,7 @@ namespace RelationalAI.Test
                 new TransactionMetadataResponse("/:output/Int64/Int64/Int64/Int64", new List<string> {":output", "Int64", "Int64", "Int64", "Int64"})
             };
 
-            var problems = new JArray();
+            var problems = new List<object>();
 
             Assert.Equal(rsp.Results, results);
             Assert.Equal(rsp.Metadata, metadata);

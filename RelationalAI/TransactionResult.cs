@@ -27,6 +27,6 @@ namespace RelationalAI
         public Relation[] Output { get; set; }
 
         [JsonProperty("problems", Required = Required.Always)]
-        public List<object> Problems { get; set; }
+        public object[] Problems { get; set; }
     }
 }

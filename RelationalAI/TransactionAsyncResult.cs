@@ -23,13 +23,13 @@ namespace RelationalAI
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
         public List<TransactionMetadataResponse> Metadata { get; set; }
-        public object Problems { get; set; }
+        public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
             List<TransactionMetadataResponse> metadata,
-            object problems
+            List<object> problems
         )
         {
             this.Transaction = transaction;
