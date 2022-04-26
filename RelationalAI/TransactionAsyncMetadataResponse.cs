@@ -19,7 +19,7 @@ namespace RelationalAI
     using System.Linq;
     using Newtonsoft.Json;
 
-    public class TransactionMetadataResponse : Entity
+    public class TransactionAsyncMetadataResponse : Entity
     {
         [JsonProperty("relationId", Required = Required.Always)]
         public string RelationId { get; set; }
@@ -27,7 +27,7 @@ namespace RelationalAI
         [JsonProperty("types", Required = Required.Always)]
         public List<string> Types { get; set; }
 
-        public TransactionMetadataResponse(string relationId, List<string> types)
+        public TransactionAsyncMetadataResponse(string relationId, List<string> types)
         {
             this.RelationId = relationId;
             this.Types = types;
@@ -35,9 +35,9 @@ namespace RelationalAI
 
         public override bool Equals(object obj)
         {
-            if (obj is TransactionMetadataResponse)
+            if (obj is TransactionAsyncMetadataResponse)
             {
-                var that = obj as TransactionMetadataResponse;
+                var that = obj as TransactionAsyncMetadataResponse;
 
                 return this.RelationId == that.RelationId && Enumerable.SequenceEqual(this.Types, that.Types);
             }

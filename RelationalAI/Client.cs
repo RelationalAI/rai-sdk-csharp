@@ -513,7 +513,6 @@ namespace RelationalAI
             List<object> problemsResult = null;
             if (problems != null)
             {
-                
                 problemsResult = ParseProblemsResult(this.rest.ReadJson(problems.Data));
             }
 
