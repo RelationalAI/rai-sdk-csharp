@@ -18,6 +18,7 @@ namespace RelationalAI.Examples
             var root = new RootCommand("RAI examples CLI");
             // add various examples as commands
             root.AddCommand(CreateEngine.GetCommand());
+            root.AddCommand(CreateDatabase.GetCommand());
             root.AddCommand(DeleteEngine.GetCommand());
             root.AddCommand(GetDatabase.GetCommand());
             root.AddCommand(GetEngine.GetCommand());

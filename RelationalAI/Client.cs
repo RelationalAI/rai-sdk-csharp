@@ -446,9 +446,7 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
-
-            string id = rsp.Transaction.ID;
+            var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
 
             var transaction = GetTransaction(id).Transaction;
 
