@@ -295,7 +295,7 @@ namespace RelationalAI
         public List<ArrowRelation> GetTransactionResults(string id)
         {
             var files = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/results", Client.PathTransactions, id))) as List<TransactionAsyncFile>;
-            return this.rest.readArrowFiles(files);
+            return this.rest.ReadArrowFiles(files);
         }
 
         public List<TransactionMetadataResponse> GetTransactionMetadata(string id)
@@ -501,23 +501,23 @@ namespace RelationalAI
             {
                 throw new SystemException("transaction part not found");
             }
-            transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.readJson(transaction.Data));
+            transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadJson(transaction.Data));
 
             List<TransactionMetadataResponse> metadataResult = null;
             if (metadata == null)
             {
                 throw new SystemException("metadata part not found");
             }
-            metadataResult = Json<List<TransactionMetadataResponse>>.Deserialize(this.rest.readJson(metadata.Data));
+            metadataResult = Json<List<TransactionMetadataResponse>>.Deserialize(this.rest.ReadJson(metadata.Data));
 
             List<object> problemsResult = null;
             if (problems != null)
             {
                 
-                problemsResult = ParseProblemsResult(this.rest.readJson(problems.Data));
+                problemsResult = ParseProblemsResult(this.rest.ReadJson(problems.Data));
             }
 
-            var results = this.rest.readArrowFiles(files);
+            var results = this.rest.ReadArrowFiles(files);
 
             var transactionAsyncResult = new TransactionAsyncResult(
                 transactionResult,

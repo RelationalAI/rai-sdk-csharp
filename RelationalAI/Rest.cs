@@ -260,7 +260,7 @@ namespace RelationalAI
 
                 if ("application/json".Equals(contentType.ToLower()))
                 {
-                    return readJson(resultTask.Result);
+                    return ReadJson(resultTask.Result);
                 }
                 else if ("multipart/form-data".Equals(contentType.ToLower()))
                 {
@@ -290,12 +290,12 @@ namespace RelationalAI
             return output;
         }
 
-        public string readJson(byte[] data)
+        public string ReadJson(byte[] data)
         {
             return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
-        public List<ArrowRelation> readArrowFiles(List<TransactionAsyncFile> files)
+        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
             var output = new List<ArrowRelation> ();
             foreach(var file in files)

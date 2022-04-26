@@ -8,7 +8,10 @@ namespace RelationalAI.Test
     {
         public static string UUID = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{UUID}@relational.ai";
-        [Fact]
+        // Created users are deleted from the account
+        // but not deleted from the database.
+        // We should enable back this test when
+        // the behavior is addressed (delete also users from the database).
         public void TestUser()
         {
             Client client = CreateClient();
