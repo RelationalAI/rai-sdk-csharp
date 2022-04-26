@@ -15,6 +15,7 @@
  */
 namespace RelationalAI
 {
+    using System.Collections.Generic;
     using Newtonsoft.Json;
 
     public class TransactionResult : Entity
@@ -26,6 +27,6 @@ namespace RelationalAI
         public Relation[] Output { get; set; }
 
         [JsonProperty("problems", Required = Required.Always)]
-        public Problem[] Problems { get; set; }
+        public ClientProblem[] Problems { get; set; }
     }
 }

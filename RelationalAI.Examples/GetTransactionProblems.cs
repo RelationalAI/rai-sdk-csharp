@@ -30,7 +30,12 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.GetTransactionProblems(id));
+            var problems = client.GetTransactionProblems(id);
+            foreach(var problem in problems)
+            {
+                Console.WriteLine(problem);
+            }
+
         }
     }
 }

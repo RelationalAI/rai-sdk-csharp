@@ -17,7 +17,7 @@ namespace RelationalAI
 {
     using Newtonsoft.Json;
 
-    public class Problem : Entity
+    public class ClientProblem : Entity
     {
         [JsonProperty("type", Required = Required.Always)]
         public string Type { get; set; }
