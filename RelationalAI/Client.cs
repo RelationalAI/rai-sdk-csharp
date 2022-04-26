@@ -519,14 +519,12 @@ namespace RelationalAI
 
             var results = this.rest.ReadArrowFiles(files);
 
-            var transactionAsyncResult = new TransactionAsyncResult(
+            return new TransactionAsyncResult(
                 transactionResult,
                 results,
                 metadataResult,
                 problemsResult
             );
-
-            return transactionAsyncResult;
         }
 
         private string GenLoadJson(string relation)
