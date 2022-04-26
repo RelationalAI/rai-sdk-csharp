@@ -494,24 +494,22 @@ namespace RelationalAI
             var metadata = files.Find(f => f.Name == "metadata");
             var problems = files.Find(f => f.Name == "problems");
 
-            TransactionAsyncCompactResponse transactionResult = null;
             if (transaction == null)
             {
                 throw new SystemException("transaction part not found");
             }
-            transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadJson(transaction.Data));
+            TransactionAsyncCompactResponse transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadString(transaction.Data));
 
-            List<TransactionAsyncMetadataResponse> metadataResult = null;
             if (metadata == null)
             {
                 throw new SystemException("metadata part not found");
             }
-            metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadJson(metadata.Data));
+            List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
 
             List<object> problemsResult = null;
             if (problems != null)
             {
-                problemsResult = ParseProblemsResult(this.rest.ReadJson(problems.Data));
+                problemsResult = ParseProblemsResult(this.rest.ReadString(problems.Data));
             }
 
             var results = this.rest.ReadArrowFiles(files);
@@ -531,6 +529,7 @@ namespace RelationalAI
             builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
             return builder.ToString();
         }
+
         public TransactionResult LoadJson(
             string database,
             string engine,

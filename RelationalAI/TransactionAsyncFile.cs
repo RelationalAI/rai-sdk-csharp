@@ -18,7 +18,7 @@ using Newtonsoft.Json;
 
 namespace RelationalAI
 {
-    public class TransactionAsyncFile
+    public class TransactionAsyncFile : Entity
     {
         public string Name { get; set; }
         public byte[] Data { get; set; }
@@ -31,11 +31,6 @@ namespace RelationalAI
             this.Data = data;
             this.Filename = filename;
             this.ContentType = contentType;
-        }
-
-        public override string ToString()
-        {
-            return JsonConvert.SerializeObject(this);
         }
     }
 }

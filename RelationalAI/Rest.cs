@@ -260,7 +260,7 @@ namespace RelationalAI
 
                 if ("application/json".Equals(contentType.ToLower()))
                 {
-                    return ReadJson(resultTask.Result);
+                    return ReadString(resultTask.Result);
                 }
                 else if ("multipart/form-data".Equals(contentType.ToLower()))
                 {
@@ -290,7 +290,7 @@ namespace RelationalAI
             return output;
         }
 
-        public string ReadJson(byte[] data)
+        public string ReadString(byte[] data)
         {
             return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
         }
