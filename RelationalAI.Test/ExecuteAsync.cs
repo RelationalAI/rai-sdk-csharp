@@ -29,9 +29,9 @@ namespace RelationalAI.Test
                 new ArrowRelation("v4", new List<object> {1L, 16L, 81L, 256L, 625L} )
             };
 
-            var metadata = new List<TransactionMetadataResponse>
+            var metadata = new List<TransactionAsyncMetadataResponse>
             {
-                new TransactionMetadataResponse("/:output/Int64/Int64/Int64/Int64", new List<string> {":output", "Int64", "Int64", "Int64", "Int64"})
+                new TransactionAsyncMetadataResponse("/:output/Int64/Int64/Int64/Int64", new List<string> {":output", "Int64", "Int64", "Int64", "Int64"})
             };
 
             var problems = new List<object>();

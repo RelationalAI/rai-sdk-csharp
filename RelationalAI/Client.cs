@@ -298,10 +298,10 @@ namespace RelationalAI
             return this.rest.ReadArrowFiles(files);
         }
 
-        public List<TransactionMetadataResponse> GetTransactionMetadata(string id)
+        public List<TransactionAsyncMetadataResponse> GetTransactionMetadata(string id)
         {
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id))) as string;
-            return Json<List<TransactionMetadataResponse>>.Deserialize(rsp);
+            return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
         }
 
         public List<object> GetTransactionProblems(string id)
@@ -484,7 +484,7 @@ namespace RelationalAI
             if (rsp is string)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(rsp as string);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionMetadataResponse>(), new List<object>());
+                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), new List<object>());
             }
 
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
@@ -503,12 +503,12 @@ namespace RelationalAI
             }
             transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadJson(transaction.Data));
 
-            List<TransactionMetadataResponse> metadataResult = null;
+            List<TransactionAsyncMetadataResponse> metadataResult = null;
             if (metadata == null)
             {
                 throw new SystemException("metadata part not found");
             }
-            metadataResult = Json<List<TransactionMetadataResponse>>.Deserialize(this.rest.ReadJson(metadata.Data));
+            metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadJson(metadata.Data));
 
             List<object> problemsResult = null;
             if (problems != null)

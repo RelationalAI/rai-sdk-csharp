@@ -22,13 +22,13 @@ namespace RelationalAI
     {
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
-        public List<TransactionMetadataResponse> Metadata { get; set; }
+        public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
-            List<TransactionMetadataResponse> metadata,
+            List<TransactionAsyncMetadataResponse> metadata,
             List<object> problems
         )
         {
