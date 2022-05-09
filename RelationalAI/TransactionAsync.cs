@@ -58,7 +58,7 @@ namespace RelationalAI
                 actionInputs.Add(actionInput);
             }
 
-            data.Add("inputs", actionInputs);
+            data.Add("v1_inputs", actionInputs);
 
             return data;
         }
