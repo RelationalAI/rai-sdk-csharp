@@ -38,7 +38,7 @@ namespace RelationalAI.Credentials
 
         public bool IsExpired
         {
-            get => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn; 
+            get => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
         }
         public string Token 
         {
