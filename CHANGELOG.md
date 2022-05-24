@@ -1,4 +1,7 @@
-## latest
+## v0.2.2-alpha
+* Added `FinishedAt` field to `TransactionAsyncResponse`.
+
+## v0.2.1-alpha
 * Fixed `executeAsync` inputs issue.
 
 ## v0.2.0-alpha

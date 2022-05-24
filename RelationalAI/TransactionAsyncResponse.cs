@@ -27,7 +27,10 @@ namespace RelationalAI
         public string CreatedBy { get; set; }
 
         [JsonProperty("created_on", Required = Required.Always)]
-        public string CreatedOn { get; set; }
+        public long CreatedOn { get; set; }
+
+        [JsonProperty("finished_at", Required = Required.Default)]
+        public long FinishedAt { get; set; }
 
         [JsonProperty("database_name", Required = Required.Always)]
         public string DatabaseName { get; set; }
@@ -46,7 +49,8 @@ namespace RelationalAI
             string state,
             string accountName,
             string createdBy,
-            string createdOn,
+            long createdOn,
+            long finishedAt,
             string databaseName,
             bool readOnly,
             string query,
@@ -56,6 +60,7 @@ namespace RelationalAI
             this.AccountName = accountName;
             this.CreatedBy = createdBy;
             this.CreatedOn = createdOn;
+            this.FinishedAt = finishedAt;
             this.DatabaseName = databaseName;
             this.ReadOnly = readOnly;
             this.Query = query;
