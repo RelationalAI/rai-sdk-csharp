@@ -17,8 +17,7 @@ namespace RelationalAI.Test
             Client client = CreateClient();
             client.CreateEngineWait(EngineName, size: EngineSize.XS);
 
-            var rsp = client.DeleteDatabase(Dbname);
-            Assert.Equal("Not Found", rsp.Message);
+            Assert.Throws<SystemException>( () => client.DeleteDatabase(Dbname) );
 
             var createRsp = client.CreateDatabase(Dbname, EngineName, overwrite: false);
             Assert.Equal(Dbname, createRsp.Name);
