@@ -2,8 +2,11 @@ RelationalAI.Test/bin
 RelationalAI.Test/obj
 RelationalAI.Examples/bin
 RelationalAI.Examples/obj
+RelationalAI.Protos/bin
+RelationalAI.Protos/obj
 RelationalAI/bin
 RelationalAI/obj
 launch.json
 tasks.json
 .vscode
+.vs
