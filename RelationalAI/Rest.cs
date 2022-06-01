@@ -21,6 +21,7 @@ namespace RelationalAI
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
     using RelationalAI.Credentials;
+    using Com.Relationalai.Protos;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -28,6 +29,8 @@ namespace RelationalAI
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web;
+    using RelationalAI.Protos.Models;
+
     public class Rest
     {
         private Rest.Context context;
@@ -321,9 +324,15 @@ namespace RelationalAI
                        }
                     }
                 }
-            } 
+            }
 
             return output;
+        }
+
+        public MetadataInfos ReadMetadataInfo(TransactionAsyncFile file)
+        {
+            MetadataInfo infos = MetadataInfo.Parser.ParseFrom(file.Data);
+            return JsonConvert.DeserializeObject<MetadataInfos>(infos.ToString());
         }
 
         public class Context

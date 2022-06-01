@@ -1,0 +1,16 @@
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos.deps.json
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos.runtimeconfig.json
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos.runtimeconfig.dev.json
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos.dll
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/RelationalAI.Protos.pdb
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/Google.Protobuf.dll
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/bin/Debug/netcoreapp3.1/Newtonsoft.Json.dll
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.csprojAssemblyReference.cache
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.AssemblyInfoInputs.cache
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.AssemblyInfo.cs
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.csproj.CoreCompileInputs.cache
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.csproj.CopyComplete
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.dll
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.pdb
+/home/helmi/workspace/rai-sdk-csharp/RelationalAI.Protos/obj/Debug/netcoreapp3.1/RelationalAI.Protos.genruntimeconfig.cache
