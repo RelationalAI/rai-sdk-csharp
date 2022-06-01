@@ -464,7 +464,6 @@ namespace RelationalAI
                 transaction,
                 results,
                 metadata,
-                null,
                 problems
             );
         }
@@ -483,7 +482,7 @@ namespace RelationalAI
             if (rsp is string)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(rsp as string);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), null, new List<object>());
+                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), new List<object>());
             }
 
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
@@ -493,7 +492,6 @@ namespace RelationalAI
         {
             var transaction = files.Find(f => f.Name == "transaction");
             var metadata = files.Find(f => f.Name == "metadata");
-            var metadataInfo = files.Find(f => f.Name == "metadata_info");
             var problems = files.Find(f => f.Name == "problems");
 
             if (transaction == null)
@@ -508,13 +506,6 @@ namespace RelationalAI
             }
             List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
 
-            if (metadataInfo == null)
-            {
-                throw new SystemException("metadata info part not found");
-            }
-
-            var metadataInfos = this.rest.ReadMetadataInfo(metadataInfo);
-
             List<object> problemsResult = null;
             if (problems != null)
             {
@@ -527,7 +518,6 @@ namespace RelationalAI
                 transactionResult,
                 results,
                 metadataResult,
-                metadataInfos,
                 problemsResult
             );
         }
