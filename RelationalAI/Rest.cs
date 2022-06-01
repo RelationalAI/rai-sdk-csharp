@@ -329,10 +329,10 @@ namespace RelationalAI
             return output;
         }
 
-        public MetadataInfos ReadMetadataInfo(TransactionAsyncFile file)
+        public MetadataInfoResult ReadMetadataInfo(TransactionAsyncFile file)
         {
             MetadataInfo infos = MetadataInfo.Parser.ParseFrom(file.Data);
-            return JsonConvert.DeserializeObject<MetadataInfos>(infos.ToString());
+            return JsonConvert.DeserializeObject<MetadataInfoResult>(infos.ToString());
         }
 
         public class Context

@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace RelationalAI.Protos.Models
 {
-    public class MetadataInfos
+    public class MetadataInfoResult
     {
        [JsonProperty("relations")]
        public List<Relation> Relations { get; set; }

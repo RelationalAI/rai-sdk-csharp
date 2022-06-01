@@ -16,7 +16,6 @@
 namespace RelationalAI
 {
     using System.Collections.Generic;
-    using Newtonsoft.Json;
     using RelationalAI.Protos.Models;
 
     public class TransactionAsyncResult : Entity
@@ -24,14 +23,14 @@ namespace RelationalAI
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
         public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
-        public MetadataInfos MetadataInfos { get; set; }
+        public MetadataInfoResult MetadataInfos { get; set; }
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
             List<TransactionAsyncMetadataResponse> metadata,
-            MetadataInfos metadataInfos,
+            MetadataInfoResult metadataInfos,
             List<object> problems
         )
         {
