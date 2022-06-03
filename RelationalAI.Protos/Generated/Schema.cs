@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Com.Relationalai.Protos {
+namespace Relationalai.Protocol {
 
   /// <summary>Holder for reflection information generated from schema.proto</summary>
   public static partial class SchemaReflection {
@@ -24,52 +24,52 @@ namespace Com.Relationalai.Protos {
     static SchemaReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "CgxzY2hlbWEucHJvdG8SF2NvbS5yZWxhdGlvbmFsYWkucHJvdG9zIkEKClJl",
-            "bGF0aW9uSWQSMwoJYXJndW1lbnRzGAEgAygLMiAuY29tLnJlbGF0aW9uYWxh",
-            "aS5wcm90b3MuUmVsVHlwZSJGCghSZWxUdXBsZRI6Cglhcmd1bWVudHMYASAD",
-            "KAsyJy5jb20ucmVsYXRpb25hbGFpLnByb3Rvcy5QcmltaXRpdmVWYWx1ZSIu",
-            "CglSZWxJbnQxMjgSEAoIaGlnaGJpdHMYASABKAQSDwoHbG93Yml0cxgCIAEo",
-            "BCIvCgpSZWxVSW50MTI4EhAKCGhpZ2hiaXRzGAEgASgEEg8KB2xvd2JpdHMY",
-            "AiABKAQi8QMKDlByaW1pdGl2ZVZhbHVlEjMKA3RhZxgBIAEoDjImLmNvbS5y",
-            "ZWxhdGlvbmFsYWkucHJvdG9zLlByaW1pdGl2ZVR5cGUSOAoKaW50MTI4X3Zh",
-            "bBgCIAEoCzIiLmNvbS5yZWxhdGlvbmFsYWkucHJvdG9zLlJlbEludDEyOEgA",
-            "EhMKCWludDY0X3ZhbBgDIAEoA0gAEhMKCWludDMyX3ZhbBgEIAEoBUgAEhMK",
-            "CWludDE2X3ZhbBgFIAEoBUgAEhIKCGludDhfdmFsGAYgASgFSAASOgoLdWlu",
-            "dDEyOF92YWwYByABKAsyIy5jb20ucmVsYXRpb25hbGFpLnByb3Rvcy5SZWxV",
-            "SW50MTI4SAASFAoKdWludDY0X3ZhbBgIIAEoBEgAEhQKCnVpbnQzMl92YWwY",
-            "CSABKA1IABIUCgp1aW50MTZfdmFsGAogASgNSAASEwoJdWludDhfdmFsGAsg",
-            "ASgNSAASFQoLZmxvYXQ2NF92YWwYDCABKAFIABIVCgtmbG9hdDMyX3ZhbBgN",
-            "IAEoAkgAEhUKC2Zsb2F0MTZfdmFsGA4gASgCSAASEgoIY2hhcl92YWwYDyAB",
-            "KA1IABISCghib29sX3ZhbBgQIAEoCEgAEhQKCnN0cmluZ192YWwYESABKAxI",
-            "AEIHCgV2YWx1ZSJFCglWYWx1ZVR5cGUSOAoOYXJndW1lbnRfdHlwZXMYASAD",
-            "KAsyIC5jb20ucmVsYXRpb25hbGFpLnByb3Rvcy5SZWxUeXBlInQKDENvbnN0",
-            "YW50VHlwZRIyCghyZWxfdHlwZRgBIAEoCzIgLmNvbS5yZWxhdGlvbmFsYWku",
-            "cHJvdG9zLlJlbFR5cGUSMAoFdmFsdWUYAiABKAsyIS5jb20ucmVsYXRpb25h",
-            "bGFpLnByb3Rvcy5SZWxUdXBsZSLrAQoHUmVsVHlwZRIqCgN0YWcYASABKA4y",
-            "HS5jb20ucmVsYXRpb25hbGFpLnByb3Rvcy5LaW5kEj4KDnByaW1pdGl2ZV90",
-            "eXBlGAIgASgOMiYuY29tLnJlbGF0aW9uYWxhaS5wcm90b3MuUHJpbWl0aXZl",
-            "VHlwZRI2Cgp2YWx1ZV90eXBlGAMgASgLMiIuY29tLnJlbGF0aW9uYWxhaS5w",
-            "cm90b3MuVmFsdWVUeXBlEjwKDWNvbnN0YW50X3R5cGUYBCABKAsyJS5jb20u",
-            "cmVsYXRpb25hbGFpLnByb3Rvcy5Db25zdGFudFR5cGUqkgIKDVByaW1pdGl2",
-            "ZVR5cGUSFAoQVU5TUEVDSUZJRURfVFlQRRAAEgsKB0lOVF8xMjgQARIKCgZJ",
-            "TlRfNjQQAhIKCgZJTlRfMzIQAxIKCgZJTlRfMTYQBBIJCgVJTlRfOBAFEgwK",
-            "CFVJTlRfMTI4EAYSCwoHVUlOVF82NBAHEgsKB1VJTlRfMzIQCBILCgdVSU5U",
-            "XzE2EAkSCgoGVUlOVF84EAoSDAoIRkxPQVRfNjQQCxIMCghGTE9BVF8zMhAM",
-            "EgwKCEZMT0FUXzE2EA0SCAoEQ0hBUhAOEggKBEJPT0wQDxIKCgZTVFJJTkcQ",
-            "EBIKCgZTWU1CT0wQERIYChRWQVJJQUJMRV9TSVpFX1NUUklORxASKlMKBEtp",
-            "bmQSFAoQVU5TUEVDSUZJRURfS0lORBAAEhIKDlBSSU1JVElWRV9UWVBFEAES",
-            "DgoKVkFMVUVfVFlQRRACEhEKDUNPTlNUQU5UX1RZUEUQA2IGcHJvdG8z"));
+            "CgxzY2hlbWEucHJvdG8SFXJlbGF0aW9uYWxhaS5wcm90b2NvbCI/CgpSZWxh",
+            "dGlvbklkEjEKCWFyZ3VtZW50cxgBIAMoCzIeLnJlbGF0aW9uYWxhaS5wcm90",
+            "b2NvbC5SZWxUeXBlIkQKCFJlbFR1cGxlEjgKCWFyZ3VtZW50cxgBIAMoCzIl",
+            "LnJlbGF0aW9uYWxhaS5wcm90b2NvbC5QcmltaXRpdmVWYWx1ZSIuCglSZWxJ",
+            "bnQxMjgSEAoIaGlnaGJpdHMYASABKAQSDwoHbG93Yml0cxgCIAEoBCIvCgpS",
+            "ZWxVSW50MTI4EhAKCGhpZ2hiaXRzGAEgASgEEg8KB2xvd2JpdHMYAiABKAQi",
+            "6wMKDlByaW1pdGl2ZVZhbHVlEjEKA3RhZxgBIAEoDjIkLnJlbGF0aW9uYWxh",
+            "aS5wcm90b2NvbC5QcmltaXRpdmVUeXBlEjYKCmludDEyOF92YWwYAiABKAsy",
+            "IC5yZWxhdGlvbmFsYWkucHJvdG9jb2wuUmVsSW50MTI4SAASEwoJaW50NjRf",
+            "dmFsGAMgASgDSAASEwoJaW50MzJfdmFsGAQgASgFSAASEwoJaW50MTZfdmFs",
+            "GAUgASgFSAASEgoIaW50OF92YWwYBiABKAVIABI4Cgt1aW50MTI4X3ZhbBgH",
+            "IAEoCzIhLnJlbGF0aW9uYWxhaS5wcm90b2NvbC5SZWxVSW50MTI4SAASFAoK",
+            "dWludDY0X3ZhbBgIIAEoBEgAEhQKCnVpbnQzMl92YWwYCSABKA1IABIUCgp1",
+            "aW50MTZfdmFsGAogASgNSAASEwoJdWludDhfdmFsGAsgASgNSAASFQoLZmxv",
+            "YXQ2NF92YWwYDCABKAFIABIVCgtmbG9hdDMyX3ZhbBgNIAEoAkgAEhUKC2Zs",
+            "b2F0MTZfdmFsGA4gASgCSAASEgoIY2hhcl92YWwYDyABKA1IABISCghib29s",
+            "X3ZhbBgQIAEoCEgAEhQKCnN0cmluZ192YWwYESABKAxIAEIHCgV2YWx1ZSJD",
+            "CglWYWx1ZVR5cGUSNgoOYXJndW1lbnRfdHlwZXMYASADKAsyHi5yZWxhdGlv",
+            "bmFsYWkucHJvdG9jb2wuUmVsVHlwZSJwCgxDb25zdGFudFR5cGUSMAoIcmVs",
+            "X3R5cGUYASABKAsyHi5yZWxhdGlvbmFsYWkucHJvdG9jb2wuUmVsVHlwZRIu",
+            "CgV2YWx1ZRgCIAEoCzIfLnJlbGF0aW9uYWxhaS5wcm90b2NvbC5SZWxUdXBs",
+            "ZSLjAQoHUmVsVHlwZRIoCgN0YWcYASABKA4yGy5yZWxhdGlvbmFsYWkucHJv",
+            "dG9jb2wuS2luZBI8Cg5wcmltaXRpdmVfdHlwZRgCIAEoDjIkLnJlbGF0aW9u",
+            "YWxhaS5wcm90b2NvbC5QcmltaXRpdmVUeXBlEjQKCnZhbHVlX3R5cGUYAyAB",
+            "KAsyIC5yZWxhdGlvbmFsYWkucHJvdG9jb2wuVmFsdWVUeXBlEjoKDWNvbnN0",
+            "YW50X3R5cGUYBCABKAsyIy5yZWxhdGlvbmFsYWkucHJvdG9jb2wuQ29uc3Rh",
+            "bnRUeXBlKpICCg1QcmltaXRpdmVUeXBlEhQKEFVOU1BFQ0lGSUVEX1RZUEUQ",
+            "ABILCgdJTlRfMTI4EAESCgoGSU5UXzY0EAISCgoGSU5UXzMyEAMSCgoGSU5U",
+            "XzE2EAQSCQoFSU5UXzgQBRIMCghVSU5UXzEyOBAGEgsKB1VJTlRfNjQQBxIL",
+            "CgdVSU5UXzMyEAgSCwoHVUlOVF8xNhAJEgoKBlVJTlRfOBAKEgwKCEZMT0FU",
+            "XzY0EAsSDAoIRkxPQVRfMzIQDBIMCghGTE9BVF8xNhANEggKBENIQVIQDhII",
+            "CgRCT09MEA8SCgoGU1RSSU5HEBASCgoGU1lNQk9MEBESGAoUVkFSSUFCTEVf",
+            "U0laRV9TVFJJTkcQEipTCgRLaW5kEhQKEFVOU1BFQ0lGSUVEX0tJTkQQABIS",
+            "Cg5QUklNSVRJVkVfVFlQRRABEg4KClZBTFVFX1RZUEUQAhIRCg1DT05TVEFO",
+            "VF9UWVBFEANiBnByb3RvMw=="));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
           new pbr::FileDescriptor[] { },
-          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Com.Relationalai.Protos.PrimitiveType), typeof(global::Com.Relationalai.Protos.Kind), }, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelationId), global::Com.Relationalai.Protos.RelationId.Parser, new[]{ "Arguments" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelTuple), global::Com.Relationalai.Protos.RelTuple.Parser, new[]{ "Arguments" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelInt128), global::Com.Relationalai.Protos.RelInt128.Parser, new[]{ "Highbits", "Lowbits" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelUInt128), global::Com.Relationalai.Protos.RelUInt128.Parser, new[]{ "Highbits", "Lowbits" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.PrimitiveValue), global::Com.Relationalai.Protos.PrimitiveValue.Parser, new[]{ "Tag", "Int128Val", "Int64Val", "Int32Val", "Int16Val", "Int8Val", "Uint128Val", "Uint64Val", "Uint32Val", "Uint16Val", "Uint8Val", "Float64Val", "Float32Val", "Float16Val", "CharVal", "BoolVal", "StringVal" }, new[]{ "Value" }, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.ValueType), global::Com.Relationalai.Protos.ValueType.Parser, new[]{ "ArgumentTypes" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.ConstantType), global::Com.Relationalai.Protos.ConstantType.Parser, new[]{ "RelType", "Value" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelType), global::Com.Relationalai.Protos.RelType.Parser, new[]{ "Tag", "PrimitiveType", "ValueType", "ConstantType" }, null, null, null, null)
+          new pbr::GeneratedClrTypeInfo(new[] {typeof(global::Relationalai.Protocol.PrimitiveType), typeof(global::Relationalai.Protocol.Kind), }, null, new pbr::GeneratedClrTypeInfo[] {
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelationId), global::Relationalai.Protocol.RelationId.Parser, new[]{ "Arguments" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelTuple), global::Relationalai.Protocol.RelTuple.Parser, new[]{ "Arguments" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelInt128), global::Relationalai.Protocol.RelInt128.Parser, new[]{ "Highbits", "Lowbits" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelUInt128), global::Relationalai.Protocol.RelUInt128.Parser, new[]{ "Highbits", "Lowbits" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.PrimitiveValue), global::Relationalai.Protocol.PrimitiveValue.Parser, new[]{ "Tag", "Int128Val", "Int64Val", "Int32Val", "Int16Val", "Int8Val", "Uint128Val", "Uint64Val", "Uint32Val", "Uint16Val", "Uint8Val", "Float64Val", "Float32Val", "Float16Val", "CharVal", "BoolVal", "StringVal" }, new[]{ "Value" }, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.ValueType), global::Relationalai.Protocol.ValueType.Parser, new[]{ "ArgumentTypes" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.ConstantType), global::Relationalai.Protocol.ConstantType.Parser, new[]{ "RelType", "Value" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelType), global::Relationalai.Protocol.RelType.Parser, new[]{ "Tag", "PrimitiveType", "ValueType", "ConstantType" }, null, null, null, null)
           }));
     }
     #endregion
@@ -165,7 +165,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -197,12 +197,12 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "arguments" field.</summary>
     public const int ArgumentsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Com.Relationalai.Protos.RelType> _repeated_arguments_codec
-        = pb::FieldCodec.ForMessage(10, global::Com.Relationalai.Protos.RelType.Parser);
-    private readonly pbc::RepeatedField<global::Com.Relationalai.Protos.RelType> arguments_ = new pbc::RepeatedField<global::Com.Relationalai.Protos.RelType>();
+    private static readonly pb::FieldCodec<global::Relationalai.Protocol.RelType> _repeated_arguments_codec
+        = pb::FieldCodec.ForMessage(10, global::Relationalai.Protocol.RelType.Parser);
+    private readonly pbc::RepeatedField<global::Relationalai.Protocol.RelType> arguments_ = new pbc::RepeatedField<global::Relationalai.Protocol.RelType>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Com.Relationalai.Protos.RelType> Arguments {
+    public pbc::RepeatedField<global::Relationalai.Protocol.RelType> Arguments {
       get { return arguments_; }
     }
 
@@ -347,7 +347,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -379,12 +379,12 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "arguments" field.</summary>
     public const int ArgumentsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Com.Relationalai.Protos.PrimitiveValue> _repeated_arguments_codec
-        = pb::FieldCodec.ForMessage(10, global::Com.Relationalai.Protos.PrimitiveValue.Parser);
-    private readonly pbc::RepeatedField<global::Com.Relationalai.Protos.PrimitiveValue> arguments_ = new pbc::RepeatedField<global::Com.Relationalai.Protos.PrimitiveValue>();
+    private static readonly pb::FieldCodec<global::Relationalai.Protocol.PrimitiveValue> _repeated_arguments_codec
+        = pb::FieldCodec.ForMessage(10, global::Relationalai.Protocol.PrimitiveValue.Parser);
+    private readonly pbc::RepeatedField<global::Relationalai.Protocol.PrimitiveValue> arguments_ = new pbc::RepeatedField<global::Relationalai.Protocol.PrimitiveValue>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Com.Relationalai.Protos.PrimitiveValue> Arguments {
+    public pbc::RepeatedField<global::Relationalai.Protocol.PrimitiveValue> Arguments {
       get { return arguments_; }
     }
 
@@ -528,7 +528,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[2]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[2]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -754,7 +754,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[3]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[3]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -983,7 +983,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[4]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[4]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1066,13 +1066,13 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "tag" field.</summary>
     public const int TagFieldNumber = 1;
-    private global::Com.Relationalai.Protos.PrimitiveType tag_ = global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType;
+    private global::Relationalai.Protocol.PrimitiveType tag_ = global::Relationalai.Protocol.PrimitiveType.UnspecifiedType;
     /// <summary>
     /// Type tag indicates which value field is set
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.PrimitiveType Tag {
+    public global::Relationalai.Protocol.PrimitiveType Tag {
       get { return tag_; }
       set {
         tag_ = value;
@@ -1086,8 +1086,8 @@ namespace Com.Relationalai.Protos {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.RelInt128 Int128Val {
-      get { return valueCase_ == ValueOneofCase.Int128Val ? (global::Com.Relationalai.Protos.RelInt128) value_ : null; }
+    public global::Relationalai.Protocol.RelInt128 Int128Val {
+      get { return valueCase_ == ValueOneofCase.Int128Val ? (global::Relationalai.Protocol.RelInt128) value_ : null; }
       set {
         value_ = value;
         valueCase_ = value == null ? ValueOneofCase.None : ValueOneofCase.Int128Val;
@@ -1155,8 +1155,8 @@ namespace Com.Relationalai.Protos {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.RelUInt128 Uint128Val {
-      get { return valueCase_ == ValueOneofCase.Uint128Val ? (global::Com.Relationalai.Protos.RelUInt128) value_ : null; }
+    public global::Relationalai.Protocol.RelUInt128 Uint128Val {
+      get { return valueCase_ == ValueOneofCase.Uint128Val ? (global::Relationalai.Protocol.RelUInt128) value_ : null; }
       set {
         value_ = value;
         valueCase_ = value == null ? ValueOneofCase.None : ValueOneofCase.Uint128Val;
@@ -1371,7 +1371,7 @@ namespace Com.Relationalai.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Tag != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) hash ^= Tag.GetHashCode();
+      if (Tag != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) hash ^= Tag.GetHashCode();
       if (valueCase_ == ValueOneofCase.Int128Val) hash ^= Int128Val.GetHashCode();
       if (valueCase_ == ValueOneofCase.Int64Val) hash ^= Int64Val.GetHashCode();
       if (valueCase_ == ValueOneofCase.Int32Val) hash ^= Int32Val.GetHashCode();
@@ -1407,7 +1407,7 @@ namespace Com.Relationalai.Protos {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Tag != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (Tag != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Tag);
       }
@@ -1485,7 +1485,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Tag != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (Tag != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Tag);
       }
@@ -1563,7 +1563,7 @@ namespace Com.Relationalai.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Tag != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (Tag != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Tag);
       }
       if (valueCase_ == ValueOneofCase.Int128Val) {
@@ -1626,13 +1626,13 @@ namespace Com.Relationalai.Protos {
       if (other == null) {
         return;
       }
-      if (other.Tag != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (other.Tag != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         Tag = other.Tag;
       }
       switch (other.ValueCase) {
         case ValueOneofCase.Int128Val:
           if (Int128Val == null) {
-            Int128Val = new global::Com.Relationalai.Protos.RelInt128();
+            Int128Val = new global::Relationalai.Protocol.RelInt128();
           }
           Int128Val.MergeFrom(other.Int128Val);
           break;
@@ -1650,7 +1650,7 @@ namespace Com.Relationalai.Protos {
           break;
         case ValueOneofCase.Uint128Val:
           if (Uint128Val == null) {
-            Uint128Val = new global::Com.Relationalai.Protos.RelUInt128();
+            Uint128Val = new global::Relationalai.Protocol.RelUInt128();
           }
           Uint128Val.MergeFrom(other.Uint128Val);
           break;
@@ -1702,11 +1702,11 @@ namespace Com.Relationalai.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Tag = (global::Com.Relationalai.Protos.PrimitiveType) input.ReadEnum();
+            Tag = (global::Relationalai.Protocol.PrimitiveType) input.ReadEnum();
             break;
           }
           case 18: {
-            global::Com.Relationalai.Protos.RelInt128 subBuilder = new global::Com.Relationalai.Protos.RelInt128();
+            global::Relationalai.Protocol.RelInt128 subBuilder = new global::Relationalai.Protocol.RelInt128();
             if (valueCase_ == ValueOneofCase.Int128Val) {
               subBuilder.MergeFrom(Int128Val);
             }
@@ -1731,7 +1731,7 @@ namespace Com.Relationalai.Protos {
             break;
           }
           case 58: {
-            global::Com.Relationalai.Protos.RelUInt128 subBuilder = new global::Com.Relationalai.Protos.RelUInt128();
+            global::Relationalai.Protocol.RelUInt128 subBuilder = new global::Relationalai.Protocol.RelUInt128();
             if (valueCase_ == ValueOneofCase.Uint128Val) {
               subBuilder.MergeFrom(Uint128Val);
             }
@@ -1795,11 +1795,11 @@ namespace Com.Relationalai.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Tag = (global::Com.Relationalai.Protos.PrimitiveType) input.ReadEnum();
+            Tag = (global::Relationalai.Protocol.PrimitiveType) input.ReadEnum();
             break;
           }
           case 18: {
-            global::Com.Relationalai.Protos.RelInt128 subBuilder = new global::Com.Relationalai.Protos.RelInt128();
+            global::Relationalai.Protocol.RelInt128 subBuilder = new global::Relationalai.Protocol.RelInt128();
             if (valueCase_ == ValueOneofCase.Int128Val) {
               subBuilder.MergeFrom(Int128Val);
             }
@@ -1824,7 +1824,7 @@ namespace Com.Relationalai.Protos {
             break;
           }
           case 58: {
-            global::Com.Relationalai.Protos.RelUInt128 subBuilder = new global::Com.Relationalai.Protos.RelUInt128();
+            global::Relationalai.Protocol.RelUInt128 subBuilder = new global::Relationalai.Protocol.RelUInt128();
             if (valueCase_ == ValueOneofCase.Uint128Val) {
               subBuilder.MergeFrom(Uint128Val);
             }
@@ -1893,7 +1893,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[5]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[5]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -1925,16 +1925,16 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "argument_types" field.</summary>
     public const int ArgumentTypesFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Com.Relationalai.Protos.RelType> _repeated_argumentTypes_codec
-        = pb::FieldCodec.ForMessage(10, global::Com.Relationalai.Protos.RelType.Parser);
-    private readonly pbc::RepeatedField<global::Com.Relationalai.Protos.RelType> argumentTypes_ = new pbc::RepeatedField<global::Com.Relationalai.Protos.RelType>();
+    private static readonly pb::FieldCodec<global::Relationalai.Protocol.RelType> _repeated_argumentTypes_codec
+        = pb::FieldCodec.ForMessage(10, global::Relationalai.Protocol.RelType.Parser);
+    private readonly pbc::RepeatedField<global::Relationalai.Protocol.RelType> argumentTypes_ = new pbc::RepeatedField<global::Relationalai.Protocol.RelType>();
     /// <summary>
     /// Constant types are allowed, e.g. the `64` in `decimal[64]`. They serve as type
     /// parameters.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Com.Relationalai.Protos.RelType> ArgumentTypes {
+    public pbc::RepeatedField<global::Relationalai.Protocol.RelType> ArgumentTypes {
       get { return argumentTypes_; }
     }
 
@@ -2078,7 +2078,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[6]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[6]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2111,14 +2111,14 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "rel_type" field.</summary>
     public const int RelTypeFieldNumber = 1;
-    private global::Com.Relationalai.Protos.RelType relType_;
+    private global::Relationalai.Protocol.RelType relType_;
     /// <summary>
     /// Required
     /// This is the type of the constant and describes whatever is in the RelTuple value
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.RelType RelType {
+    public global::Relationalai.Protocol.RelType RelType {
       get { return relType_; }
       set {
         relType_ = value;
@@ -2127,7 +2127,7 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "value" field.</summary>
     public const int ValueFieldNumber = 2;
-    private global::Com.Relationalai.Protos.RelTuple value_;
+    private global::Relationalai.Protocol.RelTuple value_;
     /// <summary>
     /// The tuple contains only the values that are not constant.
     /// E.g. for decimal[64](3.14) only 3.14 is part of the data.
@@ -2137,7 +2137,7 @@ namespace Com.Relationalai.Protos {
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.RelTuple Value {
+    public global::Relationalai.Protocol.RelTuple Value {
       get { return value_; }
       set {
         value_ = value;
@@ -2244,13 +2244,13 @@ namespace Com.Relationalai.Protos {
       }
       if (other.relType_ != null) {
         if (relType_ == null) {
-          RelType = new global::Com.Relationalai.Protos.RelType();
+          RelType = new global::Relationalai.Protocol.RelType();
         }
         RelType.MergeFrom(other.RelType);
       }
       if (other.value_ != null) {
         if (value_ == null) {
-          Value = new global::Com.Relationalai.Protos.RelTuple();
+          Value = new global::Relationalai.Protocol.RelTuple();
         }
         Value.MergeFrom(other.Value);
       }
@@ -2271,14 +2271,14 @@ namespace Com.Relationalai.Protos {
             break;
           case 10: {
             if (relType_ == null) {
-              RelType = new global::Com.Relationalai.Protos.RelType();
+              RelType = new global::Relationalai.Protocol.RelType();
             }
             input.ReadMessage(RelType);
             break;
           }
           case 18: {
             if (value_ == null) {
-              Value = new global::Com.Relationalai.Protos.RelTuple();
+              Value = new global::Relationalai.Protocol.RelTuple();
             }
             input.ReadMessage(Value);
             break;
@@ -2300,14 +2300,14 @@ namespace Com.Relationalai.Protos {
             break;
           case 10: {
             if (relType_ == null) {
-              RelType = new global::Com.Relationalai.Protos.RelType();
+              RelType = new global::Relationalai.Protocol.RelType();
             }
             input.ReadMessage(RelType);
             break;
           }
           case 18: {
             if (value_ == null) {
-              Value = new global::Com.Relationalai.Protos.RelTuple();
+              Value = new global::Relationalai.Protocol.RelTuple();
             }
             input.ReadMessage(Value);
             break;
@@ -2336,7 +2336,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.SchemaReflection.Descriptor.MessageTypes[7]; }
+      get { return global::Relationalai.Protocol.SchemaReflection.Descriptor.MessageTypes[7]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -2371,10 +2371,10 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "tag" field.</summary>
     public const int TagFieldNumber = 1;
-    private global::Com.Relationalai.Protos.Kind tag_ = global::Com.Relationalai.Protos.Kind.UnspecifiedKind;
+    private global::Relationalai.Protocol.Kind tag_ = global::Relationalai.Protocol.Kind.UnspecifiedKind;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.Kind Tag {
+    public global::Relationalai.Protocol.Kind Tag {
       get { return tag_; }
       set {
         tag_ = value;
@@ -2383,13 +2383,13 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "primitive_type" field.</summary>
     public const int PrimitiveTypeFieldNumber = 2;
-    private global::Com.Relationalai.Protos.PrimitiveType primitiveType_ = global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType;
+    private global::Relationalai.Protocol.PrimitiveType primitiveType_ = global::Relationalai.Protocol.PrimitiveType.UnspecifiedType;
     /// <summary>
     /// Only one of the following is allowed.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.PrimitiveType PrimitiveType {
+    public global::Relationalai.Protocol.PrimitiveType PrimitiveType {
       get { return primitiveType_; }
       set {
         primitiveType_ = value;
@@ -2398,10 +2398,10 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "value_type" field.</summary>
     public const int ValueTypeFieldNumber = 3;
-    private global::Com.Relationalai.Protos.ValueType valueType_;
+    private global::Relationalai.Protocol.ValueType valueType_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.ValueType ValueType {
+    public global::Relationalai.Protocol.ValueType ValueType {
       get { return valueType_; }
       set {
         valueType_ = value;
@@ -2410,10 +2410,10 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "constant_type" field.</summary>
     public const int ConstantTypeFieldNumber = 4;
-    private global::Com.Relationalai.Protos.ConstantType constantType_;
+    private global::Relationalai.Protocol.ConstantType constantType_;
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.ConstantType ConstantType {
+    public global::Relationalai.Protocol.ConstantType ConstantType {
       get { return constantType_; }
       set {
         constantType_ = value;
@@ -2446,8 +2446,8 @@ namespace Com.Relationalai.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public override int GetHashCode() {
       int hash = 1;
-      if (Tag != global::Com.Relationalai.Protos.Kind.UnspecifiedKind) hash ^= Tag.GetHashCode();
-      if (PrimitiveType != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) hash ^= PrimitiveType.GetHashCode();
+      if (Tag != global::Relationalai.Protocol.Kind.UnspecifiedKind) hash ^= Tag.GetHashCode();
+      if (PrimitiveType != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) hash ^= PrimitiveType.GetHashCode();
       if (valueType_ != null) hash ^= ValueType.GetHashCode();
       if (constantType_ != null) hash ^= ConstantType.GetHashCode();
       if (_unknownFields != null) {
@@ -2468,11 +2468,11 @@ namespace Com.Relationalai.Protos {
     #if !GOOGLE_PROTOBUF_REFSTRUCT_COMPATIBILITY_MODE
       output.WriteRawMessage(this);
     #else
-      if (Tag != global::Com.Relationalai.Protos.Kind.UnspecifiedKind) {
+      if (Tag != global::Relationalai.Protocol.Kind.UnspecifiedKind) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Tag);
       }
-      if (PrimitiveType != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (PrimitiveType != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         output.WriteRawTag(16);
         output.WriteEnum((int) PrimitiveType);
       }
@@ -2494,11 +2494,11 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     void pb::IBufferMessage.InternalWriteTo(ref pb::WriteContext output) {
-      if (Tag != global::Com.Relationalai.Protos.Kind.UnspecifiedKind) {
+      if (Tag != global::Relationalai.Protocol.Kind.UnspecifiedKind) {
         output.WriteRawTag(8);
         output.WriteEnum((int) Tag);
       }
-      if (PrimitiveType != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (PrimitiveType != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         output.WriteRawTag(16);
         output.WriteEnum((int) PrimitiveType);
       }
@@ -2520,10 +2520,10 @@ namespace Com.Relationalai.Protos {
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public int CalculateSize() {
       int size = 0;
-      if (Tag != global::Com.Relationalai.Protos.Kind.UnspecifiedKind) {
+      if (Tag != global::Relationalai.Protocol.Kind.UnspecifiedKind) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) Tag);
       }
-      if (PrimitiveType != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (PrimitiveType != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         size += 1 + pb::CodedOutputStream.ComputeEnumSize((int) PrimitiveType);
       }
       if (valueType_ != null) {
@@ -2544,21 +2544,21 @@ namespace Com.Relationalai.Protos {
       if (other == null) {
         return;
       }
-      if (other.Tag != global::Com.Relationalai.Protos.Kind.UnspecifiedKind) {
+      if (other.Tag != global::Relationalai.Protocol.Kind.UnspecifiedKind) {
         Tag = other.Tag;
       }
-      if (other.PrimitiveType != global::Com.Relationalai.Protos.PrimitiveType.UnspecifiedType) {
+      if (other.PrimitiveType != global::Relationalai.Protocol.PrimitiveType.UnspecifiedType) {
         PrimitiveType = other.PrimitiveType;
       }
       if (other.valueType_ != null) {
         if (valueType_ == null) {
-          ValueType = new global::Com.Relationalai.Protos.ValueType();
+          ValueType = new global::Relationalai.Protocol.ValueType();
         }
         ValueType.MergeFrom(other.ValueType);
       }
       if (other.constantType_ != null) {
         if (constantType_ == null) {
-          ConstantType = new global::Com.Relationalai.Protos.ConstantType();
+          ConstantType = new global::Relationalai.Protocol.ConstantType();
         }
         ConstantType.MergeFrom(other.ConstantType);
       }
@@ -2578,23 +2578,23 @@ namespace Com.Relationalai.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, input);
             break;
           case 8: {
-            Tag = (global::Com.Relationalai.Protos.Kind) input.ReadEnum();
+            Tag = (global::Relationalai.Protocol.Kind) input.ReadEnum();
             break;
           }
           case 16: {
-            PrimitiveType = (global::Com.Relationalai.Protos.PrimitiveType) input.ReadEnum();
+            PrimitiveType = (global::Relationalai.Protocol.PrimitiveType) input.ReadEnum();
             break;
           }
           case 26: {
             if (valueType_ == null) {
-              ValueType = new global::Com.Relationalai.Protos.ValueType();
+              ValueType = new global::Relationalai.Protocol.ValueType();
             }
             input.ReadMessage(ValueType);
             break;
           }
           case 34: {
             if (constantType_ == null) {
-              ConstantType = new global::Com.Relationalai.Protos.ConstantType();
+              ConstantType = new global::Relationalai.Protocol.ConstantType();
             }
             input.ReadMessage(ConstantType);
             break;
@@ -2615,23 +2615,23 @@ namespace Com.Relationalai.Protos {
             _unknownFields = pb::UnknownFieldSet.MergeFieldFrom(_unknownFields, ref input);
             break;
           case 8: {
-            Tag = (global::Com.Relationalai.Protos.Kind) input.ReadEnum();
+            Tag = (global::Relationalai.Protocol.Kind) input.ReadEnum();
             break;
           }
           case 16: {
-            PrimitiveType = (global::Com.Relationalai.Protos.PrimitiveType) input.ReadEnum();
+            PrimitiveType = (global::Relationalai.Protocol.PrimitiveType) input.ReadEnum();
             break;
           }
           case 26: {
             if (valueType_ == null) {
-              ValueType = new global::Com.Relationalai.Protos.ValueType();
+              ValueType = new global::Relationalai.Protocol.ValueType();
             }
             input.ReadMessage(ValueType);
             break;
           }
           case 34: {
             if (constantType_ == null) {
-              ConstantType = new global::Com.Relationalai.Protos.ConstantType();
+              ConstantType = new global::Relationalai.Protocol.ConstantType();
             }
             input.ReadMessage(ConstantType);
             break;

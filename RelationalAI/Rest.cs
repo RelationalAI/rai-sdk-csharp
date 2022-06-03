@@ -21,7 +21,7 @@ namespace RelationalAI
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
     using RelationalAI.Credentials;
-    using Com.Relationalai.Protos;
+    using Relationalai.Protocol;
     using System;
     using System.Collections.Generic;
     using System.Linq;

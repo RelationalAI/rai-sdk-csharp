@@ -9,7 +9,7 @@ using pb = global::Google.Protobuf;
 using pbc = global::Google.Protobuf.Collections;
 using pbr = global::Google.Protobuf.Reflection;
 using scg = global::System.Collections.Generic;
-namespace Com.Relationalai.Protos {
+namespace Relationalai.Protocol {
 
   /// <summary>Holder for reflection information generated from message.proto</summary>
   public static partial class MessageReflection {
@@ -24,17 +24,17 @@ namespace Com.Relationalai.Protos {
     static MessageReflection() {
       byte[] descriptorData = global::System.Convert.FromBase64String(
           string.Concat(
-            "Cg1tZXNzYWdlLnByb3RvEhdjb20ucmVsYXRpb25hbGFpLnByb3RvcxoMc2No",
-            "ZW1hLnByb3RvIkwKDE1ldGFkYXRhSW5mbxI8CglyZWxhdGlvbnMYASADKAsy",
-            "KS5jb20ucmVsYXRpb25hbGFpLnByb3Rvcy5SZWxhdGlvbk1ldGFkYXRhIl8K",
-            "EFJlbGF0aW9uTWV0YWRhdGESOAoLcmVsYXRpb25faWQYASABKAsyIy5jb20u",
-            "cmVsYXRpb25hbGFpLnByb3Rvcy5SZWxhdGlvbklkEhEKCWZpbGVfbmFtZRgC",
-            "IAEoCWIGcHJvdG8z"));
+            "Cg1tZXNzYWdlLnByb3RvEhVyZWxhdGlvbmFsYWkucHJvdG9jb2waDHNjaGVt",
+            "YS5wcm90byJKCgxNZXRhZGF0YUluZm8SOgoJcmVsYXRpb25zGAEgAygLMicu",
+            "cmVsYXRpb25hbGFpLnByb3RvY29sLlJlbGF0aW9uTWV0YWRhdGEiXQoQUmVs",
+            "YXRpb25NZXRhZGF0YRI2CgtyZWxhdGlvbl9pZBgBIAEoCzIhLnJlbGF0aW9u",
+            "YWxhaS5wcm90b2NvbC5SZWxhdGlvbklkEhEKCWZpbGVfbmFtZRgCIAEoCWIG",
+            "cHJvdG8z"));
       descriptor = pbr::FileDescriptor.FromGeneratedCode(descriptorData,
-          new pbr::FileDescriptor[] { global::Com.Relationalai.Protos.SchemaReflection.Descriptor, },
+          new pbr::FileDescriptor[] { global::Relationalai.Protocol.SchemaReflection.Descriptor, },
           new pbr::GeneratedClrTypeInfo(null, null, new pbr::GeneratedClrTypeInfo[] {
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.MetadataInfo), global::Com.Relationalai.Protos.MetadataInfo.Parser, new[]{ "Relations" }, null, null, null, null),
-            new pbr::GeneratedClrTypeInfo(typeof(global::Com.Relationalai.Protos.RelationMetadata), global::Com.Relationalai.Protos.RelationMetadata.Parser, new[]{ "RelationId", "FileName" }, null, null, null, null)
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.MetadataInfo), global::Relationalai.Protocol.MetadataInfo.Parser, new[]{ "Relations" }, null, null, null, null),
+            new pbr::GeneratedClrTypeInfo(typeof(global::Relationalai.Protocol.RelationMetadata), global::Relationalai.Protocol.RelationMetadata.Parser, new[]{ "RelationId", "FileName" }, null, null, null, null)
           }));
     }
     #endregion
@@ -58,7 +58,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.MessageReflection.Descriptor.MessageTypes[0]; }
+      get { return global::Relationalai.Protocol.MessageReflection.Descriptor.MessageTypes[0]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -90,12 +90,12 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "relations" field.</summary>
     public const int RelationsFieldNumber = 1;
-    private static readonly pb::FieldCodec<global::Com.Relationalai.Protos.RelationMetadata> _repeated_relations_codec
-        = pb::FieldCodec.ForMessage(10, global::Com.Relationalai.Protos.RelationMetadata.Parser);
-    private readonly pbc::RepeatedField<global::Com.Relationalai.Protos.RelationMetadata> relations_ = new pbc::RepeatedField<global::Com.Relationalai.Protos.RelationMetadata>();
+    private static readonly pb::FieldCodec<global::Relationalai.Protocol.RelationMetadata> _repeated_relations_codec
+        = pb::FieldCodec.ForMessage(10, global::Relationalai.Protocol.RelationMetadata.Parser);
+    private readonly pbc::RepeatedField<global::Relationalai.Protocol.RelationMetadata> relations_ = new pbc::RepeatedField<global::Relationalai.Protocol.RelationMetadata>();
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public pbc::RepeatedField<global::Com.Relationalai.Protos.RelationMetadata> Relations {
+    public pbc::RepeatedField<global::Relationalai.Protocol.RelationMetadata> Relations {
       get { return relations_; }
     }
 
@@ -239,7 +239,7 @@ namespace Com.Relationalai.Protos {
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
     public static pbr::MessageDescriptor Descriptor {
-      get { return global::Com.Relationalai.Protos.MessageReflection.Descriptor.MessageTypes[1]; }
+      get { return global::Relationalai.Protocol.MessageReflection.Descriptor.MessageTypes[1]; }
     }
 
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
@@ -272,13 +272,13 @@ namespace Com.Relationalai.Protos {
 
     /// <summary>Field number for the "relation_id" field.</summary>
     public const int RelationIdFieldNumber = 1;
-    private global::Com.Relationalai.Protos.RelationId relationId_;
+    private global::Relationalai.Protocol.RelationId relationId_;
     /// <summary>
     /// Type signature of this relation.
     /// </summary>
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute]
     [global::System.CodeDom.Compiler.GeneratedCode("protoc", null)]
-    public global::Com.Relationalai.Protos.RelationId RelationId {
+    public global::Relationalai.Protocol.RelationId RelationId {
       get { return relationId_; }
       set {
         relationId_ = value;
@@ -400,7 +400,7 @@ namespace Com.Relationalai.Protos {
       }
       if (other.relationId_ != null) {
         if (relationId_ == null) {
-          RelationId = new global::Com.Relationalai.Protos.RelationId();
+          RelationId = new global::Relationalai.Protocol.RelationId();
         }
         RelationId.MergeFrom(other.RelationId);
       }
@@ -424,7 +424,7 @@ namespace Com.Relationalai.Protos {
             break;
           case 10: {
             if (relationId_ == null) {
-              RelationId = new global::Com.Relationalai.Protos.RelationId();
+              RelationId = new global::Relationalai.Protocol.RelationId();
             }
             input.ReadMessage(RelationId);
             break;
@@ -450,7 +450,7 @@ namespace Com.Relationalai.Protos {
             break;
           case 10: {
             if (relationId_ == null) {
-              RelationId = new global::Com.Relationalai.Protos.RelationId();
+              RelationId = new global::Relationalai.Protocol.RelationId();
             }
             input.ReadMessage(RelationId);
             break;
