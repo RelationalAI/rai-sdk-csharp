@@ -257,6 +257,7 @@ namespace RelationalAI
                 var resultTask = httpRespTask.Result.Content.ReadAsByteArrayAsync();
                 var responseHeaders = httpRespTask.Result.Content.Headers;
                 var contentType = responseHeaders.ContentType;
+                resultTask.Wait();
 
                 if (contentType == null)
                 {
