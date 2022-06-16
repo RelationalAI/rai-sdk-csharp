@@ -1,3 +1,6 @@
+## v0.2.3-alpha
+* Added `CancelTransaction` feature.
+
 ## v0.2.2-alpha
 * Added `FinishedAt` field to `TransactionAsyncResponse`.
 
