@@ -19,9 +19,6 @@
 
     public class CancelResponse : Entity
     {
-        [JsonProperty("status", Required = Required.Default)]
-        public string status { get; set; }
-
         [JsonProperty("message", Required = Required.Default)]
         public string message { get; set; }
     }

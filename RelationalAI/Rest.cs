@@ -256,19 +256,26 @@ namespace RelationalAI
                 httpRespTask.Wait();
                 var resultTask = httpRespTask.Result.Content.ReadAsByteArrayAsync();
                 var responseHeaders = httpRespTask.Result.Content.Headers;
-                var contentType = responseHeaders.ContentType == null ? "application/json" : responseHeaders.ContentType.MediaType;
+                var contentType = responseHeaders.ContentType;
 
-                if ("application/json".Equals(contentType.ToLower()))
+                if (contentType == null)
                 {
                     return ReadString(resultTask.Result);
                 }
-                else if ("multipart/form-data".Equals(contentType.ToLower()))
-                {
-                    return ParseMultipartResponse(resultTask.Result);
-                }
                 else
                 {
-                    throw new SystemException($"unsupported content-type: {contentType}");
+                    if ("application/json".Equals(contentType.MediaType.ToLower()))
+                    {
+                        return ReadString(resultTask.Result);
+                    }
+                    else if ("multipart/form-data".Equals(contentType.MediaType.ToLower()))
+                    {
+                        return ParseMultipartResponse(resultTask.Result);
+                    }
+                    else
+                    {
+                        throw new SystemException($"unsupported content-type: {contentType}");
+                    }
                 }
             }
         }
