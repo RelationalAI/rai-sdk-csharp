@@ -39,6 +39,7 @@ namespace RelationalAI.Examples
             root.AddCommand(GetTransactionResults.GetCommand());
             root.AddCommand(GetTransactionMetadata.GetCommand());
             root.AddCommand(GetTransactionProblems.GetCommand());
+            root.AddCommand(CancelTransaction.GetCommand());
             //return the root command
             return root;
         }

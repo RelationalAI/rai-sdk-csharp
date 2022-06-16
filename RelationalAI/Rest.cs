@@ -255,8 +255,8 @@ namespace RelationalAI
                 var httpRespTask = client.SendAsync(request);
                 httpRespTask.Wait();
                 var resultTask = httpRespTask.Result.Content.ReadAsByteArrayAsync();
-                var contentType = httpRespTask.Result.Content.Headers.ContentType.MediaType;
-                resultTask.Wait();
+                var responseHeaders = httpRespTask.Result.Content.Headers;
+                var contentType = responseHeaders.ContentType == null ? "application/json" : responseHeaders.ContentType.MediaType;
 
                 if ("application/json".Equals(contentType.ToLower()))
                 {
