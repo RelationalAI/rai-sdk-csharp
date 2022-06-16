@@ -275,7 +275,7 @@ namespace RelationalAI
                     }
                     else
                     {
-                        throw new SystemException($"unsupported content-type: {contentType}");
+                        throw new SystemException($"unsupported content-type: {contentType.MediaType}");
                     }
                 }
             }
