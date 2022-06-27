@@ -17,7 +17,7 @@
 {
     using Newtonsoft.Json;
 
-    public class CancelResponse : Entity
+    public class TransactionAsyncCancelResponse : Entity
     {
         [JsonProperty("message", Required = Required.Default)]
         public string message { get; set; }
