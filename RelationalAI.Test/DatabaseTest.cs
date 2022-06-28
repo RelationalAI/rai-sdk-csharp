@@ -49,14 +49,14 @@ namespace RelationalAI.Test
             Assert.NotNull(edb);
 
             var modelNames = client.ListModelNames(Dbname, EngineName);
-            var name = modelNames.Find( item => item.Equals("stdlib") );
+            var name = modelNames.Find( item => item.Equals("rel/stdlib") );
             Assert.NotNull(name);
 
             var models = client.ListModels(Dbname, EngineName);
-            var model = models.Find( m => m.Name.Equals("stdlib") );
+            var model = models.Find( m => m.Name.Equals("rel/stdlib") );
             Assert.NotNull(model);
 
-            model = client.GetModel(Dbname, EngineName, "stdlib");
+            model = client.GetModel(Dbname, EngineName, "rel/stdlib");
             Assert.NotNull(model);
             Assert.True(model.Value.Length > 0);
 

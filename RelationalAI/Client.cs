@@ -310,6 +310,12 @@ namespace RelationalAI
             return ParseProblemsResult(rsp);
         }
 
+        public TransactionAsyncCancelResponse CancelTransaction(string id)
+        {
+            var rsp = this.rest.Post(this.MakeUrl(string.Format("{0}/{1}/cancel", Client.PathTransactions, id)), new Dictionary<string, object>() { }) as string;
+            return Json<TransactionAsyncCancelResponse>.Deserialize(rsp);
+        }
+
         private List<object> ParseProblemsResult(string rsp)
         {
             var output = new List<object>();
