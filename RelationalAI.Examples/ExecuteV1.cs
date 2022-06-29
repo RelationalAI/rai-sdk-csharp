@@ -43,7 +43,7 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.Execute(database, engine, command));
+            Console.WriteLine(client.ExecuteV1(database, engine, command));
         }
 
     }

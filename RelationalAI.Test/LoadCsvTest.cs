@@ -29,7 +29,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 
@@ -101,7 +101,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample_no_header");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample_no_header");
 
             Relation rel;
 
@@ -176,7 +176,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample_alt_syntax");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample_alt_syntax");
 
             Relation rel;
 
@@ -249,7 +249,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 

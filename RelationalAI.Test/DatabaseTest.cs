@@ -117,7 +117,7 @@ namespace RelationalAI.Test
             Assert.Equal("CREATED", database.State);
 
             // make sure the data was cloned
-            var rsp = client.Execute(databaseCloneName, EngineName, "test_data", true);
+            var rsp = client.ExecuteV1(databaseCloneName, EngineName, "test_data", true);
 
             Relation rel;
 

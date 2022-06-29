@@ -18,7 +18,7 @@ namespace RelationalAI.Test
             client.CreateDatabase(Dbname, EngineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = client.Execute(Dbname, EngineName, query, true);
+            var rsp = client.ExecuteV1(Dbname, EngineName, query, true);
 
             Assert.Equal(rsp.Aborted, false);
             var output = rsp.Output;
