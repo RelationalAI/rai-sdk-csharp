@@ -10,7 +10,7 @@ namespace RelationalAI.Test
         public static string EngineName = $"csharp-sdk-{UUID}";
 
         [Fact]
-        public void ExecuteATest()
+        public void ExecuteV1Test()
         {
             Client client = CreateClient();
 

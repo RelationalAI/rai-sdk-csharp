@@ -8,11 +8,11 @@ using RelationalAI;
 
 namespace RelationalAI.Examples
 {
-    public class Execute
+    public class ExecuteV1
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("Execute", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
+            var cmd = new Command("ExecuteV1", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
                 new Option<string>("--database"){
                     IsRequired = true,
                     Description = "Database to run query."
