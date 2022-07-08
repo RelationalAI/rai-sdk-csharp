@@ -29,7 +29,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 
@@ -39,7 +39,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
                 },
                 rel.Columns
@@ -51,7 +51,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
                 },
                 rel.Columns
@@ -62,7 +62,7 @@ namespace RelationalAI.Test
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
                 new object[][] {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
                 },
                 rel.Columns
@@ -74,7 +74,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
                 },
                 rel.Columns
@@ -101,7 +101,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample_no_header");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample_no_header");
 
             Relation rel;
 
@@ -111,7 +111,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {0L, 31L, 62L, 98L},
+                    new object[] {1L, 2L, 3L, 4L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
                 },
                 rel.Columns
@@ -124,7 +124,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {0L, 31L, 62L, 98L},
+                    new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2", "4", "4", "3"}
                 },
                 rel.Columns
@@ -136,7 +136,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {0L, 31L, 62L, 98L},
+                    new object[] {1L, 2L, 3L, 4L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
                 },
                 rel.Columns
@@ -148,7 +148,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {0L, 31L, 62L, 98L},
+                    new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
                 },
                 rel.Columns
@@ -176,7 +176,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample_alt_syntax");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample_alt_syntax");
 
             Relation rel;
 
@@ -186,7 +186,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
                 },
                 rel.Columns
@@ -198,7 +198,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
                 },
                 rel.Columns
@@ -210,7 +210,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
                 },
                 rel.Columns
@@ -222,7 +222,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
                 },
                 rel.Columns
@@ -249,7 +249,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 
@@ -259,7 +259,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
                 },
                 rel.Columns
@@ -273,7 +273,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {12.5, 14.25, 11.00, 12.25}
                 },
                 rel.Columns
@@ -287,7 +287,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {2L, 4L, 4L, 3L}
                 },
                 rel.Columns
@@ -301,7 +301,7 @@ namespace RelationalAI.Test
             Assert.Equal(
                 new object[][]
                 {
-                    new object[] {29L, 60L, 91L, 127L},
+                    new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
                 },
                 rel.Columns

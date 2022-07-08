@@ -310,6 +310,12 @@ namespace RelationalAI
             return ParseProblemsResult(rsp);
         }
 
+        public TransactionAsyncCancelResponse CancelTransaction(string id)
+        {
+            var rsp = this.rest.Post(this.MakeUrl(string.Format("{0}/{1}/cancel", Client.PathTransactions, id)), new Dictionary<string, object>() { }) as string;
+            return Json<TransactionAsyncCancelResponse>.Deserialize(rsp);
+        }
+
         private List<object> ParseProblemsResult(string rsp)
         {
             var output = new List<object>();
@@ -425,7 +431,7 @@ namespace RelationalAI
         }
 
         // Query
-        public TransactionResult Execute(
+        public TransactionResult ExecuteV1(
             string database,
             string engine,
             string source,
@@ -439,7 +445,7 @@ namespace RelationalAI
             return Json<TransactionResult>.Deserialize(resp);
         }
 
-        public TransactionAsyncResult ExecuteAsyncWait(
+        public TransactionAsyncResult Execute(
             string database,
             string engine,
             string source,
@@ -549,7 +555,7 @@ namespace RelationalAI
             var inputs = new Dictionary<string, string>();
             inputs.Add("data", data);
             var source = GenLoadJson(relation);
-            return Execute(database, engine, source, false, inputs);
+            return ExecuteV1(database, engine, source, false, inputs);
         }
 
         private void GenSchemaConfig(StringBuilder builder, CsvOptions options)
@@ -649,7 +655,7 @@ namespace RelationalAI
             var source = GenLoadCsv(relation, options);
             var inputs = new Dictionary<string, string>();
             inputs.Add("data", data);
-            return Execute(database, engine, source, false, inputs);
+            return ExecuteV1(database, engine, source, false, inputs);
         }
 
         public Database CloneDatabase(

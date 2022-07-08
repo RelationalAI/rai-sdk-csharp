@@ -1,3 +1,13 @@
+# Changelog
+
+## v0.4.0-alpha
+* Renamed:
+  - `Execute` to `ExecuteV1`.
+  - `ExecuteAsyncWait` to `Execute`.
+
+## v0.3.0-alpha
+* Added `CancelTransaction` feature.
+
 ## v0.2.2-alpha
 * Added `FinishedAt` field to `TransactionAsyncResponse`.
 

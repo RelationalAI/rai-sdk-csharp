@@ -27,7 +27,7 @@ namespace RelationalAI.Test
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.Execute(Dbname, EngineName, "def output = sample");
+            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 

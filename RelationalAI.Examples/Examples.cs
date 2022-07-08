@@ -32,13 +32,14 @@ namespace RelationalAI.Examples
             root.AddCommand(ListEngines.GetCommand());
             root.AddCommand(ListOAuthClients.GetCommand());
             root.AddCommand(ListUsers.GetCommand());
-            root.AddCommand(Execute.GetCommand());
+            root.AddCommand(ExecuteV1.GetCommand());
             root.AddCommand(ExecuteAsync.GetCommand());
             root.AddCommand(GetTransaction.GetCommand());
             root.AddCommand(GetTransactions.GetCommand());
             root.AddCommand(GetTransactionResults.GetCommand());
             root.AddCommand(GetTransactionMetadata.GetCommand());
             root.AddCommand(GetTransactionProblems.GetCommand());
+            root.AddCommand(CancelTransaction.GetCommand());
             //return the root command
             return root;
         }
