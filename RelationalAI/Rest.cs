@@ -29,7 +29,6 @@ namespace RelationalAI
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web;
-    using RelationalAI.Protos.Models;
 
     public class Rest
     {
@@ -113,7 +112,7 @@ namespace RelationalAI
             }
 
             caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", this.GetAccessToken(this.GetHost(url))));
-            return this.RequestHelper(method, url, data, caseInsensitiveHeaders, parameters);
+            return this.RequestHelper(method, url, data, headers: caseInsensitiveHeaders, parameters: parameters);
         }
 
         private HttpContent EncodeContent(object body)
@@ -269,6 +268,10 @@ namespace RelationalAI
                 {
                     return ParseMultipartResponse(resultTask.Result);
                 }
+                else if ("application/x-protobuf".Equals(contentType.ToLower()))
+                {
+                    return ReadMetadataInfo(resultTask.Result);
+                }
                 else
                 {
                     throw new SystemException($"unsupported content-type: {contentType}");
@@ -329,10 +332,9 @@ namespace RelationalAI
             return output;
         }
 
-        public MetadataInfoResult ReadMetadataInfo(TransactionAsyncFile file)
+        public MetadataInfo ReadMetadataInfo(byte[] data)
         {
-            MetadataInfo infos = MetadataInfo.Parser.ParseFrom(file.Data);
-            return JsonConvert.DeserializeObject<MetadataInfoResult>(infos.ToString());
+            return MetadataInfo.Parser.ParseFrom(data);
         }
 
         public class Context

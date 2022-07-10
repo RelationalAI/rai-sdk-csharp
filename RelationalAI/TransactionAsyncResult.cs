@@ -16,21 +16,21 @@
 namespace RelationalAI
 {
     using System.Collections.Generic;
-    using RelationalAI.Protos.Models;
+    using Relationalai.Protocol;
 
     public class TransactionAsyncResult : Entity
     {
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
         public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
-        public MetadataInfoResult MetadataInfos { get; set; }
+        public MetadataInfo MetadataInfos { get; set; }
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
             List<TransactionAsyncMetadataResponse> metadata,
-            MetadataInfoResult metadataInfos,
+            MetadataInfo metadataInfos,
             List<object> problems
         )
         {

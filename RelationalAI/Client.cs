@@ -22,6 +22,7 @@ namespace RelationalAI
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RelationalAI.Credentials;
+    using Relationalai.Protocol;
 
     public class Client
     {
@@ -304,6 +305,17 @@ namespace RelationalAI
             return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
         }
 
+        public MetadataInfo GetTransactionMetadataInfo(string id)
+        {
+            var headers = new Dictionary<string, string>()
+            {
+                {"accept", "application/x-protobuf"}
+            };
+
+            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id)), headers: headers) as MetadataInfo;
+            return rsp;
+        }
+
         public List<object> GetTransactionProblems(string id)
         {
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/problems", Client.PathTransactions, id))) as string;
@@ -464,13 +476,14 @@ namespace RelationalAI
 
             var results = GetTransactionResults(id);
             var metadata = GetTransactionMetadata(id);
+            var metadataInfo = GetTransactionMetadataInfo(id);
             var problems = GetTransactionProblems(id);
 
             return new TransactionAsyncResult(
                 transaction,
                 results,
                 metadata,
-                null,
+                metadataInfo,
                 problems
             );
         }
@@ -519,7 +532,7 @@ namespace RelationalAI
                 throw new SystemException("metadata info part not found");
             }
 
-            var metadataInfoResult = this.rest.ReadMetadataInfo(metadataInfo);
+            var metadataInfoResult = this.rest.ReadMetadataInfo(metadataInfo.Data);
 
             List<object> problemsResult = null;
             if (problems != null)
