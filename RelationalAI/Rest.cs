@@ -21,6 +21,7 @@ namespace RelationalAI
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
     using RelationalAI.Credentials;
+    using Relationalai.Protocol;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -28,6 +29,7 @@ namespace RelationalAI
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web;
+
     public class Rest
     {
         private Rest.Context context;
@@ -110,7 +112,7 @@ namespace RelationalAI
             }
 
             caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", this.GetAccessToken(this.GetHost(url))));
-            return this.RequestHelper(method, url, data, caseInsensitiveHeaders, parameters);
+            return this.RequestHelper(method, url, data, headers: caseInsensitiveHeaders, parameters: parameters);
         }
 
         private HttpContent EncodeContent(object body)
@@ -266,6 +268,10 @@ namespace RelationalAI
                 {
                     return ParseMultipartResponse(resultTask.Result);
                 }
+                else if ("application/x-protobuf".Equals(contentType.ToLower()))
+                {
+                    return ReadMetadataInfo(resultTask.Result);
+                }
                 else
                 {
                     throw new SystemException($"unsupported content-type: {contentType}");
@@ -321,9 +327,14 @@ namespace RelationalAI
                        }
                     }
                 }
-            } 
+            }
 
             return output;
+        }
+
+        public MetadataInfo ReadMetadataInfo(byte[] data)
+        {
+            return MetadataInfo.Parser.ParseFrom(data);
         }
 
         public class Context
