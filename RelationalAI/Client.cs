@@ -309,7 +309,7 @@ namespace RelationalAI
         {
             var headers = new Dictionary<string, string>()
             {
-                {"accept", "application/x-protobuf"}
+                { "accept", "application/x-protobuf" }
             };
 
             var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id)), headers: headers) as MetadataInfo;
@@ -333,7 +333,7 @@ namespace RelationalAI
             var output = new List<object>();
 
             var problems = JsonConvert.DeserializeObject(rsp);
-            foreach(var problem in problems as JArray)
+            foreach (var problem in problems as JArray)
             {
                 var data = JsonConvert.SerializeObject(problem);
                 try
@@ -394,7 +394,7 @@ namespace RelationalAI
         public TransactionResult LoadModels(
             string database,
             string engine,
-            Dictionary<string,string> models)
+            Dictionary<string, string> models)
         {
             var tx = new Transaction(this.context.Region, database, engine, "OPEN", false);
             List<DbAction> actions = new List<DbAction>() { DbAction.MakeInstallAction(models) };
@@ -479,13 +479,7 @@ namespace RelationalAI
             var metadataInfo = GetTransactionMetadataInfo(id);
             var problems = GetTransactionProblems(id);
 
-            return new TransactionAsyncResult(
-                transaction,
-                results,
-                metadata,
-                metadataInfo,
-                problems
-            );
+            return new TransactionAsyncResult(transaction, results, metadata, metadataInfo, problems);
         }
 
         public TransactionAsyncResult ExecuteAsync(
@@ -542,13 +536,7 @@ namespace RelationalAI
 
             var results = this.rest.ReadArrowFiles(files);
 
-            return new TransactionAsyncResult(
-                transactionResult,
-                results,
-                metadataResult,
-                metadataInfoResult,
-                problemsResult
-            );
+            return new TransactionAsyncResult(transactionResult, results, metadataResult, metadataInfoResult, problemsResult);
         }
 
         private string GenLoadJson(string relation)
@@ -582,7 +570,7 @@ namespace RelationalAI
 
             var isEmpty = true;
 
-            foreach(var entry in schema)
+            foreach (var entry in schema)
                 isEmpty = false;
 
             if (isEmpty)
