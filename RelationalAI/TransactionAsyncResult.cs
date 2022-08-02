@@ -22,22 +22,19 @@ namespace RelationalAI
     {
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
-        public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
-        public MetadataInfo MetadataInfos { get; set; }
+        public MetadataInfo Metadata { get; set; }
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
-            List<TransactionAsyncMetadataResponse> metadata,
-            MetadataInfo metadataInfos,
+            MetadataInfo metadataProto,
             List<object> problems
         )
         {
             this.Transaction = transaction;
             this.Results = results;
-            this.Metadata = metadata;
-            this.MetadataInfos = metadataInfos;
+            this.Metadata = metadataProto;
             this.Problems = problems;
         }
     }

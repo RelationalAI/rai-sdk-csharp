@@ -299,13 +299,7 @@ namespace RelationalAI
             return this.rest.ReadArrowFiles(files);
         }
 
-        public List<TransactionAsyncMetadataResponse> GetTransactionMetadata(string id)
-        {
-            var rsp = this.rest.Get(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id))) as string;
-            return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
-        }
-
-        public MetadataInfo GetTransactionMetadataInfo(string id)
+        public MetadataInfo GetTransactionMetadata(string id)
         {
             var headers = new Dictionary<string, string>()
             {
@@ -476,10 +470,9 @@ namespace RelationalAI
 
             var results = GetTransactionResults(id);
             var metadata = GetTransactionMetadata(id);
-            var metadataInfo = GetTransactionMetadataInfo(id);
             var problems = GetTransactionProblems(id);
 
-            return new TransactionAsyncResult(transaction, results, metadata, metadataInfo, problems);
+            return new TransactionAsyncResult(transaction, results, metadata, problems);
         }
 
         public TransactionAsyncResult ExecuteAsync(
@@ -496,7 +489,7 @@ namespace RelationalAI
             if (rsp is string)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(rsp as string);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), null, new List<object>());
+                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
@@ -505,8 +498,7 @@ namespace RelationalAI
         private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
         {
             var transaction = files.Find(f => f.Name == "transaction");
-            var metadata = files.Find(f => f.Name == "metadata");
-            var metadataInfo = files.Find(f => f.Name == "metadata_info");
+            var metadata = files.Find(f => f.Name == "metadata.proto");
             var problems = files.Find(f => f.Name == "problems");
 
             if (transaction == null)
@@ -519,14 +511,8 @@ namespace RelationalAI
             {
                 throw new SystemException("metadata part not found");
             }
-            List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
 
-            if (metadataInfo == null)
-            {
-                throw new SystemException("metadata info part not found");
-            }
-
-            var metadataInfoResult = this.rest.ReadMetadataInfo(metadataInfo.Data);
+            var metadataProto = this.rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;
             if (problems != null)
@@ -536,7 +522,7 @@ namespace RelationalAI
 
             var results = this.rest.ReadArrowFiles(files);
 
-            return new TransactionAsyncResult(transactionResult, results, metadataResult, metadataInfoResult, problemsResult);
+            return new TransactionAsyncResult(transactionResult, results, metadataProto, problemsResult);
         }
 
         private string GenLoadJson(string relation)

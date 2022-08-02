@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
@@ -9,7 +9,7 @@ namespace RelationalAI.Examples
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetTransactionMetadata", "--id <Transaction id>"){
+            var cmd = new Command("GetTransactionMetadataInfo", "--id <Transaction id>"){
                 new Option<string>("--id"){
                     IsRequired = true,
                     Description = "Transaction id."
@@ -20,7 +20,7 @@ namespace RelationalAI.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Get an asynchronous transaction metadata.";
+            cmd.Description = "Get an asynchronous transaction protobuf metadata.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
             return cmd;
         }
@@ -30,11 +30,8 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            var metadataList = client.GetTransactionMetadata(id);
-            foreach(var metadata in metadataList)
-            {
-                Console.WriteLine(metadata);
-            }
+            var metadata = client.GetTransactionMetadata(id);
+            Console.WriteLine(metadata);
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
 using Xunit;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using Relationalai.Protocol;
 
 namespace RelationalAI.Test
 {
@@ -29,15 +29,12 @@ namespace RelationalAI.Test
                 new ArrowRelation("v4", new List<object> {1L, 16L, 81L, 256L, 625L} )
             };
 
-            var metadata = new List<TransactionAsyncMetadataResponse>
-            {
-                new TransactionAsyncMetadataResponse("/:output/Int64/Int64/Int64/Int64", new List<string> {":output", "Int64", "Int64", "Int64", "Int64"})
-            };
+            var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("./metadata.pb"));
 
             var problems = new List<object>();
 
             Assert.Equal(rsp.Results, results);
-            Assert.Equal(rsp.Metadata, metadata);
+            Assert.Equal(rsp.Metadata.ToString(), metadata.ToString());
             Assert.Equal(rsp.Problems, problems);
         }
 

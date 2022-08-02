@@ -270,7 +270,7 @@ namespace RelationalAI
                 }
                 else if ("application/x-protobuf".Equals(contentType.ToLower()))
                 {
-                    return ReadMetadataInfo(resultTask.Result);
+                    return ReadMetadataProtobuf(resultTask.Result);
                 }
                 else
                 {
@@ -293,6 +293,7 @@ namespace RelationalAI
                 var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
                 output.Add(txnAsyncFile);
             }
+
             return output;
         }
 
@@ -323,7 +324,7 @@ namespace RelationalAI
                            {
                                values.Add(col[i]);
                            }
-                           output.Add(new ArrowRelation(col.Name, values));
+                           output.Add(new ArrowRelation(file.Name, values));
                        }
                     }
                 }
@@ -332,7 +333,7 @@ namespace RelationalAI
             return output;
         }
 
-        public MetadataInfo ReadMetadataInfo(byte[] data)
+        public MetadataInfo ReadMetadataProtobuf(byte[] data)
         {
             return MetadataInfo.Parser.ParseFrom(data);
         }
