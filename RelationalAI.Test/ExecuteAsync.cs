@@ -24,10 +24,10 @@ namespace RelationalAI.Test
 
             var results = new List<ArrowRelation>
             {
-                new ArrowRelation("v1", new List<object> {1L, 2L, 3L, 4L, 5L} ),
-                new ArrowRelation("v2", new List<object> {1L, 4L, 9L, 16L, 25L} ),
-                new ArrowRelation("v3", new List<object> {1L, 8L, 27L, 64L, 125L} ),
-                new ArrowRelation("v4", new List<object> {1L, 16L, 81L, 256L, 625L} )
+                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 2L, 3L, 4L, 5L} ),
+                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 4L, 9L, 16L, 25L} ),
+                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 8L, 27L, 64L, 125L} ),
+                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 16L, 81L, 256L, 625L} )
             };
 
             var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("../../../metadata.pb"));
