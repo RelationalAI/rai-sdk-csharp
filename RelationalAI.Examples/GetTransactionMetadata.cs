@@ -9,7 +9,7 @@ namespace RelationalAI.Examples
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("GetTransactionMetadataInfo", "--id <Transaction id>"){
+            var cmd = new Command("GetTransactionMetadata", "--id <Transaction id>"){
                 new Option<string>("--id"){
                     IsRequired = true,
                     Description = "Transaction id."
