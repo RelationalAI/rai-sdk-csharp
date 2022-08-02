@@ -1,7 +1,8 @@
 using System;
-using Xunit;
+using System.IO;
 using System.Collections.Generic;
 using Relationalai.Protocol;
+using Xunit;
 
 namespace RelationalAI.Test
 {
@@ -42,8 +43,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { client.DeleteDatabase(Dbname); } catch { }
+            try { client.DeleteEngineWait(EngineName); } catch { }
         }
     }
 }
