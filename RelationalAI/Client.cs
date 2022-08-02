@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+using System.Net.Http;
 using Polly;
 
 namespace RelationalAI
@@ -105,7 +106,8 @@ namespace RelationalAI
         {
             CreateEngine(engine, size);
             var resp = Policy
-                .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
+                .Handle<HttpRequestException>()
+                .OrResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
                 .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
                 .Execute(() => GetEngine(engine));
             return resp;
@@ -149,7 +151,8 @@ namespace RelationalAI
         {
             var resp = DeleteEngine(engine);
             resp.Status.State = Policy
-                .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
+                .Handle<HttpRequestException>()
+                .OrResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
                 .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
                 .Execute(() => GetEngine(engine)).State;
             return resp;
@@ -453,7 +456,8 @@ namespace RelationalAI
             var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
 
             var transaction = Policy
-                .HandleResult<TransactionAsyncSingleResponse>(r =>
+                .Handle<HttpRequestException>()
+                .OrResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
                 .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
                 .Execute(() => GetTransaction(id)).Transaction;
