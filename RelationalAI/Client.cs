@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Polly;
+
 namespace RelationalAI
 {
     using System;
     using System.Text;
     using System.Collections.Generic;
-    using System.Threading;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using RelationalAI.Credentials;
@@ -101,13 +103,11 @@ namespace RelationalAI
 
         public Engine CreateEngineWait(string engine, EngineSize size = EngineSize.XS)
         {
-            var resp = this.CreateEngine(engine, size);
-            while (!IsTerminalState(resp.State, "PROVISIONED"))
-            {
-                Thread.Sleep(2000);
-                resp = this.GetEngine(resp.Name);
-            }
-
+            CreateEngine(engine, size);
+            var resp = Policy
+                .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
+                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                .Execute(() => GetEngine(engine));
             return resp;
         }
 
@@ -147,13 +147,11 @@ namespace RelationalAI
 
         public DeleteEngineResponse DeleteEngineWait(string engine)
         {
-            var resp = this.DeleteEngine(engine);
-            var status = resp.Status.State;
-            while (!IsTerminalState(status, "DELETED"))
-            {
-                Thread.Sleep(2000);
-                status = this.GetEngine(resp.Status.Name).State;
-            }
+            var resp = DeleteEngine(engine);
+            resp.Status.State = Policy
+                .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
+                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                .Execute(() => GetEngine(engine)).State;
             return resp;
         }
 
@@ -454,13 +452,11 @@ namespace RelationalAI
         {
             var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
 
-            var transaction = GetTransaction(id).Transaction;
-
-            while (!(transaction.State.Equals("COMPLETED") || transaction.State.Equals("ABORTED")))
-            {
-                Thread.Sleep(2000);
-                transaction = GetTransaction(id).Transaction;
-            }
+            var transaction = Policy
+                .HandleResult<TransactionAsyncSingleResponse>(r =>
+                    !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
+                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                .Execute(() => GetTransaction(id)).Transaction;
 
             var results = GetTransactionResults(id);
             var metadata = GetTransactionMetadata(id);
