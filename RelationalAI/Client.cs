@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-using Polly;
-using RelationalAI.Utils;
 
 namespace RelationalAI
 {
     using System;
-    using System.Text;
     using System.Collections.Generic;
+    using System.Text;
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
+    using Polly;
     using RelationalAI.Credentials;
+    using RelationalAI.Utils;
 
     public class Client
     {

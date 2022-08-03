@@ -1,11 +1,11 @@
-﻿using System;
-using System.Net.Http;
-using Polly;
-using Polly.Retry;
-using Polly.Wrap;
-
-namespace RelationalAI.Utils
+﻿namespace RelationalAI.Utils
 {
+    using System;
+    using System.Net.Http;
+    using Polly;
+    using Polly.Retry;
+    using Polly.Wrap;
+
     public static class CommonPolicies
     {
         public static RetryPolicy RequestErrorResilience { get; }
