@@ -16,6 +16,7 @@
 
 using System.Net.Http;
 using Polly;
+using RelationalAI.Utils;
 
 namespace RelationalAI
 {
@@ -106,10 +107,10 @@ namespace RelationalAI
         {
             CreateEngine(engine, size);
             var resp = Policy
-                .Handle<HttpRequestException>()
-                .OrResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
-                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
-                .Execute(() => GetEngine(engine));
+                    .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
+                    .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                    .Wrap(CommonPolicies.RequestErrorResilience)
+                    .Execute(() => GetEngine(engine));
             return resp;
         }
 
@@ -151,9 +152,9 @@ namespace RelationalAI
         {
             var resp = DeleteEngine(engine);
             resp.Status.State = Policy
-                .Handle<HttpRequestException>()
-                .OrResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
+                .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
                 .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                .Wrap(CommonPolicies.RequestErrorResilience)
                 .Execute(() => GetEngine(engine)).State;
             return resp;
         }
@@ -456,10 +457,10 @@ namespace RelationalAI
             var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
 
             var transaction = Policy
-                .Handle<HttpRequestException>()
-                .OrResult<TransactionAsyncSingleResponse>(r =>
+                .HandleResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
                 .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+                .Wrap(CommonPolicies.RequestErrorResilience)
                 .Execute(() => GetTransaction(id)).Transaction;
 
             var results = GetTransactionResults(id);
