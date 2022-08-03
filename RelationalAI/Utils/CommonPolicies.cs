@@ -2,6 +2,7 @@
 using System.Net.Http;
 using Polly;
 using Polly.Retry;
+using Polly.Wrap;
 
 namespace RelationalAI.Utils
 {
@@ -12,6 +13,11 @@ namespace RelationalAI.Utils
         static CommonPolicies()
         {
             RequestErrorResilience = GetRequestErrorResiliencePolicy();
+        }
+
+        public static PolicyWrap<T> AddRequestErrorResilience<T>(this ISyncPolicy<T> policy)
+        {
+            return policy.Wrap(RequestErrorResilience);
         }
 
         public static RetryPolicy GetRequestErrorResiliencePolicy()
