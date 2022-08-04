@@ -108,6 +108,13 @@ namespace RelationalAI
                     .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
                     .AddRequestErrorResilience()
                     .Execute(() => GetEngine(engine));
+
+            if (resp.State != "PROVISIONED")
+            {
+                // TODO: replace with a better error during introducing the exceptions hierarchy
+                throw new SystemException("Failed to provision engine");
+            }
+
             return resp;
         }
 
