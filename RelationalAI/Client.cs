@@ -105,7 +105,19 @@ namespace RelationalAI
             CreateEngine(engine, size);
             var resp = Policy
                     .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
-                    .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+
+                    // Retry 10 times with exponential back-off. Will wait for
+                    //  2 ^ 1 = 2 seconds then
+                    //  2 ^ 2 = 4 seconds then
+                    //  2 ^ 3 = 8 seconds then
+                    //  2 ^ 4 = 16 seconds then
+                    //  2 ^ 5 = 32 seconds then
+                    //  2 ^ 6 = 64 seconds then
+                    //  2 ^ 7 = 128 seconds then
+                    //  2 ^ 8 = 256 seconds then
+                    //  2 ^ 9 = 512 seconds then
+                    //  2 ^ 10 = 1024 seconds (34 mins in total)
+                    .WaitExponentiallyAndRetry(10)
                     .AddRequestErrorResilience()
                     .Execute(() => GetEngine(engine));
 
@@ -157,7 +169,14 @@ namespace RelationalAI
             var resp = DeleteEngine(engine);
             resp.Status.State = Policy
                 .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
-                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
+
+                // Retry 5 times with exponential back-off. Will wait for
+                //  2 ^ 1 = 2 seconds then
+                //  2 ^ 2 = 4 seconds then
+                //  2 ^ 3 = 8 seconds then
+                //  2 ^ 4 = 16 seconds then
+                //  2 ^ 5 = 32 seconds (1 min in total)
+                .WaitExponentiallyAndRetry(5)
                 .AddRequestErrorResilience()
                 .Execute(() => GetEngine(engine)).State;
             return resp;
