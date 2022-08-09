@@ -64,9 +64,7 @@ namespace RelationalAI.Utils
         /// <returns>Resulting policy instance.</returns>
         public static Policy<T> Retry5Min<T>(this PolicyBuilder<T> policyBuilder)
         {
-            return policyBuilder
-                .AddBoundedRetryPolicy(15, 5 * 60)
-                .AddRequestErrorResilience();
+            return policyBuilder.AddBoundedRetryPolicy(15, 5 * 60);
         }
 
         /// <summary>
@@ -80,9 +78,7 @@ namespace RelationalAI.Utils
         /// <returns>Resulting policy instance.</returns>
         public static Policy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder)
         {
-            return policyBuilder
-                .AddBoundedRetryPolicy(15, 30 * 60)
-                .AddRequestErrorResilience();
+            return policyBuilder.AddBoundedRetryPolicy(15, 30 * 60);
         }
 
         /// <summary>
