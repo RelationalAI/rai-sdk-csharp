@@ -105,20 +105,7 @@ namespace RelationalAI
             CreateEngine(engine, size);
             var resp = Policy
                     .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
-
-                    // Retry 10 times with exponential back-off. Will wait for
-                    //  2 ^ 1 = 2 seconds then
-                    //  2 ^ 2 = 4 seconds then
-                    //  2 ^ 3 = 8 seconds then
-                    //  2 ^ 4 = 16 seconds then
-                    //  2 ^ 5 = 32 seconds then
-                    //  2 ^ 6 = 64 seconds then
-                    //  2 ^ 7 = 128 seconds then
-                    //  2 ^ 8 = 256 seconds then
-                    //  2 ^ 9 = 512 seconds then
-                    //  2 ^ 10 = 1024 seconds (34 mins in total)
-                    .WaitExponentiallyAndRetry(10)
-                    .AddRequestErrorResilience()
+                    .Retry30Min()
                     .Execute(() => GetEngine(engine));
 
             if (resp.State != "PROVISIONED")
@@ -169,15 +156,7 @@ namespace RelationalAI
             var resp = DeleteEngine(engine);
             resp.Status.State = Policy
                 .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
-
-                // Retry 5 times with exponential back-off. Will wait for
-                //  2 ^ 1 = 2 seconds then
-                //  2 ^ 2 = 4 seconds then
-                //  2 ^ 3 = 8 seconds then
-                //  2 ^ 4 = 16 seconds then
-                //  2 ^ 5 = 32 seconds (1 min in total)
-                .WaitExponentiallyAndRetry(5)
-                .AddRequestErrorResilience()
+                .Retry5Min()
                 .Execute(() => GetEngine(engine)).State;
             return resp;
         }
@@ -482,8 +461,7 @@ namespace RelationalAI
             var transaction = Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
-                .WaitAndRetryForever(_ => TimeSpan.FromSeconds(2))
-                .AddRequestErrorResilience()
+                .RetryForeverWithBoundedDelay()
                 .Execute(() => GetTransaction(id)).Transaction;
 
             var results = GetTransactionResults(id);
