@@ -22,7 +22,8 @@ namespace RelationalAI.Utils
     using Polly.Wrap;
 
     /// <summary>
-    /// Defines a number of commonly used policies to allow retrying operations based on various conditions.
+    /// Defines a number of commonly used policies and extension methods to use them
+    /// to allow retrying operations based on various conditions.
     /// </summary>
     public static class CommonPolicies
     {
