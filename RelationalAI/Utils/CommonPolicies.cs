@@ -30,11 +30,7 @@ namespace RelationalAI.Utils
             RequestErrorResilience = GetRequestErrorResiliencePolicy();
         }
 
-        /// <summary>
-        /// Gets a policy that retries 5 times with exponential back-off on HTTP request sending errors,
-        /// such as network connectivity issues, or 5xx status codes due to temporary server unavailability.
-        /// </summary>
-        public static Policy RequestErrorResilience { get; }
+        private static Policy RequestErrorResilience { get; }
 
         /// <summary>
         /// Creates a policy that can be used to produce synchronous API for async calls that may be taking a long
@@ -88,7 +84,7 @@ namespace RelationalAI.Utils
         /// <typeparam name="T">Type of result of an operation.</typeparam>
         /// <param name="policy">Initial policy instance.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static Policy<T> AddRequestErrorResilience<T>(this ISyncPolicy<T> policy)
+        private static Policy<T> AddRequestErrorResilience<T>(this ISyncPolicy<T> policy)
         {
             return policy.Wrap(RequestErrorResilience);
         }
