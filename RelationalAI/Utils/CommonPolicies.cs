@@ -54,7 +54,7 @@ namespace RelationalAI.Utils
         }
 
         /// <summary>
-        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 5 min
+        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 15 min
         /// to complete, otherwise throws TimeoutRejectedException.
         /// Uses exponential back-off starting with a 2 seconds delay up to 15 seconds and then retrying every 15 seconds.
         /// Retries on HTTP request sending errors.
@@ -62,9 +62,9 @@ namespace RelationalAI.Utils
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static Policy<T> Retry5Min<T>(this PolicyBuilder<T> policyBuilder)
+        public static Policy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder)
         {
-            return policyBuilder.AddBoundedRetryPolicy(15, 5 * 60);
+            return policyBuilder.AddBoundedRetryPolicy(15, 15 * 60);
         }
 
         /// <summary>

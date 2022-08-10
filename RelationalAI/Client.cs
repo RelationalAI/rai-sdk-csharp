@@ -156,7 +156,7 @@ namespace RelationalAI
             var resp = DeleteEngine(engine);
             resp.Status.State = Policy
                 .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
-                .Retry5Min()
+                .Retry15Min()
                 .Execute(() => GetEngine(engine)).State;
             return resp;
         }
