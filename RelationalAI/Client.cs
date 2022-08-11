@@ -453,27 +453,27 @@ namespace RelationalAI
             Dictionary<string, string> inputs = null)
         {
             var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
-            if (rsp.Transaction.State.Equals("COMPLETED"))
+            Console.WriteLine(rsp);
+            if (rsp.GotCompleteResult)
                 return rsp;
 
-            var id = rsp.Transaction.ID;
-            var transaction = GetTransaction(id).Transaction;
-
+            var transaction = GetTransaction(rsp.Transaction.ID).Transaction;
             while (!(transaction.State.Equals("COMPLETED") || transaction.State.Equals("ABORTED")))
             {
                 Thread.Sleep(2000);
-                transaction = GetTransaction(id).Transaction;
+                transaction = GetTransaction(transaction.ID).Transaction;
             }
 
-            var results = GetTransactionResults(id);
-            var metadata = GetTransactionMetadata(id);
-            var problems = GetTransactionProblems(id);
+            var results = GetTransactionResults(transaction.ID);
+            var metadata = GetTransactionMetadata(transaction.ID);
+            var problems = GetTransactionProblems(transaction.ID);
 
             return new TransactionAsyncResult(
                 transaction,
                 results,
                 metadata,
-                problems
+                problems,
+                true
             );
         }
 
@@ -527,7 +527,8 @@ namespace RelationalAI
                 transactionResult,
                 results,
                 metadataResult,
-                problemsResult
+                problemsResult,
+                true
             );
         }
 
