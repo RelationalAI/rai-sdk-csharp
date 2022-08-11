@@ -456,23 +456,29 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
+            var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
+            // fast-path
+            if (rsp.GotCompleteResult)
+                return rsp;
 
-            var transaction = Policy
+            // slow-path
+            var transaction = GetTransaction(rsp.Transaction.ID).Transaction;
+            transaction = Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
                 .RetryForeverWithBoundedDelay()
-                .Execute(() => GetTransaction(id)).Transaction;
+                .Execute(() => GetTransaction(transaction.ID)).Transaction;
 
-            var results = GetTransactionResults(id);
-            var metadata = GetTransactionMetadata(id);
-            var problems = GetTransactionProblems(id);
+            var results = GetTransactionResults(transaction.ID);
+            var metadata = GetTransactionMetadata(transaction.ID);
+            var problems = GetTransactionProblems(transaction.ID);
 
             return new TransactionAsyncResult(
                 transaction,
                 results,
                 metadata,
-                problems
+                problems,
+                true
             );
         }
 
@@ -526,7 +532,8 @@ namespace RelationalAI
                 transactionResult,
                 results,
                 metadataResult,
-                problemsResult
+                problemsResult,
+                true
             );
         }
 
