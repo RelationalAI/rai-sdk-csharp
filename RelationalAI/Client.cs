@@ -453,10 +453,11 @@ namespace RelationalAI
             Dictionary<string, string> inputs = null)
         {
             var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
-            Console.WriteLine(rsp);
+            // fast-path
             if (rsp.GotCompleteResult)
                 return rsp;
 
+            // slow-path
             var transaction = GetTransaction(rsp.Transaction.ID).Transaction;
             while (!(transaction.State.Equals("COMPLETED") || transaction.State.Equals("ABORTED")))
             {
