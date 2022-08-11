@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -10,35 +11,35 @@ namespace RelationalAI.Test
         public static string EngineName = $"csharp-sdk-{UUID}";
 
         [Fact]
-        public void EnginetTest()
+        public async Task EngineTest()
         {
             Client client = CreateClient();
 
-            var createRsp = client.CreateEngineWait(EngineName);
+            var createRsp = await  client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);
             Assert.Equal(createRsp.State, "PROVISIONED");
 
-            var engine = client.GetEngine(EngineName);
+            var engine = await client.GetEngineAsync(EngineName);
             Assert.Equal(engine.Name, EngineName);
             Assert.Equal(engine.State, "PROVISIONED");
 
-            var engines = client.ListEngines();
+            var engines = await client.ListEnginesAsync();
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.NotNull(engine);
 
-            engines = client.ListEngines("PROVISIONED");
+            engines = await client.ListEnginesAsync("PROVISIONED");
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.NotNull(engine);
 
-            engines = client.ListEngines("NONSENSE");
+            engines = await client.ListEnginesAsync("NONSENSE");
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.Null(engine);
 
-            Assert.Throws<SystemException>( () => client.DeleteEngineWait(EngineName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteEngineWaitAsync(EngineName) );
 
-            Assert.Throws<SystemException>( () => client.GetEngine(EngineName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetEngineAsync(EngineName) );
 
-            engines = client.ListEngines();
+            engines = await client.ListEnginesAsync();
             engine = engines.Find( item => item.Name.Equals(EngineName) );
             Assert.Equal(engine.State, "DELETED");
         }
@@ -47,7 +48,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { client.DeleteEngineWaitAsync(EngineName).Wait(); } catch {}
         }
     }
 }

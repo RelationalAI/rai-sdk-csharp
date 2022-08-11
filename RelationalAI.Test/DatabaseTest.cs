@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
@@ -12,58 +13,58 @@ namespace RelationalAI.Test
         public static string Dbname = $"csharp-sdk-{UUID}";
         public static string EngineName = $"csharp-sdk-{UUID}";
         [Fact]
-        public void DatabaseTest()
+        public async Task DatabaseTest()
         {
             Client client = CreateClient();
-            client.CreateEngineWait(EngineName, size: EngineSize.XS);
+            await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
 
-            Assert.Throws<SystemException>( () => client.DeleteDatabase(Dbname) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );
 
-            var createRsp = client.CreateDatabase(Dbname, EngineName, overwrite: false);
+            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, overwrite: false);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
-            createRsp = client.CreateDatabase(Dbname, EngineName, overwrite: true);
+            createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, overwrite: true);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
-            var database = client.GetDatabase(Dbname);
+            var database = await client.GetDatabaseAsync(Dbname);
             Assert.Equal(Dbname, database.Name);
             Assert.Equal("CREATED", database.State);
 
-            var databases = client.ListDatabases();
+            var databases = await client.ListDatabasesAsync();
             database = databases.Find( db => db.Name == Dbname );
             Assert.Equal(Dbname, database.Name);
             Assert.Equal("CREATED", database.State);
 
-            databases = client.ListDatabases("CREATED");
+            databases = await client.ListDatabasesAsync("CREATED");
             database = databases.Find( db => db.Name == Dbname );
             Assert.Equal(Dbname, database.Name);
             Assert.Equal("CREATED", database.State);
 
-            databases = client.ListDatabases("NONESENSE");
+            databases = await client.ListDatabasesAsync("NONESENSE");
             Assert.Empty(databases);
 
-            var edbs = client.ListEdbs(Dbname, EngineName);
+            var edbs = await client.ListEdbsAsync(Dbname, EngineName);
             var edb = edbs.Find( item => item.Name.Equals("rel"));
             Assert.NotNull(edb);
 
-            var modelNames = client.ListModelNames(Dbname, EngineName);
+            var modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
             var name = modelNames.Find( item => item.Equals("rel/stdlib") );
             Assert.NotNull(name);
 
-            var models = client.ListModels(Dbname, EngineName);
+            var models = await client.ListModelsAsync(Dbname, EngineName);
             var model = models.Find( m => m.Name.Equals("rel/stdlib") );
             Assert.NotNull(model);
 
-            model = client.GetModel(Dbname, EngineName, "rel/stdlib");
+            model = await client.GetModelAsync(Dbname, EngineName, "rel/stdlib");
             Assert.NotNull(model);
             Assert.True(model.Value.Length > 0);
 
-            var deleteRsp = client.DeleteDatabase(Dbname);
+            var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
 
-            Assert.Throws<SystemException>( () => client.GetDatabase(Dbname) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetDatabaseAsync(Dbname) );
         }
 
         string testModel =
@@ -76,48 +77,48 @@ namespace RelationalAI.Test
                 "\"pets\":[\"dog\",\"rabbit\"]}";
 
         [Fact]
-        public void DatabaseCloneTest()
+        public async Task DatabaseCloneTest()
         {
             Client client = CreateClient();
-            client.CreateEngineWait(EngineName, size: EngineSize.XS);
+            await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
 
-            Assert.Throws<SystemException>( () => client.DeleteDatabase(Dbname) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );
 
             // create a fresh database
-            var createRsp = client.CreateDatabase(Dbname, EngineName);
+            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
             // load some data and model
-            var loadRsp = client.LoadJson(Dbname, EngineName, "test_data", testJson);
+            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", testJson);
             Assert.Equal(false, loadRsp.Aborted);
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            loadRsp = client.LoadModel(Dbname, EngineName, "test_model", testModel);
+            loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
             Assert.Equal(false, loadRsp.Aborted);
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";
-            createRsp = client.CloneDatabase(databaseCloneName, EngineName, Dbname, true);
+            createRsp = await client.CloneDatabaseAsync(databaseCloneName, EngineName, Dbname, true);
             Assert.Equal(databaseCloneName, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
             // make sure the database exists
-            var database = client.GetDatabase(databaseCloneName);
+            var database = await client.GetDatabaseAsync(databaseCloneName);
             Assert.Equal(databaseCloneName, database.Name);
             Assert.Equal("CREATED", database.State);
 
-            var databases = client.ListDatabases();
+            var databases = await client.ListDatabasesAsync();
             database = databases.Find( db => db.Name == databaseCloneName );
             Assert.NotNull(database);
             Assert.Equal(databaseCloneName, database.Name);
             Assert.Equal("CREATED", database.State);
 
             // make sure the data was cloned
-            var rsp = client.ExecuteV1(databaseCloneName, EngineName, "test_data", true);
+            var rsp = await client.ExecuteV1Async(databaseCloneName, EngineName, "test_data", true);
 
             Relation rel;
 
@@ -134,20 +135,20 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
 
             // make sure the model was cloned
-            var modelNames = client.ListModelNames(databaseCloneName, EngineName);
+            var modelNames = await client.ListModelNamesAsync(databaseCloneName, EngineName);
             var name = modelNames.Find( item => item.Equals("test_model") );
             Assert.NotNull(name);
 
-            var models = client.ListModels(databaseCloneName, EngineName);
+            var models = await client.ListModelsAsync(databaseCloneName, EngineName);
             var model = models.Find( m => m.Name.Equals("test_model") );
             Assert.NotNull(model);
 
-            model = client.GetModel(databaseCloneName, EngineName, "test_model");
+            model = await client.GetModelAsync(databaseCloneName, EngineName, "test_model");
             Assert.NotNull(model);
             Assert.True(model.Value.Length > 0);
 
             // cleanup
-            var deleteRsp = client.DeleteDatabase(databaseCloneName);
+            var deleteRsp = await client.DeleteDatabaseAsync(databaseCloneName);
             Assert.Equal(databaseCloneName, deleteRsp.Name);
         }
 
@@ -155,8 +156,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { client.DeleteDatabaseAsync(Dbname).Wait(); } catch {}
+            try { client.DeleteEngineWaitAsync(EngineName).Wait(); } catch {}
         }
     }
 }

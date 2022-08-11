@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -15,19 +16,19 @@ namespace RelationalAI.Test
             "\"pets\":[\"dog\",\"rabbit\"]}";
 
         [Fact]
-        public void LoadJsontTest()
+        public async Task LoadJsontTest()
         {
             Client client = CreateClient();
 
-            client.CreateEngineWait(EngineName);
-            client.CreateDatabase(Dbname, EngineName);
+            await client.CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = client.LoadJson(Dbname, EngineName, "sample", sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", sample);
             Assert.Equal(false, loadRsp.Aborted);
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var rsp = client.ExecuteV1(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
             Relation rel;
 
@@ -56,8 +57,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { client.DeleteDatabaseAsync(Dbname).Wait(); } catch {}
+            try { client.DeleteEngineWaitAsync(EngineName).Wait(); } catch {}
         }
     }
 }
