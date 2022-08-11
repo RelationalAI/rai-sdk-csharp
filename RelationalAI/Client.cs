@@ -452,8 +452,11 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var id = ExecuteAsync(database, engine, source, readOnly, inputs).Transaction.ID;
+            var rsp = ExecuteAsync(database, engine, source, readOnly, inputs);
+            if (rsp.Transaction.State.Equals("COMPLETED"))
+                return rsp;
 
+            var id = rsp.Transaction.ID;
             var transaction = GetTransaction(id).Transaction;
 
             while (!(transaction.State.Equals("COMPLETED") || transaction.State.Equals("ABORTED")))
