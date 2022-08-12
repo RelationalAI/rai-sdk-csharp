@@ -50,12 +50,12 @@ namespace RelationalAI.Test
             Assert.Null(model);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabaseAsync(Dbname).Wait(); } catch {}
-            try { client.DeleteEngineWaitAsync(EngineName).Wait(); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
         }
     }
 }

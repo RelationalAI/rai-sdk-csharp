@@ -61,11 +61,15 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.ID);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteUserAsync(client.FindUserAsync(UserEmail).Result.ID).Wait(); } catch {}
+            try
+            {
+                var oauthClient = await client.FindUserAsync(UserEmail);
+                await client.DeleteUserAsync(oauthClient.ID);
+            } catch {}
         }
     }
 }

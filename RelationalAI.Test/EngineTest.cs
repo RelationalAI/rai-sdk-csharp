@@ -44,11 +44,11 @@ namespace RelationalAI.Test
             Assert.Equal(engine.State, "DELETED");
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteEngineWaitAsync(EngineName).Wait(); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
         }
     }
 }

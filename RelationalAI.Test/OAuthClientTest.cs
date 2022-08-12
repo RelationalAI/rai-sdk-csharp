@@ -40,11 +40,16 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName) );
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteOAuthClientAsync(client.FindOAuthClientAsync(OAuthClientName).Result.ID).Wait(); } catch {}
+            try
+            {
+                var oauthClient = await client.FindOAuthClientAsync(OAuthClientName);
+                await client.DeleteOAuthClientAsync(oauthClient.ID);
+            }
+            catch {}
         }
     }
 }
