@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using System.Threading.Tasks;
 
 namespace RelationalAI.Examples
 {
@@ -35,12 +36,12 @@ namespace RelationalAI.Examples
             return cmd;
         }
 
-        private static void Run(string database, string engine, string command, string profile = "default")
+        private static async Task Run(string database, string engine, string command, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.Execute(database, engine, command));
+            Console.WriteLine(await client.ExecuteAsync(database, engine, command));
         }
     }
 }
