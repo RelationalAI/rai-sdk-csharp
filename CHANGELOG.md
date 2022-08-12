@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.5.0-alpha
+* In this update we ensure the SDK follows the standard async/await approach for the methods. The following methods have been renamed to include the "Async" postfix, made async and now return a `Task<T>` to the user:
+  - `CreateDatabase`, `GetDatabase`, `ListDatabases`, `DeleteDatabase`, `CloneDatabase`.
+  - `CreateEngine`, `CreateEngineWait`, `GetEngine`, `ListEngines`, `DeleteEngine`.
+  - `CreateOAuthClient`, `FindOAuthClient`, `GetOAuthClient`, `ListOAuthClients`, `DeleteOAuthClient`.
+  - `CreateUser`, `UpdateUser`, `FindUser`, `GetUser`, `ListUsers`, `DeleteUser`, `DisableUser`, `EnableUser`.
+  - `GetTransactions`, `GetTransaction`, `GetTransactionResults`, `GetTransactionMetadata`, `GetTransactionProblems`, `CancelTransaction`, `DeleteTransaction`.
+  - `ListEdbs`, `LoadModel`, `LoadModels`, `ListModels`, `ListModelNames`, `GetModel`, `DeleteModel`.
+  - `LoadJson`, `LoadCsv`.
+  - `ExecuteV1`.
+  - `Execute` renamed to `ExecuteWaitAsync` to match the naming of the sync operations.
+
 ## v0.4.0-alpha
 * Renamed:
   - `Execute` to `ExecuteV1`.
