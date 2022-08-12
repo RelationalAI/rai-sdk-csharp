@@ -460,9 +460,14 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var transactionResult = await this.ExecuteAsync(database, engine, source, readOnly, inputs);
-            var id = transactionResult.Transaction.ID;
+            var rsp = await ExecuteAsync(database, engine, source, readOnly, inputs);
+            var id = rsp.Transaction.ID;
 
+            // fast-path
+            if (rsp.GotCompleteResult)
+                return rsp;
+
+            // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
@@ -478,7 +483,8 @@ namespace RelationalAI
                 transaction,
                 results,
                 metadata,
-                problems
+                problems,
+                true
             );
         }
 
@@ -532,7 +538,8 @@ namespace RelationalAI
                 transactionResult,
                 results,
                 metadataResult,
-                problemsResult
+                problemsResult,
+                true
             );
         }
 
