@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
-
+using System.Threading.Tasks;
 using RelationalAI;
 
 
@@ -28,12 +28,12 @@ namespace RelationalAI.Examples
             return cmd;
         }
 
-        private static void Run(string id, string profile = "default")
+        private static async Task Run(string id, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.EnableUser(id));
+            Console.WriteLine(await client.EnableUserAsync(id));
         }
 
     }

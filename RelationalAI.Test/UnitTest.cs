@@ -2,11 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Xunit;
 
 namespace RelationalAI.Test
 {
-    public class UnitTest : IDisposable
+    public class UnitTest : IAsyncLifetime
     {
         public Client CreateClient()
         {
@@ -38,7 +40,9 @@ namespace RelationalAI.Test
             return new Client(ctx);
         }
 
-        public virtual void Dispose() {}
+        public virtual Task InitializeAsync() => Task.CompletedTask;
+
+        public virtual Task DisposeAsync() => Task.CompletedTask;
 
         public Relation findRelation(Relation[] relations, string colName)
         {

@@ -30,7 +30,7 @@ namespace RelationalAI.Utils
             RequestErrorResilience = GetRequestErrorResiliencePolicy();
         }
 
-        private static Policy RequestErrorResilience { get; }
+        private static AsyncPolicy RequestErrorResilience { get; }
 
         /// <summary>
         /// Creates a policy that can be used to produce synchronous API for async calls that may be taking a long
@@ -42,10 +42,10 @@ namespace RelationalAI.Utils
         /// <param name="policyBuilder">The policy builder.</param>
         /// <param name="delayThreshold">Max delay between retry attempts in seconds. Defaults to 30 seconds.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static Policy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold = 30)
+        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold = 30)
         {
             return policyBuilder
-                .WaitAndRetryForever(retryAttempt => GetBoundedRetryDelay(retryAttempt, delayThreshold))
+                .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(retryAttempt, delayThreshold))
                 .AddRequestErrorResilience();
         }
 
@@ -58,7 +58,7 @@ namespace RelationalAI.Utils
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static Policy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder)
+        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder)
         {
             return policyBuilder.AddBoundedRetryPolicy(15, 15 * 60);
         }
@@ -72,7 +72,7 @@ namespace RelationalAI.Utils
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static Policy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder)
+        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder)
         {
             return policyBuilder.AddBoundedRetryPolicy(15, 30 * 60);
         }
@@ -84,19 +84,19 @@ namespace RelationalAI.Utils
         /// <typeparam name="T">Type of result of an operation.</typeparam>
         /// <param name="policy">Initial policy instance.</param>
         /// <returns>Resulting policy instance.</returns>
-        private static Policy<T> AddRequestErrorResilience<T>(this ISyncPolicy<T> policy)
+        private static AsyncPolicy<T> AddRequestErrorResilience<T>(this IAsyncPolicy<T> policy)
         {
-            return policy.Wrap(RequestErrorResilience);
+            return policy.WrapAsync(RequestErrorResilience);
         }
 
-        private static Policy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold, int timeoutSeconds)
+        private static AsyncPolicy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold, int timeoutSeconds)
         {
-            var timeoutPolicy = Policy.Timeout(TimeSpan.FromSeconds(timeoutSeconds));
+            var timeoutPolicy = Policy.TimeoutAsync(TimeSpan.FromSeconds(timeoutSeconds));
             var retryPolicy = policyBuilder.RetryForeverWithBoundedDelay(delayThreshold);
-            return timeoutPolicy.Wrap(retryPolicy);
+            return timeoutPolicy.WrapAsync(retryPolicy);
         }
 
-        private static Policy GetRequestErrorResiliencePolicy()
+        private static AsyncPolicy GetRequestErrorResiliencePolicy()
         {
             return Policy
 
@@ -110,7 +110,7 @@ namespace RelationalAI.Utils
 
                 // Retry 5 times. In this case will wait for: 2 + 4 + 8 + 16 + 30 seconds
                 // And rethrow the exception.
-                .WaitAndRetry(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, 30));
+                .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, 30));
         }
 
         private static TimeSpan GetBoundedRetryDelay(int retryAttempt, int delayThreshold)

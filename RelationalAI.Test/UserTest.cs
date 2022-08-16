@@ -1,6 +1,7 @@
 using System;
 using Xunit;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RelationalAI.Test
 {
@@ -10,61 +11,65 @@ namespace RelationalAI.Test
         public static string UserEmail = $"csharp-sdk-{UUID}@example.com";
 
         [Fact]
-        public void TestUser()
+        public async Task TestUser()
         {
             Client client = CreateClient();
 
-            Assert.Throws<SystemException>( () => client.FindUser(UserEmail) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.FindUserAsync(UserEmail) );
 
-            var rsp = client.CreateUser(UserEmail);
+            var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);
             Assert.Equal("ACTIVE", rsp.Status);
             Assert.Equal( new List<string> {"user"}, rsp.Roles);
 
-            rsp = client.FindUser(UserEmail);
+            rsp = await client.FindUserAsync(UserEmail);
             var userId = rsp.ID;
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(UserEmail, rsp.Email);
 
-            rsp = client.GetUser(userId);
+            rsp = await client.GetUserAsync(userId);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(UserEmail, rsp.Email);
 
-            var users = client.ListUsers();
+            var users = await client.ListUsersAsync();
             var user = users.Find( user => user.ID == userId);
             Assert.Equal(userId, user.ID);
             Assert.Equal(UserEmail, user.Email);
 
-            rsp = client.DisableUser(userId);
+            rsp = await client.DisableUserAsync(userId);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("INACTIVE", rsp.Status);
 
-            rsp = client.UpdateUser(userId, UserStatus.InActive);
+            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("INACTIVE", rsp.Status);
 
-            rsp = client.UpdateUser(userId, UserStatus.Active);
+            rsp = await client.UpdateUserAsync(userId, UserStatus.Active);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("ACTIVE", rsp.Status);
 
-            rsp = client.UpdateUser(userId, roles: new List<Role> {Role.Admin, Role.User});
+            rsp = await client.UpdateUserAsync(userId, roles: new List<Role> {Role.Admin, Role.User});
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string> {"admin", "user"}, rsp.Roles);
 
-            rsp = client.UpdateUser(userId, UserStatus.InActive, new List<Role>{Role.User});
+            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive, new List<Role>{Role.User});
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string>{"user"}, rsp.Roles);
 
             // cleanup
-            var deleteRsp = client.DeleteUser(userId);
+            var deleteRsp = await client.DeleteUserAsync(userId);
             Assert.Equal(userId, rsp.ID);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteUser(client.FindUser(UserEmail).ID); } catch {}
+            try
+            {
+                var oauthClient = await client.FindUserAsync(UserEmail);
+                await client.DeleteUserAsync(oauthClient.ID);
+            } catch {}
         }
     }
 }

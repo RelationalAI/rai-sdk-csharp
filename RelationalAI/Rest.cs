@@ -27,6 +27,7 @@ namespace RelationalAI
     using System.IO;
     using System.Net.Http;
     using System.Net.Http.Headers;
+    using System.Threading.Tasks;
     using System.Web;
     public class Rest
     {
@@ -48,52 +49,52 @@ namespace RelationalAI
                 string.Format("{0}={1}", HttpUtility.UrlEncode(kvp.Key), HttpUtility.UrlEncode(kvp.Value))));
         }
 
-        public object Delete(
+        public Task<object> DeleteAsync(
             string url,
             object data = null,
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.Request("DELETE", url, data, headers, parameters);
+            return this.RequestAsync("DELETE", url, data, headers, parameters);
         }
 
-        public object Get(
-        string url,
-        object data = null,
-        Dictionary<string, string> headers = null,
-        Dictionary<string, string> parameters = null)
+        public Task<object> GetAsync(
+            string url,
+            object data = null,
+            Dictionary<string, string> headers = null,
+            Dictionary<string, string> parameters = null)
         {
-            return this.Request("GET", url, data, headers, parameters);
+            return this.RequestAsync("GET", url, data, headers, parameters);
         }
 
-        public object Patch(
-        string url,
-        object data = null, 
-        Dictionary<string, string> headers = null,
-        Dictionary<string, string> parameters = null)
-        { 
-            return this.Request("PATCH", url, data, headers, parameters);
-        }
-
-        public object Post(
-        string url,
-        object data = null, 
-        Dictionary<string, string> headers = null,
-        Dictionary<string, string> parameters = null)
+        public Task<object> PatchAsync(
+            string url,
+            object data = null,
+            Dictionary<string, string> headers = null,
+            Dictionary<string, string> parameters = null)
         {
-            return this.Request("POST", url, data, headers, parameters);
+            return this.RequestAsync("PATCH", url, data, headers, parameters);
         }
 
-        public object Put(
-        string url,
-        object data = null, 
-        Dictionary<string, string> headers = null,
-        Dictionary<string, string> parameters = null)
+        public Task<object> PostAsync(
+            string url,
+            object data = null,
+            Dictionary<string, string> headers = null,
+            Dictionary<string, string> parameters = null)
         {
-            return this.Request("PUT", url, data, headers, parameters);
+            return this.RequestAsync("POST", url, data, headers, parameters);
         }
 
-        public object Request(
+        public Task<object> PutAsync(
+            string url,
+            object data = null,
+            Dictionary<string, string> headers = null,
+            Dictionary<string, string> parameters = null)
+        {
+            return this.RequestAsync("PUT", url, data, headers, parameters);
+        }
+
+        public async Task<object> RequestAsync(
             string method,
             string url,
             object data = null,
@@ -109,8 +110,9 @@ namespace RelationalAI
                 }
             }
 
-            caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", this.GetAccessToken(this.GetHost(url))));
-            return this.RequestHelper(method, url, data, caseInsensitiveHeaders, parameters);
+            var accessToken = await this.GetAccessTokenAsync(this.GetHost(url));
+            caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", accessToken));
+            return await this.RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
         private HttpContent EncodeContent(object body)
@@ -129,7 +131,7 @@ namespace RelationalAI
             return new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes((string)body));
         }
 
-        private string GetAccessToken(string host)
+        private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(this.context.Credentials is ClientCredentials))
             {
@@ -139,7 +141,7 @@ namespace RelationalAI
             ClientCredentials creds = (ClientCredentials)this.context.Credentials;
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
-                creds.AccessToken = this.RequestAccessToken(host, creds);
+                creds.AccessToken = await this.RequestAccessTokenAsync(host, creds);
             }
 
             return creds.AccessToken.Token;
@@ -220,7 +222,7 @@ namespace RelationalAI
             return request;
         }
 
-        private AccessToken RequestAccessToken(string host, ClientCredentials creds)
+        private async Task<AccessToken> RequestAccessTokenAsync(string host, ClientCredentials creds)
         {
             // Form the API request body.
             Dictionary<string, string> data = new Dictionary<string, string>()
@@ -230,14 +232,14 @@ namespace RelationalAI
                 {"audience", String.Format("https://{0}", host)},
                 {"grant_type", "client_credentials"}
             };
-            string resp = (this.RequestHelper("POST", creds.ClientCredentialsURL, data) as string);
+            string resp = await this.RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
             Dictionary<string, string> result =
                 (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
-        public object RequestHelper(
+        public async Task<object> RequestHelperAsync(
             string method,
             string url,
             object data = null,
@@ -249,27 +251,21 @@ namespace RelationalAI
             {
                 // Set the API url
                 client.BaseAddress = uri;
+
                 // Create the POST request
                 var request = this.PrepareHttpRequest(method, client.BaseAddress, this.EncodeContent(data), headers, parameters);
-                // Get the result back or throws an exception.
-                var httpRespTask = client.SendAsync(request);
-                httpRespTask.Wait();
-                var resultTask = httpRespTask.Result.Content.ReadAsByteArrayAsync();
-                var contentType = httpRespTask.Result.Content.Headers.ContentType.MediaType;
-                resultTask.Wait();
 
-                if ("application/json".Equals(contentType.ToLower()))
+                // Get the result back or throws an exception.
+                var httpResponse = await client.SendAsync(request);
+                var content = await httpResponse.Content.ReadAsByteArrayAsync();
+                var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+
+                return contentType.ToLower() switch
                 {
-                    return ReadString(resultTask.Result);
-                }
-                else if ("multipart/form-data".Equals(contentType.ToLower()))
-                {
-                    return ParseMultipartResponse(resultTask.Result);
-                }
-                else
-                {
-                    throw new SystemException($"unsupported content-type: {contentType}");
-                }
+                    "application/json" => ReadString(content),
+                    "multipart/form-data" => ParseMultipartResponse(content),
+                    _ => throw new SystemException($"unsupported content-type: {contentType}")
+                };
             }
         }
 

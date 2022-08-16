@@ -2,6 +2,7 @@ using System;
 using Xunit;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace RelationalAI.Test
 {
@@ -11,15 +12,15 @@ namespace RelationalAI.Test
         public static string Dbname = $"csharp-sdk-{UUID}";
         public static string EngineName = $"csharp-sdk-{UUID}";
         [Fact]
-        public void ExecuteAsyncTest()
+        public async Task ExecuteAsyncTest()
         {
             Client client = CreateClient();
 
-            client.CreateEngineWait(EngineName);
-            client.CreateDatabase(Dbname, EngineName);
+            await client.CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = client.Execute(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
 
             var results = new List<ArrowRelation>
             {
@@ -41,12 +42,12 @@ namespace RelationalAI.Test
             Assert.Equal(rsp.Problems, problems);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
         }
     }
 }
