@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -8,42 +9,47 @@ namespace RelationalAI.Test
         public static string UUID = Guid.NewGuid().ToString();
         public static string OAuthClientName = $"csharp-sdk-{UUID}";
         [Fact]
-        public void OAuthClientTest()
+        public async Task OAuthClientTest()
         {
             Client client = CreateClient();
 
-            Assert.Throws<SystemException>( () => client.FindOAuthClient(OAuthClientName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
 
-            var rsp = client.CreateOAuthClient(OAuthClientName);
+            var rsp = await client.CreateOAuthClientAsync(OAuthClientName);
             Assert.Equal(OAuthClientName, rsp.Name);
 
             var clientId = rsp.ID;
 
-            rsp = client.FindOAuthClient(OAuthClientName);
+            rsp = await client.FindOAuthClientAsync(OAuthClientName);
             Assert.Equal(clientId, rsp.ID);
             Assert.Equal(OAuthClientName, rsp.Name);
 
-            rsp = client.GetOAuthClient(clientId);
+            rsp = await client.GetOAuthClientAsync(clientId);
             Assert.Equal(clientId, rsp.ID);
             Assert.Equal(OAuthClientName, rsp.Name);
 
-            var clients = client.ListOAuthClients();
+            var clients = await client.ListOAuthClientsAsync();
             var found = clients.Find( item => item.ID == clientId );
             Assert.NotNull(found);
             Assert.Equal(clientId, found.ID);
             Assert.Equal(OAuthClientName, found.Name);
 
-            var deleteRsp = client.DeleteOAuthClient(clientId);
+            var deleteRsp = await client.DeleteOAuthClientAsync(clientId);
             Assert.Equal(clientId, deleteRsp.ID);
 
-            Assert.Throws<SystemException>( () => client.FindOAuthClient(OAuthClientName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName) );
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteOAuthClient(client.FindOAuthClient(OAuthClientName).ID); } catch {}
+            try
+            {
+                var oauthClient = await client.FindOAuthClientAsync(OAuthClientName);
+                await client.DeleteOAuthClientAsync(oauthClient.ID);
+            }
+            catch {}
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -10,15 +11,15 @@ namespace RelationalAI.Test
         public static string EngineName = $"csharp-sdk-{UUID}";
 
         [Fact]
-        public void ExecuteV1Test()
+        public async Task ExecuteV1Test()
         {
             Client client = CreateClient();
 
-            client.CreateEngineWait(EngineName);
-            client.CreateDatabase(Dbname, EngineName);
+            await client.CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = client.ExecuteV1(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteV1Async(Dbname, EngineName, query, true);
 
             Assert.Equal(rsp.Aborted, false);
             var output = rsp.Output;
@@ -40,12 +41,12 @@ namespace RelationalAI.Test
             Assert.Equal(expected, columns);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
         }
     }
 }

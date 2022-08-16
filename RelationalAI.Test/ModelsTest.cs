@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -11,50 +12,50 @@ namespace RelationalAI.Test
         string testModel = "def R = \"hello\", \"world\"";
 
         [Fact]
-        public void ModelsTest()
+        public async Task ModelsTest()
         {
             Client client = CreateClient();
 
-            client.CreateEngineWait(EngineName);
-            client.CreateDatabase(Dbname, EngineName);
+            await client.CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = client.LoadModel(Dbname, EngineName, "test_model", testModel);
+            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
             Assert.Equal(false, loadRsp.Aborted);
             Assert.Equal(0, loadRsp.Output.Length);
             Assert.Equal(0, loadRsp.Problems.Length);
 
-            var model = client.GetModel(Dbname, EngineName, "test_model");
+            var model = await client.GetModelAsync(Dbname, EngineName, "test_model");
             Assert.Equal("test_model", model.Name);
 
-            var modelNames = client.ListModelNames(Dbname, EngineName);
+            var modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
             var modelName = modelNames.Find( item => item.Equals("test_model") );
 
-            var models = client.ListModels(Dbname, EngineName);
+            var models = await client.ListModelsAsync(Dbname, EngineName);
             model = models.Find( item => item.Name.Equals("test_model") );
             Assert.NotNull(model);
 
-            var deleteRsp = client.DeleteModel(Dbname, EngineName, "test_model");
+            var deleteRsp = await client.DeleteModelAsync(Dbname, EngineName, "test_model");
             Assert.Equal(false, deleteRsp.Aborted);
             Assert.Equal(0, deleteRsp.Output.Length);
             Assert.Equal(0, deleteRsp.Problems.Length);
 
-            Assert.Throws<SystemException>( () => client.GetModel(Dbname, EngineName, "test_model") );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model") );
 
-            modelNames = client.ListModelNames(Dbname, EngineName);
+            modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
             modelName = modelNames.Find( item => item.Equals("test_model") );
             Assert.Null(modelName);
 
-            models = client.ListModels(Dbname, EngineName);
+            models = await client.ListModelsAsync(Dbname, EngineName);
             model = models.Find( item => item.Name.Equals("test_model") );
             Assert.Null(model);
         }
 
-        public override void Dispose()
+        public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { client.DeleteDatabase(Dbname); } catch {}
-            try { client.DeleteEngineWait(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
         }
     }
 }

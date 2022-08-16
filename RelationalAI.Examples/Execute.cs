@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace RelationalAI.Examples
 {
-    public class ExecuteAsync
+    public class Execute
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("ExecuteAsync", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
+            var cmd = new Command("Execute", "--database <Database name> --engine <Compute name> --command <Command text> --profile <Profile name>"){
                 new Option<string>("--database"){
                     IsRequired = true,
                     Description = "Database to run query."
@@ -41,8 +41,7 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(await client.ExecuteAsync(database, engine, command));
+            Console.WriteLine(await client.ExecuteWaitAsync(database, engine, command));
         }
-
     }
 }

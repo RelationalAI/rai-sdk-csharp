@@ -20,6 +20,7 @@ namespace RelationalAI
 
     public class TransactionAsyncResult : Entity
     {
+        public bool GotCompleteResult { get; set; }
         public TransactionAsyncCompactResponse Transaction { get; set; }
         public List<ArrowRelation> Results { get; set; }
         public MetadataInfo Metadata { get; set; }
@@ -28,13 +29,15 @@ namespace RelationalAI
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
-            MetadataInfo metadataProto,
-            List<object> problems
+            MetadataInfo metadata,
+            List<object> problems,
+            bool gotCompleteResult = false
         )
         {
+            this.GotCompleteResult = gotCompleteResult;
             this.Transaction = transaction;
             this.Results = results;
-            this.Metadata = metadataProto;
+            this.Metadata = metadata;
             this.Problems = problems;
         }
     }

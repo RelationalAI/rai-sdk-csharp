@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+
 namespace RelationalAI.Examples
 {
     using System;
@@ -27,12 +29,12 @@ namespace RelationalAI.Examples
         }
 
 
-        private static void Run(string email, string profile = "default")
+        private static async Task Run(string email, string profile = "default")
         {
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine(client.FindUser(email));
+            Console.WriteLine(await client.FindUserAsync(email));
         }
     }
 }
