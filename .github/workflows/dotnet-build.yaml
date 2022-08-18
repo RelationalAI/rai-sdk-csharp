@@ -23,6 +23,11 @@ jobs:
       - name: Build
         run: dotnet build
 
+      - name: Dotnet linter
+        run: |
+          dotnet tools install -g dotnet-format
+          dotnet format . --check
+
       - name: Test
         env:
             CLIENT_ID: ${{ secrets.CLIENT_ID }}
