@@ -56,15 +56,17 @@ namespace RelationalAI
         // Construct the transaction payload and return serialized JSON string.
         public Dictionary<string, object> Payload(List<DbAction> actions)
         {
-            var data = new Dictionary<string, object>();
-            data.Add("type", "Transaction");
-            data.Add("mode", GetMode(Mode));
-            data.Add("dbname", Database);
-            data.Add("abort", Abort);
-            data.Add("nowait_durable", NoWaitDurable);
-            data.Add("readonly", ReadOnly);
-            data.Add("version", Version);
-            data.Add("actions", DbAction.MakeActions(actions));
+            var data = new Dictionary<string, object>
+            {
+                { "type", "Transaction" },
+                { "mode", GetMode(Mode) },
+                { "dbname", Database },
+                { "abort", Abort },
+                { "nowait_durable", NoWaitDurable },
+                { "readonly", ReadOnly },
+                { "version", Version },
+                { "actions", DbAction.MakeActions(actions) }
+            };
             if (Engine != null)
             {
                 data.Add("computeName", Engine);
@@ -98,12 +100,7 @@ namespace RelationalAI
 
         private static string GetMode(string mode)
         {
-            if (mode == null)
-            {
-                return "OPEN";
-            }
-
-            return mode;
+            return mode ?? "OPEN";
         }
     }
 }

@@ -31,11 +31,9 @@ namespace RelationalAI
 
         public override bool Equals(object obj)
         {
-            if (obj is ArrowRelation)
+            if (obj is ArrowRelation arrowRelation)
             {
-                var that = obj as ArrowRelation;
-
-                return RelationId == that.RelationId && Table.SequenceEqual(that.Table);
+                return RelationId == arrowRelation.RelationId && Table.SequenceEqual(arrowRelation.Table);
             }
 
             return false;

@@ -21,7 +21,6 @@ namespace RelationalAI.Credentials
     {
         private DateTime _createdOn;
         private int _expiresIn;
-        private string _token;
 
         public AccessToken(string token, int expiresIn)
         {
@@ -36,15 +35,8 @@ namespace RelationalAI.Credentials
             set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");  
         }
 
-        public bool IsExpired
-        {
-            get => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
-        }
-        public string Token 
-        {
-            get => _token;
-            set => _token = value;
-        } 
-        
+        public bool IsExpired => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
+
+        public string Token { get; set; }
     }
 }

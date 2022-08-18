@@ -23,19 +23,16 @@ namespace RelationalAI
         Admin
     }
 
-    static class Roles 
+    static class Roles
     {
         public static string Value(this Role role)
         {
-            switch (role)
+            return role switch
             {
-                case Role.User:
-                    return "user";
-                case Role.Admin:
-                    return "admin";
-                default:
-                    throw new SystemException(string.Format("role '{0}' not supported", role));
-            }
+                Role.User => "user",
+                Role.Admin => "admin",
+                _ => throw new SystemException($"role '{role}' not supported")
+            };
         }
     }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Xunit;
@@ -45,16 +46,8 @@ namespace RelationalAI.Test
 
         public Relation findRelation(Relation[] relations, string colName)
         {
-            foreach(var relation in relations)
-            {
-                var keys = relation.RelKey.Keys;
-                if (keys.Length == 0)
-                    continue;
-                var name = keys[0];
-                if (name.Equals(colName))
-                    return relation;
-            }
-            return null;
+            return relations
+                .FirstOrDefault(relation => relation.RelKey.Keys.Length != 0 && relation.RelKey.Keys[0].Equals(colName));
         }
     }
 }

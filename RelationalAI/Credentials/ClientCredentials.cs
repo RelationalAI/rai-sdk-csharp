@@ -23,7 +23,6 @@ namespace RelationalAI.Credentials
         private string _clientID;
         private string _clientSecret;
         private string _clientCredentialsURL = defaultClientCredentialsURL;
-        private AccessToken _accessToken;
 
         public ClientCredentials(string clientID, string clientSecret)
         {
@@ -38,25 +37,20 @@ namespace RelationalAI.Credentials
         public string ClientID
         {
             get => _clientID;
-            set => _clientID = !String.IsNullOrEmpty(value) ? value : 
+            set => _clientID = !string.IsNullOrEmpty(value) ? value : 
                 throw new ArgumentException("ClientID cannot be null or empty"); 
         }
         public string ClientSecret
         {
             get => _clientSecret;
-            set => _clientSecret =  !String.IsNullOrEmpty(value) ? value : 
+            set => _clientSecret =  !string.IsNullOrEmpty(value) ? value : 
                 throw new ArgumentException("ClientSecret cannot be null or empty"); 
         }
         public string ClientCredentialsURL
         {
             get => _clientCredentialsURL;
-            set => _clientCredentialsURL = !String.IsNullOrEmpty(value) ? value : defaultClientCredentialsURL;
+            set => _clientCredentialsURL = !string.IsNullOrEmpty(value) ? value : defaultClientCredentialsURL;
         }
-        public AccessToken AccessToken
-        {
-            get => _accessToken;
-            set => _accessToken = value;
-        }
-
+        public AccessToken AccessToken { get; set; }
     }
 }

@@ -28,9 +28,9 @@ namespace RelationalAI
         public string Encode()
         {
             var result = new StringBuilder();
-            foreach (var entry in this)
+            foreach (var (key, value) in this)
             {
-                Append(result, entry.Key, entry.Value);
+                Append(result, key, value);
             }
 
             return result.ToString();
@@ -39,9 +39,9 @@ namespace RelationalAI
         // Encode the given k, v pair, and append to the given builder.
         private static void Append(StringBuilder builder, string k, object v)
         {
-            if (v is string[])
+            if (v is string[] strings)
             {
-                foreach (var vv in (string[])v)
+                foreach (var vv in strings)
                 {
                     Append(builder, k, vv);
                 }

@@ -16,6 +16,7 @@
 namespace RelationalAI
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public class TransactionAsync : Entity
     {
@@ -39,24 +40,21 @@ namespace RelationalAI
             Engine = engine;
             ReadOnly = readOnly;
             Source = source;
-            Inputs = inputs == null ? new Dictionary<string, string>() : inputs;
+            Inputs = inputs ?? new Dictionary<string, string>();
         }
 
         // Construct the transaction payload and return serialized JSON string.
         public Dictionary<string, object> Payload()
         {
-            var data = new Dictionary<string, object>();
-            data.Add("dbname", Database);
-            data.Add("readonly", ReadOnly);
-            data.Add("engine_name", Engine);
-            data.Add("query", Source);
-
-            var actionInputs = new List<DbAction>();
-            foreach (var entry in Inputs)
+            var data = new Dictionary<string, object>
             {
-                var actionInput = DbAction.MakeQueryActionInput(entry.Key, entry.Value);
-                actionInputs.Add(actionInput);
-            }
+                { "dbname", Database },
+                { "readonly", ReadOnly },
+                { "engine_name", Engine },
+                { "query", Source }
+            };
+
+            var actionInputs = Inputs.Select(entry => DbAction.MakeQueryActionInput(entry.Key, entry.Value)).ToList();
 
             data.Add("v1_inputs", actionInputs);
 

@@ -17,6 +17,7 @@ namespace RelationalAI
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     // Represents a "database action", which is an argument to a transaction.
     public class DbAction : Dictionary<string, object>
@@ -35,13 +36,8 @@ namespace RelationalAI
             var result = new List<DbAction>();
             if (actions != null)
             {
-                foreach (var action in actions)
-                {
-                    var item = new DbAction("LabeledAction");
-                    item.Add("name", string.Format("action{0}", ix++));
-                    item.Add("action", action);
-                    result.Add(item);
-                }
+                result.AddRange(actions.Select(action => new DbAction("LabeledAction")
+                    { { "name", $"action{ix++}" }, { "action", action } }));
             }
 
             return result;
@@ -54,31 +50,31 @@ namespace RelationalAI
 
         private static DbAction MakeDeleteModelsAction(string[] names)
         {
-            var result = new DbAction("ModifyWorkspaceAction");
-            result.Add("delete_source", names);
+            var result = new DbAction("ModifyWorkspaceAction")
+            {
+                { "delete_source", names }
+            };
             return result;
         }
 
         // Return a DbAction for installing the single named model. 
         public static DbAction MakeInstallAction(string name, string model)
         {
-            var result = new DbAction("InstallAction");
-            result.Add("sources", new[] { MakeQuerySource(name, model) });
+            var result = new DbAction("InstallAction")
+            {
+                { "sources", new[] { MakeQuerySource(name, model) } }
+            };
             return result;
         }
 
         // Return a DbAction for isntalling the set of name => model pairs.
         public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
-            var i = 0;
-            var size = models.Count;
-            var sources = new DbAction[size];
-            foreach (var entry in models)
+            var sources = models.Select(entry => MakeQuerySource(entry.Key, entry.Value)).ToArray();
+            var result = new DbAction("InstallAction")
             {
-                sources[i++] = MakeQuerySource(entry.Key, entry.Value);
-            }
-            var result = new DbAction("InstallAction");
-            result.Add("sources", sources);
+                { "sources", sources }
+            };
             return result;
         }
 
@@ -96,10 +92,12 @@ namespace RelationalAI
         {
             string[] keys = { key };
             string[] values = { };
-            var result = new DbAction("RelKey");
-            result.Add("name", name);
-            result.Add("keys", keys);
-            result.Add("value", values);
+            var result = new DbAction("RelKey")
+            {
+                { "name", name },
+                { "keys", keys },
+                { "value", values }
+            };
             return result;
         }
 
@@ -108,18 +106,16 @@ namespace RelationalAI
             var actionInputs = new List<DbAction>();
             if (inputs != null)
             {
-                foreach (var entry in inputs)
-                {
-                    var actionInput = MakeQueryActionInput(entry.Key, entry.Value);
-                    actionInputs.Add(actionInput);
-                }
+                actionInputs.AddRange(inputs.Select(entry => MakeQueryActionInput(entry.Key, entry.Value)));
             }
             string[] empty = { };
-            var result = new DbAction("QueryAction");
-            result.Add("source", MakeQuerySource("query", source));
-            result.Add("inputs", actionInputs);
-            result.Add("outputs", empty);
-            result.Add("persist", empty);
+            var result = new DbAction("QueryAction")
+            {
+                { "source", MakeQuerySource("query", source) },
+                { "inputs", actionInputs },
+                { "outputs", empty },
+                { "persist", empty }
+            };
             return result;
         }
 
@@ -127,18 +123,22 @@ namespace RelationalAI
         {
             string[,] columns = { { value } };
             var typename = Reltype(value);
-            var result = new DbAction("Relation");
-            result.Add("columns", columns);
-            result.Add("rel_key", MakeRelKey(name, typename));
+            var result = new DbAction("Relation")
+            {
+                { "columns", columns },
+                { "rel_key", MakeRelKey(name, typename) }
+            };
             return result;
         }
 
         private static DbAction MakeQuerySource(string name, string model)
         {
-            var result = new DbAction("Source");
-            result.Add("name", name);
-            result.Add("path", "");
-            result.Add("value", model);
+            var result = new DbAction("Source")
+            {
+                { "name", name },
+                { "path", "" },
+                { "value", model }
+            };
             return result;
         }
 

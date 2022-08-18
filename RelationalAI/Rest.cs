@@ -48,7 +48,7 @@ namespace RelationalAI
             }
 
             return string.Join("&", parameters.Select(kvp =>
-                string.Format("{0}={1}", HttpUtility.UrlEncode(kvp.Key), HttpUtility.UrlEncode(kvp.Value))));
+                $"{HttpUtility.UrlEncode(kvp.Key)}={HttpUtility.UrlEncode(kvp.Value)}"));
         }
 
         public Task<object> DeleteAsync(
@@ -106,14 +106,14 @@ namespace RelationalAI
             var caseInsensitiveHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (headers != null)
             {
-                foreach (var kv in headers)
+                foreach (var (key, value) in headers)
                 {
-                   caseInsensitiveHeaders.Add(kv.Key, kv.Value);
+                   caseInsensitiveHeaders.Add(key, value);
                 }
             }
 
             var accessToken = await GetAccessTokenAsync(GetHost(url));
-            caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", accessToken));
+            caseInsensitiveHeaders.Add("Authorization", $"Bearer {accessToken}");
             return await RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
@@ -124,23 +124,22 @@ namespace RelationalAI
                 return null;
             }
 
-            if (!(body is string))
+            if (!(body is string s))
             {
                 var stringContent = new StringContent(JsonConvert.SerializeObject(body));
                 return new ByteArrayContent(stringContent.ReadAsByteArrayAsync().Result);
             }
 
-            return new ByteArrayContent(Encoding.UTF8.GetBytes((string)body));
+            return new ByteArrayContent(Encoding.UTF8.GetBytes(s));
         }
 
         private async Task<string> GetAccessTokenAsync(string host)
         {
-            if (!(context.Credentials is ClientCredentials))
+            if (!(context.Credentials is ClientCredentials creds))
             {
                 throw new SystemException("credential not supported");
             }
 
-            var creds = (ClientCredentials)context.Credentials;
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
                 creds.AccessToken = await RequestAccessTokenAsync(host, creds);
@@ -161,7 +160,7 @@ namespace RelationalAI
 
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
         {
-            headers = headers != null ? headers : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            headers ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (!headers.ContainsKey("accept"))
             {
                 headers.Add("Accept", "application/json");
@@ -216,9 +215,9 @@ namespace RelationalAI
             headers.Remove("host");
             headers.Remove("user-agent");
 
-            foreach (var kv in headers)
+            foreach (var (key, value) in headers)
             {
-                request.Headers.TryAddWithoutValidation(kv.Key, kv.Value);
+                request.Headers.TryAddWithoutValidation(key, value);
             }
 
             return request;
@@ -231,7 +230,7 @@ namespace RelationalAI
             {
                 {"client_id", creds.ClientID},
                 {"client_secret", creds.ClientSecret},
-                {"audience", String.Format("https://{0}", host)},
+                {"audience", $"https://{host}" },
                 {"grant_type", "client_credentials"}
             };
             var resp = await RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
@@ -249,26 +248,25 @@ namespace RelationalAI
             Dictionary<string, string> parameters = null)
         {
             var uri = new Uri(url);
-            using (var client = new HttpClient())
+            using var client = new HttpClient();
+
+            // Set the API url
+            client.BaseAddress = uri;
+
+            // Create the POST request
+            var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
+
+            // Get the result back or throws an exception.
+            var httpResponse = await client.SendAsync(request);
+            var content = await httpResponse.Content.ReadAsByteArrayAsync();
+            var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+
+            return contentType.ToLower() switch
             {
-                // Set the API url
-                client.BaseAddress = uri;
-
-                // Create the POST request
-                var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
-
-                // Get the result back or throws an exception.
-                var httpResponse = await client.SendAsync(request);
-                var content = await httpResponse.Content.ReadAsByteArrayAsync();
-                var contentType = httpResponse.Content.Headers.ContentType.MediaType;
-
-                return contentType.ToLower() switch
-                {
-                    "application/json" => ReadString(content),
-                    "multipart/form-data" => ParseMultipartResponse(content),
-                    _ => throw new SystemException($"unsupported content-type: {contentType}")
-                };
-            }
+                "application/json" => ReadString(content),
+                "multipart/form-data" => ParseMultipartResponse(content),
+                _ => throw new SystemException($"unsupported content-type: {contentType}")
+            };
         }
 
         public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
@@ -296,28 +294,19 @@ namespace RelationalAI
         public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
             var output = new List<ArrowRelation> ();
-            foreach(var file in files)
+            foreach (var memoryStream in files
+                         .Where(file => "application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
+                         .Select(file => new MemoryStream(file.Data)))
             {
-                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                {
-                    var memoryStream = new MemoryStream(file.Data);
-                    memoryStream.Position = 0;
+                memoryStream.Position = 0;
 
-                    var reader = new ArrowStreamReader(memoryStream);
-                    RecordBatch recordBatch;
-                    while((recordBatch = reader.ReadNextRecordBatch()) != null)
-                    {
-                       var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                       foreach(var col in df.Columns)
-                       {
-                           var values = new List<object>();
-                           for (var i = 0; i < col.Length; i++)
-                           {
-                               values.Add(col[i]);
-                           }
-                           output.Add(new ArrowRelation(col.Name, values));
-                       }
-                    }
+                var reader = new ArrowStreamReader(memoryStream);
+                RecordBatch recordBatch;
+                while((recordBatch = reader.ReadNextRecordBatch()) != null)
+                {
+                    var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object?>().ToList() })
+                        .Select(t => new ArrowRelation(t.col.Name, t.values)));
                 }
             } 
 
@@ -326,7 +315,6 @@ namespace RelationalAI
 
         public class Context
         {
-            private ICredentials credentials;
             private string region;
             public Context(string region = null, ICredentials credentials = null)
             {
@@ -334,16 +322,12 @@ namespace RelationalAI
                 Credentials = credentials;
             }
 
-            public ICredentials Credentials
-            {
-                get => credentials;
-                set => credentials = value;
-            }
+            public ICredentials Credentials { get; set; }
 
             public string Region
             {
                 get => region;
-                set => region = !String.IsNullOrEmpty(value) ? value : "us-east";
+                set => region = !string.IsNullOrEmpty(value) ? value : "us-east";
             }
         }
     }

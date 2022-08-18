@@ -13,15 +13,15 @@ namespace RelationalAI.Test
         public async Task DatabaseTest()
         {
             var client = CreateClient();
-            await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
+            await client.CreateEngineWaitAsync(EngineName);
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );
 
-            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, overwrite: false);
+            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, false);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
-            createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, overwrite: true);
+            createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, true);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal("CREATED", createRsp.State);
 
@@ -77,7 +77,7 @@ namespace RelationalAI.Test
         public async Task DatabaseCloneTest()
         {
             var client = CreateClient();
-            await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
+            await client.CreateEngineWaitAsync(EngineName);
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );
 
@@ -88,14 +88,14 @@ namespace RelationalAI.Test
 
             // load some data and model
             var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", testJson);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";
@@ -117,9 +117,7 @@ namespace RelationalAI.Test
             // make sure the data was cloned
             var rsp = await client.ExecuteV1Async(databaseCloneName, EngineName, "test_data", true);
 
-            Relation rel;
-
-            rel = findRelation(rsp.Output, ":name");
+            var rel = findRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
 
             rel = findRelation(rsp.Output, ":age");

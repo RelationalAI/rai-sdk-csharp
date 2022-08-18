@@ -35,11 +35,9 @@ namespace RelationalAI
 
         public override bool Equals(object obj)
         {
-            if (obj is TransactionAsyncMetadataResponse)
+            if (obj is TransactionAsyncMetadataResponse metadataResponse)
             {
-                var that = obj as TransactionAsyncMetadataResponse;
-
-                return RelationId == that.RelationId && Types.SequenceEqual(that.Types);
+                return RelationId == metadataResponse.RelationId && Types.SequenceEqual(metadataResponse.Types);
             }
 
             return false;

@@ -57,7 +57,7 @@ namespace RelationalAI.Test
             Assert.Equal(new List<string>{"user"}, rsp.Roles);
 
             // cleanup
-            var deleteRsp = await client.DeleteUserAsync(userId);
+            await client.DeleteUserAsync(userId);
             Assert.Equal(userId, rsp.ID);
         }
 

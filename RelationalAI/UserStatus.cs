@@ -26,15 +26,12 @@ namespace RelationalAI
     {
         public static string Value(this UserStatus status)
         {
-            switch (status)
+            return status switch
             {
-                case UserStatus.Active:
-                    return "ACTIVE";
-                case UserStatus.InActive:
-                    return "INACTIVE";
-                default:
-                    return "NONE"; 
-            }
+                UserStatus.Active => "ACTIVE",
+                UserStatus.InActive => "INACTIVE",
+                _ => "NONE"
+            };
         }
     }
 }

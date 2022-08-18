@@ -18,6 +18,7 @@ namespace RelationalAI
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Runtime.InteropServices;
     using IniParser;
     using IniParser.Model;
@@ -43,11 +44,8 @@ namespace RelationalAI
         private static Dictionary<string, object> ReadConfigFromInitData(IniData data, string profile)
         {
             string[] keys = { "host", "port", "scheme", "region" };
-            var config = new Dictionary<string, object>();
-            foreach (var key in keys)
-            {
-                config.Add(key, GetIniValue(data, profile, key, null));
-            }
+            var config = keys
+                .ToDictionary<string, string, object>(key => key, key => GetIniValue(data, profile, key, null));
 
             var clientCredentials = ReadClientCredentials(data, profile);
             if (clientCredentials != null)

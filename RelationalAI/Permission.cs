@@ -109,7 +109,7 @@ namespace RelationalAI
                 case Permission.UpdateUser:
                     return "update:user";
                 default:
-                    throw new ArgumentException(string.Format("permission '{0}' not supported", permission));
+                    throw new ArgumentException($"permission '{permission}' not supported");
             }
         }
     }

@@ -21,12 +21,12 @@ namespace RelationalAI.Test
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, query, true);
 
-            Assert.Equal(rsp.Aborted, false);
+            Assert.False(rsp.Aborted);
             var output = rsp.Output;
-            Assert.Equal(output.Length, 1);
+            Assert.Single(output);
             var relation = output[0];
             var relKey = relation.RelKey;
-            Assert.Equal(relKey.Name, "output");
+            Assert.Equal("output", relKey.Name);
             Assert.Equal(relKey.Keys, new[] {"Int64", "Int64", "Int64"} );
             Assert.Equal(relKey.Values, new[] {"Int64"} );
             var columns = relation.Columns;
