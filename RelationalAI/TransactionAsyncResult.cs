@@ -16,7 +16,6 @@
 namespace RelationalAI
 {
     using System.Collections.Generic;
-    using Newtonsoft.Json;
 
     public class TransactionAsyncResult : Entity
     {
@@ -34,11 +33,11 @@ namespace RelationalAI
             bool gotCompleteResult = false
         )
         {
-            this.GotCompleteResult = gotCompleteResult;
-            this.Transaction = transaction;
-            this.Results = results;
-            this.Metadata = metadata;
-            this.Problems = problems;
+            GotCompleteResult = gotCompleteResult;
+            Transaction = transaction;
+            Results = results;
+            Metadata = metadata;
+            Problems = problems;
         }
     }
 }

@@ -17,7 +17,6 @@ namespace RelationalAI
 {
     using System;
     using System.Collections.Generic;
-    using Newtonsoft.Json;
 
     // Represents a "database action", which is an argument to a transaction.
     public class DbAction : Dictionary<string, object>
@@ -26,7 +25,7 @@ namespace RelationalAI
 
         public DbAction(string type)
         {
-            this.Add("type", type);
+            Add("type", type);
         }
 
         // Wrapps each of the given action in a LabeledAction.
@@ -50,7 +49,7 @@ namespace RelationalAI
 
         public static DbAction MakeDeleteModelAction(string name)
         {
-            return MakeDeleteModelsAction(new string[] { name });
+            return MakeDeleteModelsAction(new[] { name });
         }
 
         private static DbAction MakeDeleteModelsAction(string[] names)
@@ -64,7 +63,7 @@ namespace RelationalAI
         public static DbAction MakeInstallAction(string name, string model)
         {
             var result = new DbAction("InstallAction");
-            result.Add("sources", new DbAction[] { MakeQuerySource(name, model) });
+            result.Add("sources", new[] { MakeQuerySource(name, model) });
             return result;
         }
 

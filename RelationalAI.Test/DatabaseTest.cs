@@ -1,9 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-
 
 namespace RelationalAI.Test
 {

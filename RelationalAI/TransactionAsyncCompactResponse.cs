@@ -27,8 +27,8 @@ namespace RelationalAI
 
         public TransactionAsyncCompactResponse(string id, string state)
         {
-            this.ID = id;
-            this.State = state;
+            ID = id;
+            State = state;
         }
     }
 }

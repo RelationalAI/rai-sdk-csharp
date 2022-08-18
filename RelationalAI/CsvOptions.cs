@@ -25,30 +25,29 @@ namespace RelationalAI
         public char? QuoteChar;
         public Dictionary<string, string> Schema;
 
-        public CsvOptions() {}
         public CsvOptions WithDelim(char delim)
         {
-            this.Delim = delim;
+            Delim = delim;
             return this;
         }
 
         public CsvOptions WithEscapeChar(char escapeChar) {
-            this.EscapeChar = escapeChar;
+            EscapeChar = escapeChar;
             return this;
         }
 
         public CsvOptions WithHeaderRow(int headerRow) {
-            this.HeaderRow = headerRow;
+            HeaderRow = headerRow;
             return this;
         }
 
         public CsvOptions WithQuoteChar(char quoteChar) {
-            this.QuoteChar = quoteChar;
+            QuoteChar = quoteChar;
             return this;
         }
 
         public CsvOptions WithSchema(Dictionary<string, string> schema) {
-            this.Schema = schema;
+            Schema = schema;
             return this;
         }
     }

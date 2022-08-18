@@ -16,7 +16,6 @@
 namespace RelationalAI
 {
     using System.Collections.Generic;
-    using Newtonsoft.Json;
 
     public class Transaction : Entity
     {
@@ -46,12 +45,12 @@ namespace RelationalAI
             bool readOnly = false,
             string source = null)
         {
-            this.Region = region;
-            this.Database = database;
-            this.Engine = engine;
-            this.Mode = mode;
-            this.ReadOnly = readOnly;
-            this.Source = source;
+            Region = region;
+            Database = database;
+            Engine = engine;
+            Mode = mode;
+            ReadOnly = readOnly;
+            Source = source;
         }
 
         // Construct the transaction payload and return serialized JSON string.
@@ -59,20 +58,20 @@ namespace RelationalAI
         {
             var data = new Dictionary<string, object>();
             data.Add("type", "Transaction");
-            data.Add("mode", Transaction.GetMode(this.Mode));
-            data.Add("dbname", this.Database);
-            data.Add("abort", this.Abort);
-            data.Add("nowait_durable", this.NoWaitDurable);
-            data.Add("readonly", this.ReadOnly);
-            data.Add("version", this.Version);
+            data.Add("mode", GetMode(Mode));
+            data.Add("dbname", Database);
+            data.Add("abort", Abort);
+            data.Add("nowait_durable", NoWaitDurable);
+            data.Add("readonly", ReadOnly);
+            data.Add("version", Version);
             data.Add("actions", DbAction.MakeActions(actions));
-            if (this.Engine != null)
+            if (Engine != null)
             {
-                data.Add("computeName", this.Engine);
+                data.Add("computeName", Engine);
             }
-            if (this.Source != null)
+            if (Source != null)
             {
-                data.Add("source_dbname", this.Source);
+                data.Add("source_dbname", Source);
             }
 
             return data;
@@ -81,17 +80,17 @@ namespace RelationalAI
         // Returns the query params corresponding to the transaction state.
         public Dictionary<string, string> QueryParams()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>()
+            Dictionary<string, string> result = new Dictionary<string, string>
             { 
-                { "region", this.Region },
-                { "dbname", this.Database },
-                { "compute_name", this.Engine },
-                { "open_mode", Transaction.GetMode(this.Mode) },
+                { "region", Region },
+                { "dbname", Database },
+                { "compute_name", Engine },
+                { "open_mode", GetMode(Mode) },
             };
 
-            if (this.Source != null)
+            if (Source != null)
             {
-                result.Add("source_dbname", this.Source);
+                result.Add("source_dbname", Source);
             }
 
             return result;

@@ -35,24 +35,24 @@ namespace RelationalAI
             string source = null,
             Dictionary<string, string> inputs = null)
         {
-            this.Database = database;
-            this.Engine = engine;
-            this.ReadOnly = readOnly;
-            this.Source = source;
-            this.Inputs = inputs == null ? new Dictionary<string, string>() : inputs;
+            Database = database;
+            Engine = engine;
+            ReadOnly = readOnly;
+            Source = source;
+            Inputs = inputs == null ? new Dictionary<string, string>() : inputs;
         }
 
         // Construct the transaction payload and return serialized JSON string.
         public Dictionary<string, object> Payload()
         {
             var data = new Dictionary<string, object>();
-            data.Add("dbname", this.Database);
-            data.Add("readonly", this.ReadOnly);
-            data.Add("engine_name", this.Engine);
-            data.Add("query", this.Source);
+            data.Add("dbname", Database);
+            data.Add("readonly", ReadOnly);
+            data.Add("engine_name", Engine);
+            data.Add("query", Source);
 
             var actionInputs = new List<DbAction>();
-            foreach (var entry in this.Inputs)
+            foreach (var entry in Inputs)
             {
                 var actionInput = DbAction.MakeQueryActionInput(entry.Key, entry.Value);
                 actionInputs.Add(actionInput);
@@ -66,10 +66,10 @@ namespace RelationalAI
         // Returns the query params corresponding to the transaction state.
         public Dictionary<string, string> QueryParams()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>()
+            Dictionary<string, string> result = new Dictionary<string, string>
             {
-                { "dbname", this.Database },
-                { "engine_name", this.Engine },
+                { "dbname", Database },
+                { "engine_name", Engine },
             };
 
             return result;

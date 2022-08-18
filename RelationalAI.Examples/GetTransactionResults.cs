@@ -4,7 +4,6 @@ using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
 
-
 namespace RelationalAI.Examples
 {
     public class GetTransactionResults

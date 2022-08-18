@@ -1,13 +1,11 @@
+using System;
+using System.Collections.Generic;
+using System.CommandLine;
+using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
 
 namespace RelationalAI.Examples
 {
-    using System;
-    using System.Collections.Generic;
-    using System.CommandLine;
-    using System.CommandLine.NamingConventionBinder;
-    using Newtonsoft.Json;
-    using RelationalAI;
     public class FindUser
     {
         public static Command GetCommand()

@@ -27,10 +27,10 @@ namespace RelationalAI.Test
             var relation = output[0];
             var relKey = relation.RelKey;
             Assert.Equal(relKey.Name, "output");
-            Assert.Equal(relKey.Keys, new string[] {"Int64", "Int64", "Int64"} );
-            Assert.Equal(relKey.Values, new string[] {"Int64"} );
+            Assert.Equal(relKey.Keys, new[] {"Int64", "Int64", "Int64"} );
+            Assert.Equal(relKey.Values, new[] {"Int64"} );
             var columns = relation.Columns;
-            var expected = new object[][]
+            var expected = new[]
             {
                 new object[] {1L, 2L, 3L, 4L, 5L},
                 new object[] {1L, 4L, 9L, 16L, 25L},

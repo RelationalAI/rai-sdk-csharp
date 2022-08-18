@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-using Newtonsoft.Json;
-
 namespace RelationalAI
 {
     public class TransactionAsyncFile : Entity
@@ -27,10 +25,10 @@ namespace RelationalAI
 
         public TransactionAsyncFile(string name, byte[] data, string filename, string contentType)
         {
-            this.Name = name;
-            this.Data = data;
-            this.Filename = filename;
-            this.ContentType = contentType;
+            Name = name;
+            Data = data;
+            Filename = filename;
+            ContentType = contentType;
         }
     }
 }

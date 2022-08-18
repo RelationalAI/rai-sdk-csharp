@@ -38,7 +38,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -50,7 +50,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -62,7 +62,8 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][] {
+                new[]
+                {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
                 },
@@ -73,7 +74,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -110,7 +111,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -123,7 +124,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2", "4", "4", "3"}
@@ -135,7 +136,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -147,7 +148,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -185,7 +186,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -197,7 +198,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -209,7 +210,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
@@ -221,7 +222,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -258,7 +259,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -272,7 +273,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {12.5, 14.25, 11.00, 12.25}
@@ -286,7 +287,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {2L, 4L, 4L, 3L}
@@ -300,7 +301,7 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}

@@ -57,14 +57,14 @@ namespace RelationalAI
             string lastRequestedInterval
         ) : base(id, state)
         {
-            this.AccountName = accountName;
-            this.CreatedBy = createdBy;
-            this.CreatedOn = createdOn;
-            this.FinishedAt = finishedAt;
-            this.DatabaseName = databaseName;
-            this.ReadOnly = readOnly;
-            this.Query = query;
-            this.LastRequestedInterval = lastRequestedInterval;
+            AccountName = accountName;
+            CreatedBy = createdBy;
+            CreatedOn = createdOn;
+            FinishedAt = finishedAt;
+            DatabaseName = databaseName;
+            ReadOnly = readOnly;
+            Query = query;
+            LastRequestedInterval = lastRequestedInterval;
         }
     }
 }

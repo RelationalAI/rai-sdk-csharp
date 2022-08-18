@@ -16,9 +16,7 @@
 
 namespace RelationalAI
 {
-    using System;
-    using System.Collections.Generic;
-   /*
+    /*
     class HttpError : SystemException
     {
         public int StatusCode { get; set; }

@@ -25,8 +25,8 @@ namespace RelationalAI
 
         public ArrowRelation(string relationId, List<object> table)
         {
-            this.RelationId = relationId;
-            this.Table = table;
+            RelationId = relationId;
+            Table = table;
         }
 
         public override bool Equals(object obj)
@@ -35,7 +35,7 @@ namespace RelationalAI
             {
                 var that = obj as ArrowRelation;
 
-                return this.RelationId == that.RelationId && Enumerable.SequenceEqual(this.Table, that.Table);
+                return RelationId == that.RelationId && Table.SequenceEqual(that.Table);
             }
 
             return false;
@@ -43,8 +43,8 @@ namespace RelationalAI
 
         public override int GetHashCode()
         {
-            var hashcode = this.RelationId.GetHashCode();
-            hashcode ^= this.Table.GetHashCode();
+            var hashcode = RelationId.GetHashCode();
+            hashcode ^= Table.GetHashCode();
             return hashcode;
         }
     }

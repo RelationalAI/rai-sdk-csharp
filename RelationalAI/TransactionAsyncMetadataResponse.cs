@@ -29,8 +29,8 @@ namespace RelationalAI
 
         public TransactionAsyncMetadataResponse(string relationId, List<string> types)
         {
-            this.RelationId = relationId;
-            this.Types = types;
+            RelationId = relationId;
+            Types = types;
         }
 
         public override bool Equals(object obj)
@@ -39,7 +39,7 @@ namespace RelationalAI
             {
                 var that = obj as TransactionAsyncMetadataResponse;
 
-                return this.RelationId == that.RelationId && Enumerable.SequenceEqual(this.Types, that.Types);
+                return RelationId == that.RelationId && Types.SequenceEqual(that.Types);
             }
 
             return false;
@@ -47,8 +47,8 @@ namespace RelationalAI
 
         public override int GetHashCode()
         {
-            var hashcode = this.RelationId.GetHashCode();
-            hashcode ^= this.Types.GetHashCode();
+            var hashcode = RelationId.GetHashCode();
+            hashcode ^= Types.GetHashCode();
             return hashcode;
         }
     }

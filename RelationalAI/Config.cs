@@ -21,13 +21,13 @@ namespace RelationalAI
     using System.Runtime.InteropServices;
     using IniParser;
     using IniParser.Model;
-    using RelationalAI.Credentials;
-    
+    using Credentials;
+
     public class Config
     {
         public static Dictionary<string, object> Read(string path = null, string profile = "default")
         {
-            IniData data = Config.LoadIniConfig(path);
+            IniData data = LoadIniConfig(path);
 
             return ReadConfigFromInitData(data, profile);
         }
@@ -46,10 +46,10 @@ namespace RelationalAI
             Dictionary<string, object> config = new Dictionary<string, object>();
             foreach (string key in keys)
             {
-                config.Add(key, Config.GetIniValue(data, profile, key, null));
+                config.Add(key, GetIniValue(data, profile, key, null));
             }
 
-            ICredentials clientCredentials = Config.ReadClientCredentials(data, profile);
+            ICredentials clientCredentials = ReadClientCredentials(data, profile);
             if (clientCredentials != null)
             {
                 config.Add("credentials", clientCredentials);
@@ -60,9 +60,9 @@ namespace RelationalAI
 
         private static ICredentials ReadClientCredentials(IniData data, string profile)
         {
-            var clientID = Config.GetIniValue(data, profile, "client_id", null);
-            var clientSecret = Config.GetIniValue(data, profile, "client_secret", null);
-            var clientCredentialsURL = Config.GetIniValue(data, profile, "client_credentials_url", null);
+            var clientID = GetIniValue(data, profile, "client_id", null);
+            var clientSecret = GetIniValue(data, profile, "client_secret", null);
+            var clientCredentialsURL = GetIniValue(data, profile, "client_credentials_url", null);
             if (clientID != null && clientSecret != null)
             {
                 return new ClientCredentials(clientID, clientSecret, clientCredentialsURL);
@@ -93,7 +93,7 @@ namespace RelationalAI
         {
             FileIniDataParser parser = new FileIniDataParser();
 
-            path = !string.IsNullOrEmpty(path) ? path : Config.GetRAIConfigPath();
+            path = !string.IsNullOrEmpty(path) ? path : GetRAIConfigPath();
             if (!File.Exists(path))
             {
                 throw new FileNotFoundException(path + " does not exist");

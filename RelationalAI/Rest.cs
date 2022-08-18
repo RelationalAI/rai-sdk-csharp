@@ -15,25 +15,27 @@
  */
 namespace RelationalAI
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Text;
+    using System.Threading.Tasks;
+    using System.Web;
     using Apache.Arrow;
     using Apache.Arrow.Ipc;
     using HttpMultipartParser;
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
-    using RelationalAI.Credentials;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.IO;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
-    using System.Web;
+    using Credentials;
+
     public class Rest
     {
-        private Rest.Context context;
+        private Context context;
 
-        public Rest(Rest.Context context)
+        public Rest(Context context)
         {
             this.context = context;
         }
@@ -55,7 +57,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.RequestAsync("DELETE", url, data, headers, parameters);
+            return RequestAsync("DELETE", url, data, headers, parameters);
         }
 
         public Task<object> GetAsync(
@@ -64,7 +66,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.RequestAsync("GET", url, data, headers, parameters);
+            return RequestAsync("GET", url, data, headers, parameters);
         }
 
         public Task<object> PatchAsync(
@@ -73,7 +75,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.RequestAsync("PATCH", url, data, headers, parameters);
+            return RequestAsync("PATCH", url, data, headers, parameters);
         }
 
         public Task<object> PostAsync(
@@ -82,7 +84,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.RequestAsync("POST", url, data, headers, parameters);
+            return RequestAsync("POST", url, data, headers, parameters);
         }
 
         public Task<object> PutAsync(
@@ -91,7 +93,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            return this.RequestAsync("PUT", url, data, headers, parameters);
+            return RequestAsync("PUT", url, data, headers, parameters);
         }
 
         public async Task<object> RequestAsync(
@@ -110,9 +112,9 @@ namespace RelationalAI
                 }
             }
 
-            var accessToken = await this.GetAccessTokenAsync(this.GetHost(url));
+            var accessToken = await GetAccessTokenAsync(GetHost(url));
             caseInsensitiveHeaders.Add("Authorization", string.Format("Bearer {0}", accessToken));
-            return await this.RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
+            return await RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
         private HttpContent EncodeContent(object body)
@@ -128,20 +130,20 @@ namespace RelationalAI
                 return new ByteArrayContent(stringContent.ReadAsByteArrayAsync().Result);
             }
 
-            return new ByteArrayContent(System.Text.Encoding.UTF8.GetBytes((string)body));
+            return new ByteArrayContent(Encoding.UTF8.GetBytes((string)body));
         }
 
         private async Task<string> GetAccessTokenAsync(string host)
         {
-            if (!(this.context.Credentials is ClientCredentials))
+            if (!(context.Credentials is ClientCredentials))
             {
                 throw new SystemException("credential not supported");
             }
 
-            ClientCredentials creds = (ClientCredentials)this.context.Credentials;
+            ClientCredentials creds = (ClientCredentials)context.Credentials;
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
-                creds.AccessToken = await this.RequestAccessTokenAsync(host, creds);
+                creds.AccessToken = await RequestAccessTokenAsync(host, creds);
             }
 
             return creds.AccessToken.Token;
@@ -177,7 +179,7 @@ namespace RelationalAI
 
             if (!headers.ContainsKey("user-agent"))
             {
-                headers.Add("User-Agent", this.GetUserAgent());
+                headers.Add("User-Agent", GetUserAgent());
             }
 
             return headers;
@@ -193,10 +195,10 @@ namespace RelationalAI
             var uriBuilder = new UriBuilder(uri);
             if (parameters != null)
             {
-                uriBuilder.Query = Rest.EncodeQueryString(parameters);
+                uriBuilder.Query = EncodeQueryString(parameters);
             }
 
-            headers = this.GetDefaultHeaders(uri, headers);
+            headers = GetDefaultHeaders(uri, headers);
             var request = new HttpRequestMessage(new HttpMethod(method), uriBuilder.Uri);
             request.Headers.Accept.Add(MediaTypeWithQualityHeaderValue.Parse(headers["accept"]));
             request.Content = content;
@@ -225,14 +227,14 @@ namespace RelationalAI
         private async Task<AccessToken> RequestAccessTokenAsync(string host, ClientCredentials creds)
         {
             // Form the API request body.
-            Dictionary<string, string> data = new Dictionary<string, string>()
+            Dictionary<string, string> data = new Dictionary<string, string>
             {
                 {"client_id", creds.ClientID},
                 {"client_secret", creds.ClientSecret},
                 {"audience", String.Format("https://{0}", host)},
                 {"grant_type", "client_credentials"}
             };
-            string resp = await this.RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
+            string resp = await RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
             Dictionary<string, string> result =
                 (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
 
@@ -253,7 +255,7 @@ namespace RelationalAI
                 client.BaseAddress = uri;
 
                 // Create the POST request
-                var request = this.PrepareHttpRequest(method, client.BaseAddress, this.EncodeContent(data), headers, parameters);
+                var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
 
                 // Get the result back or throws an exception.
                 var httpResponse = await client.SendAsync(request);
@@ -288,7 +290,7 @@ namespace RelationalAI
 
         public string ReadString(byte[] data)
         {
-            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
+            return Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
         public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
@@ -328,20 +330,20 @@ namespace RelationalAI
             private string region;
             public Context(string region = null, ICredentials credentials = null)
             {
-                this.Region = region;
-                this.Credentials = credentials;
+                Region = region;
+                Credentials = credentials;
             }
 
             public ICredentials Credentials
             {
-                get => this.credentials;
-                set => this.credentials = value;
+                get => credentials;
+                set => credentials = value;
             }
 
             public string Region
             {
-                get => this.region;
-                set => this.region = !String.IsNullOrEmpty(value) ? value : "us-east";
+                get => region;
+                set => region = !String.IsNullOrEmpty(value) ? value : "us-east";
             }
         }
     }
