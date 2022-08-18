@@ -35,7 +35,7 @@ namespace RelationalAI.Test
                 config = Config.Read(new MemoryStream(Encoding.UTF8.GetBytes(configStr)));
             }
 
-            Client.Context ctx = new Client.Context(config);
+            var ctx = new Client.Context(config);
             return new Client(ctx);
         }
 

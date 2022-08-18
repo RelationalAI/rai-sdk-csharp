@@ -31,7 +31,7 @@ namespace RelationalAI
         // Wrapps each of the given action in a LabeledAction.
         public static List<DbAction> MakeActions(List<DbAction> actions)
         {
-            int ix = 0;
+            var ix = 0;
             var result = new List<DbAction>();
             if (actions != null)
             {
@@ -70,7 +70,7 @@ namespace RelationalAI
         // Return a DbAction for isntalling the set of name => model pairs.
         public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
-            int i = 0;
+            var i = 0;
             var size = models.Count;
             var sources = new DbAction[size];
             foreach (var entry in models)

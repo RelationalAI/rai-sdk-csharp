@@ -80,7 +80,7 @@ namespace RelationalAI
         // Returns the query params corresponding to the transaction state.
         public Dictionary<string, string> QueryParams()
         {
-            Dictionary<string, string> result = new Dictionary<string, string>
+            var result = new Dictionary<string, string>
             { 
                 { "region", Region },
                 { "dbname", Database },

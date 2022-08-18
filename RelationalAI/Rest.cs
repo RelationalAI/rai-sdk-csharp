@@ -103,7 +103,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            Dictionary<string, string> caseInsensitiveHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var caseInsensitiveHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (headers != null)
             {
                 foreach (var kv in headers)
@@ -140,7 +140,7 @@ namespace RelationalAI
                 throw new SystemException("credential not supported");
             }
 
-            ClientCredentials creds = (ClientCredentials)context.Credentials;
+            var creds = (ClientCredentials)context.Credentials;
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
                 creds.AccessToken = await RequestAccessTokenAsync(host, creds);
@@ -216,7 +216,7 @@ namespace RelationalAI
             headers.Remove("host");
             headers.Remove("user-agent");
 
-            foreach (KeyValuePair<string, string> kv in headers)
+            foreach (var kv in headers)
             {
                 request.Headers.TryAddWithoutValidation(kv.Key, kv.Value);
             }
@@ -227,15 +227,15 @@ namespace RelationalAI
         private async Task<AccessToken> RequestAccessTokenAsync(string host, ClientCredentials creds)
         {
             // Form the API request body.
-            Dictionary<string, string> data = new Dictionary<string, string>
+            var data = new Dictionary<string, string>
             {
                 {"client_id", creds.ClientID},
                 {"client_secret", creds.ClientSecret},
                 {"audience", String.Format("https://{0}", host)},
                 {"grant_type", "client_credentials"}
             };
-            string resp = await RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
-            Dictionary<string, string> result =
+            var resp = await RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
+            var result =
                 (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
@@ -248,7 +248,7 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            Uri uri = new Uri(url);
+            var uri = new Uri(url);
             using (var client = new HttpClient())
             {
                 // Set the API url
@@ -279,9 +279,9 @@ namespace RelationalAI
 
             foreach (var file in parser.Files)
             {
-                MemoryStream memoryStream = new MemoryStream();
+                var memoryStream = new MemoryStream();
                 file.Data.CopyTo(memoryStream);
-                byte[] buffer = memoryStream.ToArray();
+                var buffer = memoryStream.ToArray();
                 var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
                 output.Add(txnAsyncFile);
             }
@@ -300,17 +300,17 @@ namespace RelationalAI
             {
                 if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
                 {
-                    MemoryStream memoryStream = new MemoryStream(file.Data);
+                    var memoryStream = new MemoryStream(file.Data);
                     memoryStream.Position = 0;
 
-                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
+                    var reader = new ArrowStreamReader(memoryStream);
                     RecordBatch recordBatch;
                     while((recordBatch = reader.ReadNextRecordBatch()) != null)
                     {
                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
                        foreach(var col in df.Columns)
                        {
-                           List<Object> values = new List<object>();
+                           var values = new List<object>();
                            for (var i = 0; i < col.Length; i++)
                            {
                                values.Add(col[i]);

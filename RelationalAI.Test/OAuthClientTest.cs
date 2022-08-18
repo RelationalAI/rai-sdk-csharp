@@ -11,7 +11,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task OAuthClientTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
 

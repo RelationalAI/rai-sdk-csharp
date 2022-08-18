@@ -27,7 +27,7 @@ namespace RelationalAI
         // Returns a query string encoded in the format the RAI REST API expects.
         public string Encode()
         {
-            StringBuilder result = new StringBuilder();
+            var result = new StringBuilder();
             foreach (var entry in this)
             {
                 Append(result, entry.Key, entry.Value);
@@ -49,7 +49,7 @@ namespace RelationalAI
                 return;
             }
 
-            string value = v.ToString();
+            var value = v.ToString();
             if (builder.Length > 0)
             {
                 builder.Append('&');

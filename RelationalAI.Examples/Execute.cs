@@ -38,9 +38,9 @@ namespace RelationalAI.Examples
 
         private static async Task Run(string database, string engine, string command, string profile = "default")
         {
-            Dictionary<string, object> config = Config.Read("", profile);
-            Client.Context context = new Client.Context(config);
-            Client client = new Client(context);
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
             Console.WriteLine(await client.ExecuteWaitAsync(database, engine, command));
         }
     }

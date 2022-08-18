@@ -13,7 +13,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task TestUser()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.FindUserAsync(UserEmail) );
 

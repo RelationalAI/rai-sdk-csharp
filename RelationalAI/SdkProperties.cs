@@ -24,8 +24,8 @@ namespace RelationalAI
 
         static SdkProperties()
         {
-            Assembly assembly = Assembly.GetExecutingAssembly();
-            FileVersionInfo fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
+            var assembly = Assembly.GetExecutingAssembly();
+            var fileVersionInfo = FileVersionInfo.GetVersionInfo(assembly.Location);
 
             Version = fileVersionInfo.ProductVersion;
             ProductName = fileVersionInfo.ProductName;

@@ -23,10 +23,10 @@ namespace RelationalAI.Examples
 
         private static async Task Run(string profile = "default")
         {
-            Dictionary<string, object> config = Config.Read("", profile);
-            Client.Context context = new Client.Context(config);
-            Client client = new Client(context);
-            List<User> users = await client.ListUsersAsync();
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
+            var users = await client.ListUsersAsync();
             foreach(var user in users)
             {
                 Console.WriteLine(user.ToString(true));

@@ -20,7 +20,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvtTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -92,7 +92,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvNoHeaderTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -167,7 +167,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvAltSyntaxTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -234,7 +234,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvWithSchemaTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);

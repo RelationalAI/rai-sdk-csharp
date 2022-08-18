@@ -12,7 +12,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task EngineTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             var createRsp = await client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);

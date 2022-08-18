@@ -12,7 +12,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task DatabaseTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
             await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );
@@ -76,7 +76,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task DatabaseCloneTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
             await client.CreateEngineWaitAsync(EngineName, size: EngineSize.XS);
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname) );

@@ -18,7 +18,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadJsontTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
