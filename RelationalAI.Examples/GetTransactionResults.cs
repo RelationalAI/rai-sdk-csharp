@@ -32,7 +32,7 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            foreach( var result in await client.GetTransactionResultsAsync(id))
+            foreach (var result in await client.GetTransactionResultsAsync(id))
             {
                 Console.WriteLine(result);
             }

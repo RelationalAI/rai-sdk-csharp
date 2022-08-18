@@ -34,11 +34,11 @@ namespace RelationalAI.Examples
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
             List<Engine> engines = await client.ListEnginesAsync(state);
-            foreach(var engine in engines)
+            foreach (var engine in engines)
             {
                 Console.WriteLine(engine.ToString(true));
-            } 
-            
+            }
+
         }
 
     }

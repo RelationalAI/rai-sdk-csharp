@@ -22,7 +22,7 @@ namespace RelationalAI
     using IniParser;
     using IniParser.Model;
     using RelationalAI.Credentials;
-    
+
     public class Config
     {
         public static Dictionary<string, object> Read(string path = null, string profile = "default")

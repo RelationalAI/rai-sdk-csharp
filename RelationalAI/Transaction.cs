@@ -82,7 +82,7 @@ namespace RelationalAI
         public Dictionary<string, string> QueryParams()
         {
             Dictionary<string, string> result = new Dictionary<string, string>()
-            { 
+            {
                 { "region", this.Region },
                 { "dbname", this.Database },
                 { "compute_name", this.Engine },

@@ -28,10 +28,10 @@ namespace RelationalAI.Test
             Assert.Equal("test_model", model.Name);
 
             var modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
-            var modelName = modelNames.Find( item => item.Equals("test_model") );
+            var modelName = modelNames.Find(item => item.Equals("test_model"));
 
             var models = await client.ListModelsAsync(Dbname, EngineName);
-            model = models.Find( item => item.Name.Equals("test_model") );
+            model = models.Find(item => item.Name.Equals("test_model"));
             Assert.NotNull(model);
 
             var deleteRsp = await client.DeleteModelAsync(Dbname, EngineName, "test_model");
@@ -39,14 +39,14 @@ namespace RelationalAI.Test
             Assert.Equal(0, deleteRsp.Output.Length);
             Assert.Equal(0, deleteRsp.Problems.Length);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model") );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
 
             modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
-            modelName = modelNames.Find( item => item.Equals("test_model") );
+            modelName = modelNames.Find(item => item.Equals("test_model"));
             Assert.Null(modelName);
 
             models = await client.ListModelsAsync(Dbname, EngineName);
-            model = models.Find( item => item.Name.Equals("test_model") );
+            model = models.Find(item => item.Name.Equals("test_model"));
             Assert.Null(model);
         }
 
@@ -54,8 +54,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

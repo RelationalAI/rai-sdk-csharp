@@ -22,7 +22,7 @@ namespace RelationalAI
         None,
     }
 
-    static class UserStatuses 
+    static class UserStatuses
     {
         public static string Value(this UserStatus status)
         {
@@ -33,7 +33,7 @@ namespace RelationalAI
                 case UserStatus.InActive:
                     return "INACTIVE";
                 default:
-                    return "NONE"; 
+                    return "NONE";
             }
         }
     }

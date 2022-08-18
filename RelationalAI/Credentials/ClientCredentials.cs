@@ -30,7 +30,7 @@ namespace RelationalAI.Credentials
             ClientID = clientID;
             ClientSecret = clientSecret;
         }
-        public ClientCredentials(string clientID, string clientSecret, string clientCredentialsURL): 
+        public ClientCredentials(string clientID, string clientSecret, string clientCredentialsURL) :
             this(clientID, clientSecret)
         {
             ClientCredentialsURL = clientCredentialsURL;
@@ -38,14 +38,14 @@ namespace RelationalAI.Credentials
         public string ClientID
         {
             get => _clientID;
-            set => _clientID = !String.IsNullOrEmpty(value) ? value : 
-                throw new ArgumentException("ClientID cannot be null or empty"); 
+            set => _clientID = !String.IsNullOrEmpty(value) ? value :
+                throw new ArgumentException("ClientID cannot be null or empty");
         }
         public string ClientSecret
         {
             get => _clientSecret;
-            set => _clientSecret =  !String.IsNullOrEmpty(value) ? value : 
-                throw new ArgumentException("ClientSecret cannot be null or empty"); 
+            set => _clientSecret = !String.IsNullOrEmpty(value) ? value :
+                throw new ArgumentException("ClientSecret cannot be null or empty");
         }
         public string ClientCredentialsURL
         {

@@ -23,7 +23,7 @@ namespace RelationalAI
         Admin
     }
 
-    static class Roles 
+    static class Roles
     {
         public static string Value(this Role role)
         {

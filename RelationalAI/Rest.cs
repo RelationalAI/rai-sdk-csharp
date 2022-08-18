@@ -108,7 +108,7 @@ namespace RelationalAI
             {
                 foreach (var kv in headers)
                 {
-                   caseInsensitiveHeaders.Add(kv.Key, kv.Value);
+                    caseInsensitiveHeaders.Add(kv.Key, kv.Value);
                 }
             }
 
@@ -297,8 +297,8 @@ namespace RelationalAI
 
         public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
-            var output = new List<ArrowRelation> ();
-            foreach(var file in files)
+            var output = new List<ArrowRelation>();
+            foreach (var file in files)
             {
                 if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
                 {
@@ -307,18 +307,18 @@ namespace RelationalAI
 
                     ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
                     RecordBatch recordBatch;
-                    while((recordBatch = reader.ReadNextRecordBatch()) != null)
+                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
                     {
-                       var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                       foreach(var col in df.Columns)
-                       {
-                           List<Object> values = new List<object>();
-                           for (var i = 0; i < col.Length; i++)
-                           {
-                               values.Add(col[i]);
-                           }
-                           output.Add(new ArrowRelation(file.Name, values));
-                       }
+                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                        foreach (var col in df.Columns)
+                        {
+                            List<Object> values = new List<object>();
+                            for (var i = 0; i < col.Length; i++)
+                            {
+                                values.Add(col[i]);
+                            }
+                            output.Add(new ArrowRelation(file.Name, values));
+                        }
                     }
                 }
             }

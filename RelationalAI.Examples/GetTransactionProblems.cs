@@ -32,7 +32,7 @@ namespace RelationalAI.Examples
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
             var problems = await client.GetTransactionProblemsAsync(id);
-            foreach(var problem in problems)
+            foreach (var problem in problems)
             {
                 Console.WriteLine(problem);
             }

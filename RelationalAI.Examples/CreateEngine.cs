@@ -33,7 +33,7 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            Console.WriteLine("Creating Engine: "+ engine);
+            Console.WriteLine("Creating Engine: " + engine);
             Console.WriteLine(await client.CreateEngineWaitAsync(engine));
         }
 

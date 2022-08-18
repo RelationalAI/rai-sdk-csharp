@@ -29,7 +29,7 @@ namespace RelationalAI.Test
             Assert.Equal(OAuthClientName, rsp.Name);
 
             var clients = await client.ListOAuthClientsAsync();
-            var found = clients.Find( item => item.ID == clientId );
+            var found = clients.Find(item => item.ID == clientId);
             Assert.NotNull(found);
             Assert.Equal(clientId, found.ID);
             Assert.Equal(OAuthClientName, found.Name);
@@ -37,7 +37,7 @@ namespace RelationalAI.Test
             var deleteRsp = await client.DeleteOAuthClientAsync(clientId);
             Assert.Equal(clientId, deleteRsp.ID);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
         }
 
         public override async Task DisposeAsync()
@@ -49,7 +49,7 @@ namespace RelationalAI.Test
                 var oauthClient = await client.FindOAuthClientAsync(OAuthClientName);
                 await client.DeleteOAuthClientAsync(oauthClient.ID);
             }
-            catch {}
+            catch { }
         }
     }
 }

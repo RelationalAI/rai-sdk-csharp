@@ -33,18 +33,18 @@ namespace RelationalAI.Credentials
         public int ExpiresIn
         {
             get => _expiresIn;
-            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");  
+            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
         }
 
         public bool IsExpired
         {
             get => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
         }
-        public string Token 
+        public string Token
         {
             get => _token;
             set => _token = value;
-        } 
-        
+        }
+
     }
 }

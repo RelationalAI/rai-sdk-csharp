@@ -15,12 +15,12 @@ namespace RelationalAI.Test
         {
             Client client = CreateClient();
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.FindUserAsync(UserEmail) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.FindUserAsync(UserEmail));
 
             var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);
             Assert.Equal("ACTIVE", rsp.Status);
-            Assert.Equal( new List<string> {"user"}, rsp.Roles);
+            Assert.Equal(new List<string> { "user" }, rsp.Roles);
 
             rsp = await client.FindUserAsync(UserEmail);
             var userId = rsp.ID;
@@ -32,7 +32,7 @@ namespace RelationalAI.Test
             Assert.Equal(UserEmail, rsp.Email);
 
             var users = await client.ListUsersAsync();
-            var user = users.Find( user => user.ID == userId);
+            var user = users.Find(user => user.ID == userId);
             Assert.Equal(userId, user.ID);
             Assert.Equal(UserEmail, user.Email);
 
@@ -48,13 +48,13 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("ACTIVE", rsp.Status);
 
-            rsp = await client.UpdateUserAsync(userId, roles: new List<Role> {Role.Admin, Role.User});
+            rsp = await client.UpdateUserAsync(userId, roles: new List<Role> { Role.Admin, Role.User });
             Assert.Equal(userId, rsp.ID);
-            Assert.Equal(new List<string> {"admin", "user"}, rsp.Roles);
+            Assert.Equal(new List<string> { "admin", "user" }, rsp.Roles);
 
-            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive, new List<Role>{Role.User});
+            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive, new List<Role> { Role.User });
             Assert.Equal(userId, rsp.ID);
-            Assert.Equal(new List<string>{"user"}, rsp.Roles);
+            Assert.Equal(new List<string> { "user" }, rsp.Roles);
 
             // cleanup
             var deleteRsp = await client.DeleteUserAsync(userId);
@@ -69,7 +69,8 @@ namespace RelationalAI.Test
             {
                 var oauthClient = await client.FindUserAsync(UserEmail);
                 await client.DeleteUserAsync(oauthClient.ID);
-            } catch {}
+            }
+            catch { }
         }
     }
 }

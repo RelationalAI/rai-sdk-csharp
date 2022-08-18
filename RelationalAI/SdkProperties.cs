@@ -18,7 +18,8 @@ namespace RelationalAI
     using System.Diagnostics;
     using System.Reflection;
 
-    public static class SdkProperties {
+    public static class SdkProperties
+    {
         public static string Version;
         public static string ProductName;
 

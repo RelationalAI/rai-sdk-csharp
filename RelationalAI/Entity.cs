@@ -18,7 +18,7 @@ namespace RelationalAI
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public abstract class Entity 
+    public abstract class Entity
     {
         public override string ToString()
         {
