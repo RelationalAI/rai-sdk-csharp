@@ -9,7 +9,7 @@ namespace RelationalAI.Test
         public static string UUID = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{UUID}";
         public static string EngineName = $"csharp-sdk-{UUID}";
-        string testModel = "def R = \"hello\", \"world\"";
+        readonly string testModel = "def R = \"hello\", \"world\"";
 
         [Fact]
         public async Task ModelsTest()
@@ -20,9 +20,9 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var model = await client.GetModelAsync(Dbname, EngineName, "test_model");
             Assert.Equal("test_model", model.Name);
@@ -35,9 +35,9 @@ namespace RelationalAI.Test
             Assert.NotNull(model);
 
             var deleteRsp = await client.DeleteModelAsync(Dbname, EngineName, "test_model");
-            Assert.Equal(false, deleteRsp.Aborted);
-            Assert.Equal(0, deleteRsp.Output.Length);
-            Assert.Equal(0, deleteRsp.Problems.Length);
+            Assert.False(deleteRsp.Aborted);
+            Assert.Empty(deleteRsp.Output);
+            Assert.Empty(deleteRsp.Problems);
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
 

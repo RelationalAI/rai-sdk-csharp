@@ -1,3 +1,7 @@
+// <copyright file="Config.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -40,6 +44,11 @@ namespace RelationalAI
             return ReadConfigFromInitData(data, profile);
         }
 
+        public static string GetRAIConfigPath()
+        {
+            return Path.Combine(GetRAIDir(), "config");
+        }
+
         private static Dictionary<string, object> ReadConfigFromInitData(IniData data, string profile)
         {
             string[] keys = { "host", "port", "scheme", "region" };
@@ -69,11 +78,6 @@ namespace RelationalAI
             }
 
             return null;
-        }
-
-        public static string GetRAIConfigPath()
-        {
-            return Path.Combine(GetRAIDir(), "config");
         }
 
         private static string GetRAIDir()

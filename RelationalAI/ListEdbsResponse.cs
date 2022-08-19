@@ -1,3 +1,7 @@
+// <copyright file="ListEdbsResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -22,6 +26,6 @@ namespace RelationalAI
     public class ListEdbsResponse : Entity
     {
         [JsonProperty("actions", Required = Required.Always)]
-        public List<ListEdbsResponseAction> actions { get; set; }
+        public List<ListEdbsResponseAction> Actions { get; set; }
     }
 }

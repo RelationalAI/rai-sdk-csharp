@@ -1,3 +1,7 @@
+// <copyright file="Permission.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -16,6 +20,7 @@
 namespace RelationalAI
 {
     using System;
+
     public enum Permission
     {
         CreateAccessKey,
@@ -47,9 +52,8 @@ namespace RelationalAI
         UpdateUser,
     }
 
-    static class Permissions
+    internal static class Permissions
     {
-
         public static string Value(this Permission permission)
         {
             switch (permission)
@@ -63,11 +67,11 @@ namespace RelationalAI
                 case Permission.CreateDatabase:
                     return "create:database";
                 case Permission.DeleteDatabase:
-                    return "delete:database"; ;
+                    return "delete:database";
                 case Permission.ListDatabases:
-                    return "list:database"; ;
+                    return "list:database";
                 case Permission.UpdateDatabase:
-                    return "update:database"; ;
+                    return "update:database";
                 case Permission.CreateCompute:
                     return "create:compute";
                 case Permission.DeleteCompute:

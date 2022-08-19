@@ -1,3 +1,7 @@
+// <copyright file="AccessToken.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -17,34 +21,35 @@
 namespace RelationalAI.Credentials
 {
     using System;
+
     public class AccessToken
     {
-        private DateTime _createdOn;
-        private int _expiresIn;
-        private string _token;
+        private readonly DateTime createdOn;
+        private int expiresIn;
+        private string token;
 
         public AccessToken(string token, int expiresIn)
         {
-            Token = token;
-            ExpiresIn = expiresIn;
-            _createdOn = DateTime.Now;
+            this.Token = token;
+            this.ExpiresIn = expiresIn;
+            this.createdOn = DateTime.Now;
         }
 
         public int ExpiresIn
         {
-            get => _expiresIn;
-            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
+            get => this.expiresIn;
+            set => this.expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
         }
 
         public bool IsExpired
         {
-            get => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
-        }
-        public string Token
-        {
-            get => _token;
-            set => _token = value;
+            get => (DateTime.Now - this.createdOn).TotalSeconds >= this.ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
         }
 
+        public string Token
+        {
+            get => this.token;
+            set => this.token = value;
+        }
     }
 }

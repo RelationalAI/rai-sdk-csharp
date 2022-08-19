@@ -10,7 +10,7 @@ namespace RelationalAI.Test
         public static string UUID = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{UUID}";
         public static string EngineName = $"csharp-sdk-{UUID}";
-        string sample = "" +
+        readonly string sample = "" +
             "cocktail,quantity,price,date\n" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
@@ -26,9 +26,9 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
@@ -82,7 +82,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string sampleNoHeader = "" +
+        readonly string sampleNoHeader = "" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
             "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
@@ -98,9 +98,9 @@ namespace RelationalAI.Test
 
             var opts = new CsvOptions().WithHeaderRow(0);
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", sampleNoHeader, opts);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_no_header");
 
@@ -156,7 +156,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string sampleAltSyntax = "" +
+        readonly string sampleAltSyntax = "" +
             "cocktail|quantity|price|date\n" +
             "'martini'|2|12.50|'2020-01-01'\n" +
             "'sazerac'|4|14.25|'2020-02-02'\n" +
@@ -173,9 +173,9 @@ namespace RelationalAI.Test
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", sampleAltSyntax, opts);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_alt_syntax");
 
@@ -238,17 +238,19 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var schema = new Dictionary<string, string>();
-            schema.Add("cocktail", "string");
-            schema.Add("quantity", "int");
-            schema.Add("price", "decimal(64,2)");
-            schema.Add("date", "date");
+            var schema = new Dictionary<string, string>
+            {
+                { "cocktail", "string" },
+                { "quantity", "int" },
+                { "price", "decimal(64,2)" },
+                { "date", "date" }
+            };
 
             var opts = new CsvOptions().WithSchema(schema);
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample, opts);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 

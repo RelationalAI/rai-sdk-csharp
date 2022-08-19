@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncResult.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -20,19 +24,12 @@ namespace RelationalAI
 
     public class TransactionAsyncResult : Entity
     {
-        public bool GotCompleteResult { get; set; }
-        public TransactionAsyncCompactResponse Transaction { get; set; }
-        public List<ArrowRelation> Results { get; set; }
-        public MetadataInfo Metadata { get; set; }
-        public List<object> Problems { get; set; }
-
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
             MetadataInfo metadata,
             List<object> problems,
-            bool gotCompleteResult = false
-        )
+            bool gotCompleteResult = false)
         {
             this.GotCompleteResult = gotCompleteResult;
             this.Transaction = transaction;
@@ -40,5 +37,15 @@ namespace RelationalAI
             this.Metadata = metadata;
             this.Problems = problems;
         }
+
+        public bool GotCompleteResult { get; set; }
+
+        public TransactionAsyncCompactResponse Transaction { get; set; }
+
+        public List<ArrowRelation> Results { get; set; }
+
+        public MetadataInfo Metadata { get; set; }
+
+        public List<object> Problems { get; set; }
     }
 }

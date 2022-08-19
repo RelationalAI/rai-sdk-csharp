@@ -1,3 +1,7 @@
+// <copyright file="ListModelsResponseAction.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -22,6 +26,6 @@ namespace RelationalAI
     public class ListModelsResponseAction : Entity
     {
         [JsonProperty("result", Required = Required.Always)]
-        public ListModelsResponseResult result { get; set; }
+        public ListModelsResponseResult Result { get; set; }
     }
 }

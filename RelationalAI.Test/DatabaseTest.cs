@@ -67,10 +67,9 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<SystemException>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
-        string testModel =
+        readonly string testModel =
                 "def R = \"hello\", \"world\"";
-
-        string testJson = "{" +
+        readonly string testJson = "{" +
                 "\"name\":\"Amira\",\n" +
                 "\"age\":32,\n" +
                 "\"height\":null,\n" +
@@ -91,14 +90,14 @@ namespace RelationalAI.Test
 
             // load some data and model
             var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", testJson);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";

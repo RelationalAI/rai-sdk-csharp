@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncSingleResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -19,7 +23,6 @@ namespace RelationalAI
 
     public class TransactionAsyncSingleResponse : Entity
     {
-
         [JsonProperty("transaction", Required = Required.Always)]
         public TransactionAsyncResponse Transaction { get; set; }
     }

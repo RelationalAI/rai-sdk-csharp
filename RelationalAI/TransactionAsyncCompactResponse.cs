@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncCompactResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -19,16 +23,16 @@ namespace RelationalAI
 
     public class TransactionAsyncCompactResponse : Entity
     {
-        [JsonProperty("id", Required = Required.Always)]
-        public string ID { get; set; }
-
-        [JsonProperty("state", Required = Required.Always)]
-        public string State { get; set; }
-
         public TransactionAsyncCompactResponse(string id, string state)
         {
             this.ID = id;
             this.State = state;
         }
+
+        [JsonProperty("id", Required = Required.Always)]
+        public string ID { get; set; }
+
+        [JsonProperty("state", Required = Required.Always)]
+        public string State { get; set; }
     }
 }

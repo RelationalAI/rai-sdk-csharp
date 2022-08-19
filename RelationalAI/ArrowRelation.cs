@@ -1,3 +1,7 @@
+// <copyright file="ArrowRelation.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -18,16 +22,18 @@ namespace RelationalAI
 {
     using System.Collections.Generic;
     using System.Linq;
+
     public class ArrowRelation : Entity
     {
-        public string RelationId { get; set; }
-        public List<object> Table { get; set; }
-
         public ArrowRelation(string relationId, List<object> table)
         {
             this.RelationId = relationId;
             this.Table = table;
         }
+
+        public string RelationId { get; set; }
+
+        public List<object> Table { get; set; }
 
         public override bool Equals(object obj)
         {

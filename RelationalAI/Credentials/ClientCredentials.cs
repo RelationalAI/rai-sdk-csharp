@@ -1,3 +1,7 @@
+// <copyright file="ClientCredentials.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -19,44 +23,48 @@ namespace RelationalAI.Credentials
 
     public class ClientCredentials : ICredentials
     {
-        public static string defaultClientCredentialsURL = "https://login.relationalai.com/oauth/token";
-        private string _clientID;
-        private string _clientSecret;
-        private string _clientCredentialsURL = ClientCredentials.defaultClientCredentialsURL;
-        private AccessToken _accessToken;
+        public static string DefaultClientCredentialsURL = "https://login.relationalai.com/oauth/token";
+        private string clientID;
+        private string clientSecret;
+        private string clientCredentialsURL = ClientCredentials.DefaultClientCredentialsURL;
+        private AccessToken accessToken;
 
         public ClientCredentials(string clientID, string clientSecret)
         {
-            ClientID = clientID;
-            ClientSecret = clientSecret;
-        }
-        public ClientCredentials(string clientID, string clientSecret, string clientCredentialsURL) :
-            this(clientID, clientSecret)
-        {
-            ClientCredentialsURL = clientCredentialsURL;
-        }
-        public string ClientID
-        {
-            get => _clientID;
-            set => _clientID = !String.IsNullOrEmpty(value) ? value :
-                throw new ArgumentException("ClientID cannot be null or empty");
-        }
-        public string ClientSecret
-        {
-            get => _clientSecret;
-            set => _clientSecret = !String.IsNullOrEmpty(value) ? value :
-                throw new ArgumentException("ClientSecret cannot be null or empty");
-        }
-        public string ClientCredentialsURL
-        {
-            get => _clientCredentialsURL;
-            set => _clientCredentialsURL = !String.IsNullOrEmpty(value) ? value : defaultClientCredentialsURL;
-        }
-        public AccessToken AccessToken
-        {
-            get => _accessToken;
-            set => _accessToken = value;
+            this.ClientID = clientID;
+            this.ClientSecret = clientSecret;
         }
 
+        public ClientCredentials(string clientID, string clientSecret, string clientCredentialsURL)
+            : this(clientID, clientSecret)
+        {
+            this.ClientCredentialsURL = clientCredentialsURL;
+        }
+
+        public string ClientID
+        {
+            get => this.clientID;
+            set => this.clientID = !string.IsNullOrEmpty(value) ? value :
+                throw new ArgumentException("ClientID cannot be null or empty");
+        }
+
+        public string ClientSecret
+        {
+            get => this.clientSecret;
+            set => this.clientSecret = !string.IsNullOrEmpty(value) ? value :
+                throw new ArgumentException("ClientSecret cannot be null or empty");
+        }
+
+        public string ClientCredentialsURL
+        {
+            get => this.clientCredentialsURL;
+            set => this.clientCredentialsURL = !string.IsNullOrEmpty(value) ? value : DefaultClientCredentialsURL;
+        }
+
+        public AccessToken AccessToken
+        {
+            get => this.accessToken;
+            set => this.accessToken = value;
+        }
     }
 }

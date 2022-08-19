@@ -1,4 +1,8 @@
-﻿/*
+﻿// <copyright file="TransactionAsyncCancelResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+/*
  * Copyright 2022 RelationalAI, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,6 +24,6 @@ namespace RelationalAI
     public class TransactionAsyncCancelResponse : Entity
     {
         [JsonProperty("message", Required = Required.Default)]
-        public string message { get; set; }
+        public string Message { get; set; }
     }
 }

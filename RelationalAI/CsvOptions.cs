@@ -1,3 +1,7 @@
+// <copyright file="CsvOptions.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -13,10 +17,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.Collections.Generic;
-
 namespace RelationalAI
 {
+    using System.Collections.Generic;
+
     public class CsvOptions
     {
         public char? Delim;
@@ -25,7 +29,10 @@ namespace RelationalAI
         public char? QuoteChar;
         public Dictionary<string, string> Schema;
 
-        public CsvOptions() { }
+        public CsvOptions()
+        {
+        }
+
         public CsvOptions WithDelim(char delim)
         {
             this.Delim = delim;

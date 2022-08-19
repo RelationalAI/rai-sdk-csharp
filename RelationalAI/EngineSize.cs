@@ -1,3 +1,7 @@
+// <copyright file="EngineSize.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -21,6 +25,6 @@ namespace RelationalAI
         S,
         M,
         L,
-        XL
+        XL,
     }
 }
