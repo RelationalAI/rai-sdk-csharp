@@ -1,3 +1,7 @@
+// <copyright file="CsvOptions.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -13,41 +17,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-using System.Collections.Generic;
-
 namespace RelationalAI
 {
+    using System.Collections.Generic;
+
     public class CsvOptions
     {
-        public char? Delim;
-        public char? EscapeChar;
-        public int? HeaderRow;
-        public char? QuoteChar;
-        public Dictionary<string, string> Schema;
+        public CsvOptions()
+        {
+        }
 
-        public CsvOptions() {}
+        public char? Delim { get; set; }
+
+        public char? EscapeChar { get; set; }
+
+        public int? HeaderRow { get; set; }
+
+        public char? QuoteChar { get; set;  }
+
+        public Dictionary<string, string> Schema { get; set; }
+
         public CsvOptions WithDelim(char delim)
         {
             this.Delim = delim;
             return this;
         }
 
-        public CsvOptions WithEscapeChar(char escapeChar) {
+        public CsvOptions WithEscapeChar(char escapeChar)
+        {
             this.EscapeChar = escapeChar;
             return this;
         }
 
-        public CsvOptions WithHeaderRow(int headerRow) {
+        public CsvOptions WithHeaderRow(int headerRow)
+        {
             this.HeaderRow = headerRow;
             return this;
         }
 
-        public CsvOptions WithQuoteChar(char quoteChar) {
+        public CsvOptions WithQuoteChar(char quoteChar)
+        {
             this.QuoteChar = quoteChar;
             return this;
         }
 
-        public CsvOptions WithSchema(Dictionary<string, string> schema) {
+        public CsvOptions WithSchema(Dictionary<string, string> schema)
+        {
             this.Schema = schema;
             return this;
         }

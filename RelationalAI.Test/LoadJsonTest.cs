@@ -9,7 +9,7 @@ namespace RelationalAI.Test
         public static string UUID = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{UUID}";
         public static string EngineName = $"csharp-sdk-{UUID}";
-        string sample = "{" +
+        readonly string sample = "{" +
             "\"name\":\"Amira\",\n" +
             "\"age\":32,\n" +
             "\"height\":null,\n" +
@@ -24,9 +24,9 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", sample);
-            Assert.Equal(false, loadRsp.Aborted);
-            Assert.Equal(0, loadRsp.Output.Length);
-            Assert.Equal(0, loadRsp.Problems.Length);
+            Assert.False(loadRsp.Aborted);
+            Assert.Empty(loadRsp.Output);
+            Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
@@ -34,17 +34,17 @@ namespace RelationalAI.Test
 
             rel = findRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
+            Assert.Single(rel.Columns);
             Assert.Equal(new object [][] { new object[] {"Amira"} }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":age");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
+            Assert.Single(rel.Columns);
             Assert.Equal(new object [][] { new object[] { 32L } }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":height");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
+            Assert.Single(rel.Columns);
             Assert.Equal(new object [][] { new object [] { null } }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":pets");

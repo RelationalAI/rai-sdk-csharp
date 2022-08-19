@@ -1,3 +1,7 @@
+// <copyright file="Rest.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -15,23 +19,24 @@
  */
 namespace RelationalAI
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using System.Net.Http;
+    using System.Net.Http.Headers;
+    using System.Threading.Tasks;
+    using System.Web;
     using Apache.Arrow;
     using Apache.Arrow.Ipc;
     using HttpMultipartParser;
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
     using RelationalAI.Credentials;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.IO;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Threading.Tasks;
-    using System.Web;
+
     public class Rest
     {
-        private Rest.Context context;
+        private readonly Rest.Context context;
 
         public Rest(Rest.Context context)
         {
@@ -115,6 +120,92 @@ namespace RelationalAI
             return await this.RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
+        public async Task<object> RequestHelperAsync(
+            string method,
+            string url,
+            object data = null,
+            Dictionary<string, string> headers = null,
+            Dictionary<string, string> parameters = null)
+        {
+            Uri uri = new Uri(url);
+            using var client = new HttpClient();
+
+            // Set the API url
+            client.BaseAddress = uri;
+
+            // Create the POST request
+            var request = this.PrepareHttpRequest(method, client.BaseAddress, this.EncodeContent(data), headers, parameters);
+
+            // Get the result back or throws an exception.
+            var httpResponse = await client.SendAsync(request);
+            var content = await httpResponse.Content.ReadAsByteArrayAsync();
+            var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+
+            return contentType.ToLower() switch
+            {
+                "application/json" => this.ReadString(content),
+                "multipart/form-data" => this.ParseMultipartResponse(content),
+                _ => throw new SystemException($"unsupported content-type: {contentType}")
+            };
+        }
+
+        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
+        {
+            var output = new List<TransactionAsyncFile>();
+
+            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
+
+            foreach (var file in parser.Files)
+            {
+                MemoryStream memoryStream = new MemoryStream();
+                file.Data.CopyTo(memoryStream);
+                byte[] buffer = memoryStream.ToArray();
+                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
+                output.Add(txnAsyncFile);
+            }
+
+            return output;
+        }
+
+        public string ReadString(byte[] data)
+        {
+            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
+        }
+
+        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
+        {
+            var output = new List<ArrowRelation>();
+            foreach (var file in files)
+            {
+                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
+                {
+                    MemoryStream memoryStream = new MemoryStream(file.Data)
+                    {
+                        Position = 0,
+                    };
+
+                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
+                    RecordBatch recordBatch;
+                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                    {
+                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                        foreach (var col in df.Columns)
+                        {
+                            List<object> values = new List<object>();
+                            for (var i = 0; i < col.Length; i++)
+                            {
+                                values.Add(col[i]);
+                            }
+
+                            output.Add(new ArrowRelation(col.Name, values));
+                        }
+                    }
+                }
+            }
+
+            return output;
+        }
+
         private HttpContent EncodeContent(object body)
         {
             if (body == null)
@@ -159,7 +250,7 @@ namespace RelationalAI
 
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
         {
-            headers = headers != null ? headers : new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            headers ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (!headers.ContainsKey("accept"))
             {
                 headers.Add("Accept", "application/json");
@@ -227,10 +318,10 @@ namespace RelationalAI
             // Form the API request body.
             Dictionary<string, string> data = new Dictionary<string, string>()
             {
-                {"client_id", creds.ClientID},
-                {"client_secret", creds.ClientSecret},
-                {"audience", String.Format("https://{0}", host)},
-                {"grant_type", "client_credentials"}
+                { "client_id", creds.ClientID },
+                { "client_secret", creds.ClientSecret },
+                { "audience", string.Format("https://{0}", host) },
+                { "grant_type", "client_credentials" },
             };
             string resp = await this.RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
             Dictionary<string, string> result =
@@ -239,93 +330,11 @@ namespace RelationalAI
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
-        public async Task<object> RequestHelperAsync(
-            string method,
-            string url,
-            object data = null,
-            Dictionary<string, string> headers = null,
-            Dictionary<string, string> parameters = null)
-        {
-            Uri uri = new Uri(url);
-            using (var client = new HttpClient())
-            {
-                // Set the API url
-                client.BaseAddress = uri;
-
-                // Create the POST request
-                var request = this.PrepareHttpRequest(method, client.BaseAddress, this.EncodeContent(data), headers, parameters);
-
-                // Get the result back or throws an exception.
-                var httpResponse = await client.SendAsync(request);
-                var content = await httpResponse.Content.ReadAsByteArrayAsync();
-                var contentType = httpResponse.Content.Headers.ContentType.MediaType;
-
-                return contentType.ToLower() switch
-                {
-                    "application/json" => ReadString(content),
-                    "multipart/form-data" => ParseMultipartResponse(content),
-                    _ => throw new SystemException($"unsupported content-type: {contentType}")
-                };
-            }
-        }
-
-        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
-        {
-            var output = new List<TransactionAsyncFile>();
-
-            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
-
-            foreach (var file in parser.Files)
-            {
-                MemoryStream memoryStream = new MemoryStream();
-                file.Data.CopyTo(memoryStream);
-                byte[] buffer = memoryStream.ToArray();
-                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
-                output.Add(txnAsyncFile);
-            }
-            return output;
-        }
-
-        public string ReadString(byte[] data)
-        {
-            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
-        }
-
-        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
-        {
-            var output = new List<ArrowRelation> ();
-            foreach(var file in files)
-            {
-                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                {
-                    MemoryStream memoryStream = new MemoryStream(file.Data);
-                    memoryStream.Position = 0;
-
-                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
-                    RecordBatch recordBatch;
-                    while((recordBatch = reader.ReadNextRecordBatch()) != null)
-                    {
-                       var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                       foreach(var col in df.Columns)
-                       {
-                           List<Object> values = new List<object>();
-                           for (var i = 0; i < col.Length; i++)
-                           {
-                               values.Add(col[i]);
-                           }
-                           output.Add(new ArrowRelation(col.Name, values));
-                       }
-                    }
-                }
-            } 
-
-            return output;
-        }
-
         public class Context
         {
             private ICredentials credentials;
             private string region;
+
             public Context(string region = null, ICredentials credentials = null)
             {
                 this.Region = region;
@@ -341,7 +350,7 @@ namespace RelationalAI
             public string Region
             {
                 get => this.region;
-                set => this.region = !String.IsNullOrEmpty(value) ? value : "us-east";
+                set => this.region = !string.IsNullOrEmpty(value) ? value : "us-east";
             }
         }
     }

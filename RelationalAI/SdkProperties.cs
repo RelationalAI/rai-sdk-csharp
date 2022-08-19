@@ -1,3 +1,7 @@
+// <copyright file="SdkProperties.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -18,10 +22,8 @@ namespace RelationalAI
     using System.Diagnostics;
     using System.Reflection;
 
-    public static class SdkProperties {
-        public static string Version;
-        public static string ProductName;
-
+    public static class SdkProperties
+    {
         static SdkProperties()
         {
             Assembly assembly = Assembly.GetExecutingAssembly();
@@ -30,5 +32,9 @@ namespace RelationalAI
             Version = fileVersionInfo.ProductVersion;
             ProductName = fileVersionInfo.ProductName;
         }
+
+        public static string Version { get; set; }
+
+        public static string ProductName { get; set; }
     }
 }

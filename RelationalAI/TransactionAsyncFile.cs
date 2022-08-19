@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncFile.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -14,17 +18,12 @@
  * limitations under the License.
  */
 
-using Newtonsoft.Json;
-
 namespace RelationalAI
 {
+    using Newtonsoft.Json;
+
     public class TransactionAsyncFile : Entity
     {
-        public string Name { get; set; }
-        public byte[] Data { get; set; }
-        public string Filename { get; set; }
-        public string ContentType { get; set; }
-
         public TransactionAsyncFile(string name, byte[] data, string filename, string contentType)
         {
             this.Name = name;
@@ -32,5 +31,13 @@ namespace RelationalAI
             this.Filename = filename;
             this.ContentType = contentType;
         }
+
+        public string Name { get; set; }
+
+        public byte[] Data { get; set; }
+
+        public string Filename { get; set; }
+
+        public string ContentType { get; set; }
     }
 }

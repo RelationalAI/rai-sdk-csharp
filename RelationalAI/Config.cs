@@ -1,3 +1,7 @@
+// <copyright file="Config.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -22,7 +26,7 @@ namespace RelationalAI
     using IniParser;
     using IniParser.Model;
     using RelationalAI.Credentials;
-    
+
     public class Config
     {
         public static Dictionary<string, object> Read(string path = null, string profile = "default")
@@ -38,6 +42,11 @@ namespace RelationalAI
             IniData data = parser.ReadData(new StreamReader(stream));
 
             return ReadConfigFromInitData(data, profile);
+        }
+
+        public static string GetRAIConfigPath()
+        {
+            return Path.Combine(GetRAIDir(), "config");
         }
 
         private static Dictionary<string, object> ReadConfigFromInitData(IniData data, string profile)
@@ -69,11 +78,6 @@ namespace RelationalAI
             }
 
             return null;
-        }
-
-        public static string GetRAIConfigPath()
-        {
-            return Path.Combine(GetRAIDir(), "config");
         }
 
         private static string GetRAIDir()

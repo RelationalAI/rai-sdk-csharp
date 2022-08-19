@@ -1,3 +1,7 @@
+// <copyright file="UserStatus.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -15,26 +19,23 @@
  */
 namespace RelationalAI
 {
-    public enum UserStatus
+    public enum UserStatusEnum
     {
         Active,
         InActive,
         None,
     }
 
-    static class UserStatuses 
+    internal static class UserStatus
     {
-        public static string Value(this UserStatus status)
+        public static string Value(this UserStatusEnum status)
         {
-            switch (status)
+            return status switch
             {
-                case UserStatus.Active:
-                    return "ACTIVE";
-                case UserStatus.InActive:
-                    return "INACTIVE";
-                default:
-                    return "NONE"; 
-            }
+                UserStatusEnum.Active => "ACTIVE",
+                UserStatusEnum.InActive => "INACTIVE",
+                _ => "NONE",
+            };
         }
     }
 }

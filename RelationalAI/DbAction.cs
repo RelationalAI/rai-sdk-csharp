@@ -1,3 +1,7 @@
+// <copyright file="DbAction.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -22,7 +26,9 @@ namespace RelationalAI
     // Represents a "database action", which is an argument to a transaction.
     public class DbAction : Dictionary<string, object>
     {
-        public DbAction() { }
+        public DbAction()
+        {
+        }
 
         public DbAction(string type)
         {
@@ -38,9 +44,11 @@ namespace RelationalAI
             {
                 foreach (var action in actions)
                 {
-                    var item = new DbAction("LabeledAction");
-                    item.Add("name", string.Format("action{0}", ix++));
-                    item.Add("action", action);
+                    var item = new DbAction("LabeledAction")
+                    {
+                        { "name", string.Format("action{0}", ix++) },
+                        { "action", action },
+                    };
                     result.Add(item);
                 }
             }
@@ -53,18 +61,13 @@ namespace RelationalAI
             return MakeDeleteModelsAction(new string[] { name });
         }
 
-        private static DbAction MakeDeleteModelsAction(string[] names)
-        {
-            var result = new DbAction("ModifyWorkspaceAction");
-            result.Add("delete_source", names);
-            return result;
-        }
-
-        // Return a DbAction for installing the single named model. 
+        // Return a DbAction for installing the single named model.
         public static DbAction MakeInstallAction(string name, string model)
         {
-            var result = new DbAction("InstallAction");
-            result.Add("sources", new DbAction[] { MakeQuerySource(name, model) });
+            var result = new DbAction("InstallAction")
+            {
+                { "sources", new DbAction[] { MakeQuerySource(name, model) } },
+            };
             return result;
         }
 
@@ -78,8 +81,11 @@ namespace RelationalAI
             {
                 sources[i++] = MakeQuerySource(entry.Key, entry.Value);
             }
-            var result = new DbAction("InstallAction");
-            result.Add("sources", sources);
+
+            var result = new DbAction("InstallAction")
+            {
+                { "sources", sources },
+            };
             return result;
         }
 
@@ -93,17 +99,6 @@ namespace RelationalAI
             return new DbAction("ListEdbAction");
         }
 
-        private static DbAction MakeRelKey(string name, string key)
-        {
-            string[] keys = { key };
-            string[] values = { };
-            var result = new DbAction("RelKey");
-            result.Add("name", name);
-            result.Add("keys", keys);
-            result.Add("value", values);
-            return result;
-        }
-
         public static DbAction MakeQueryAction(string source, Dictionary<string, string> inputs)
         {
             var actionInputs = new List<DbAction>();
@@ -115,12 +110,15 @@ namespace RelationalAI
                     actionInputs.Add(actionInput);
                 }
             }
+
             string[] empty = { };
-            var result = new DbAction("QueryAction");
-            result.Add("source", MakeQuerySource("query", source));
-            result.Add("inputs", actionInputs);
-            result.Add("outputs", empty);
-            result.Add("persist", empty);
+            var result = new DbAction("QueryAction")
+            {
+                { "source", MakeQuerySource("query", source) },
+                { "inputs", actionInputs },
+                { "outputs", empty },
+                { "persist", empty },
+            };
             return result;
         }
 
@@ -128,18 +126,44 @@ namespace RelationalAI
         {
             string[,] columns = { { value } };
             var typename = Reltype(value);
-            var result = new DbAction("Relation");
-            result.Add("columns", columns);
-            result.Add("rel_key", MakeRelKey(name, typename));
+            var result = new DbAction("Relation")
+            {
+                { "columns", columns },
+                { "rel_key", MakeRelKey(name, typename) },
+            };
+            return result;
+        }
+
+        private static DbAction MakeDeleteModelsAction(string[] names)
+        {
+            var result = new DbAction("ModifyWorkspaceAction")
+            {
+                { "delete_source", names },
+            };
+            return result;
+        }
+
+        private static DbAction MakeRelKey(string name, string key)
+        {
+            string[] keys = { key };
+            string[] values = { };
+            var result = new DbAction("RelKey")
+            {
+                { "name", name },
+                { "keys", keys },
+                { "value", values },
+            };
             return result;
         }
 
         private static DbAction MakeQuerySource(string name, string model)
         {
-            var result = new DbAction("Source");
-            result.Add("name", name);
-            result.Add("path", "");
-            result.Add("value", model);
+            var result = new DbAction("Source")
+            {
+                { "name", name },
+                { "path", string.Empty },
+                { "value", model },
+            };
             return result;
         }
 

@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -19,6 +23,28 @@ namespace RelationalAI
 
     public class TransactionAsyncResponse : TransactionAsyncCompactResponse
     {
+        public TransactionAsyncResponse(
+            string id,
+            string state,
+            string accountName,
+            string createdBy,
+            long createdOn,
+            long finishedAt,
+            string databaseName,
+            bool readOnly,
+            string query,
+            string lastRequestedInterval)
+            : base(id, state)
+        {
+            this.AccountName = accountName;
+            this.CreatedBy = createdBy;
+            this.CreatedOn = createdOn;
+            this.FinishedAt = finishedAt;
+            this.DatabaseName = databaseName;
+            this.ReadOnly = readOnly;
+            this.Query = query;
+            this.LastRequestedInterval = lastRequestedInterval;
+        }
 
         [JsonProperty("account_name", Required = Required.Always)]
         public string AccountName { get; set; }
@@ -43,28 +69,5 @@ namespace RelationalAI
 
         [JsonProperty("last_requested_interval", Required = Required.Always)]
         public string LastRequestedInterval { get; set; }
-
-        public TransactionAsyncResponse(
-            string id,
-            string state,
-            string accountName,
-            string createdBy,
-            long createdOn,
-            long finishedAt,
-            string databaseName,
-            bool readOnly,
-            string query,
-            string lastRequestedInterval
-        ) : base(id, state)
-        {
-            this.AccountName = accountName;
-            this.CreatedBy = createdBy;
-            this.CreatedOn = createdOn;
-            this.FinishedAt = finishedAt;
-            this.DatabaseName = databaseName;
-            this.ReadOnly = readOnly;
-            this.Query = query;
-            this.LastRequestedInterval = lastRequestedInterval;
-        }
     }
 }

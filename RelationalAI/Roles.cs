@@ -1,3 +1,7 @@
+// <copyright file="Roles.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -20,22 +24,19 @@ namespace RelationalAI
     public enum Role
     {
         User,
-        Admin
+        Admin,
     }
 
-    static class Roles 
+    internal static class Roles
     {
         public static string Value(this Role role)
         {
-            switch (role)
+            return role switch
             {
-                case Role.User:
-                    return "user";
-                case Role.Admin:
-                    return "admin";
-                default:
-                    throw new SystemException(string.Format("role '{0}' not supported", role));
-            }
+                Role.User => "user",
+                Role.Admin => "admin",
+                _ => throw new SystemException(string.Format("role '{0}' not supported", role)),
+            };
         }
     }
 }
