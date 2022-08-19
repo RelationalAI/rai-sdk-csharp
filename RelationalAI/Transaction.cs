@@ -1,3 +1,7 @@
+// <copyright file="Transaction.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -20,6 +24,22 @@ namespace RelationalAI
 
     public class Transaction : Entity
     {
+        public Transaction(
+            string region,
+            string database,
+            string engine,
+            string mode,
+            bool readOnly = false,
+            string source = null)
+        {
+            this.Region = region;
+            this.Database = database;
+            this.Engine = engine;
+            this.Mode = mode;
+            this.ReadOnly = readOnly;
+            this.Source = source;
+        }
+
         public string Region { get; set; }
 
         public string Database { get; set; }
@@ -38,38 +58,25 @@ namespace RelationalAI
 
         public int Version { get; set; }
 
-        public Transaction(
-            string region,
-            string database,
-            string engine,
-            string mode,
-            bool readOnly = false,
-            string source = null)
-        {
-            this.Region = region;
-            this.Database = database;
-            this.Engine = engine;
-            this.Mode = mode;
-            this.ReadOnly = readOnly;
-            this.Source = source;
-        }
-
         // Construct the transaction payload and return serialized JSON string.
         public Dictionary<string, object> Payload(List<DbAction> actions)
         {
-            var data = new Dictionary<string, object>();
-            data.Add("type", "Transaction");
-            data.Add("mode", Transaction.GetMode(this.Mode));
-            data.Add("dbname", this.Database);
-            data.Add("abort", this.Abort);
-            data.Add("nowait_durable", this.NoWaitDurable);
-            data.Add("readonly", this.ReadOnly);
-            data.Add("version", this.Version);
-            data.Add("actions", DbAction.MakeActions(actions));
+            var data = new Dictionary<string, object>
+            {
+                { "type", "Transaction" },
+                { "mode", Transaction.GetMode(this.Mode) },
+                { "dbname", this.Database },
+                { "abort", this.Abort },
+                { "nowait_durable", this.NoWaitDurable },
+                { "readonly", this.ReadOnly },
+                { "version", this.Version },
+                { "actions", DbAction.MakeActions(actions) },
+            };
             if (this.Engine != null)
             {
                 data.Add("computeName", this.Engine);
             }
+
             if (this.Source != null)
             {
                 data.Add("source_dbname", this.Source);
@@ -82,7 +89,7 @@ namespace RelationalAI
         public Dictionary<string, string> QueryParams()
         {
             Dictionary<string, string> result = new Dictionary<string, string>()
-            { 
+            {
                 { "region", this.Region },
                 { "dbname", this.Database },
                 { "compute_name", this.Engine },

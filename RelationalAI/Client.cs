@@ -1,3 +1,7 @@
+// <copyright file="Client.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -103,11 +107,11 @@ namespace RelationalAI
 
         public async Task<Engine> CreateEngineWaitAsync(string engine, EngineSize size = EngineSize.XS)
         {
-            await CreateEngineAsync(engine, size);
+            await this.CreateEngineAsync(engine, size);
             var resp = await Policy
                     .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
                     .Retry30Min()
-                    .ExecuteAsync(() => GetEngineAsync(engine));
+                    .ExecuteAsync(() => this.GetEngineAsync(engine));
 
             if (resp.State != "PROVISIONED")
             {
@@ -154,11 +158,11 @@ namespace RelationalAI
 
         public async Task<DeleteEngineResponse> DeleteEngineWaitAsync(string engine)
         {
-            var resp = await DeleteEngineAsync(engine);
+            var resp = await this.DeleteEngineAsync(engine);
             var engineResponse = await Policy
                 .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
                 .Retry15Min()
-                .ExecuteAsync(() => GetEngineAsync(engine));
+                .ExecuteAsync(() => this.GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
             return resp;
         }
@@ -170,6 +174,7 @@ namespace RelationalAI
             {
                 permissions.ForEach(p => uniquePermissions.Add(p.Value()));
             }
+
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
                 { "name", name },
@@ -218,6 +223,7 @@ namespace RelationalAI
             {
                 roles.ForEach(r => uniqueRoles.Add(r.Value()));
             }
+
             Dictionary<string, object> data = new Dictionary<string, object>()
             {
                 { "email", email },
@@ -227,7 +233,7 @@ namespace RelationalAI
             return Json<CreateUserResponse>.Deserialize(resp).User;
         }
 
-        public async Task<User> UpdateUserAsync(string id, UserStatus status = UserStatus.None, List<Role> roles = null)
+        public async Task<User> UpdateUserAsync(string id, UserStatusEnum status = UserStatusEnum.None, List<Role> roles = null)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
             if (roles != null)
@@ -236,7 +242,8 @@ namespace RelationalAI
                 roles.ForEach(r => uniqueRoles.Add(r.Value()));
                 data.Add("roles", uniqueRoles);
             }
-            if (status != UserStatus.None)
+
+            if (status != UserStatusEnum.None)
             {
                 data.Add("status", status.Value());
             }
@@ -279,18 +286,18 @@ namespace RelationalAI
 
         public Task<User> DisableUserAsync(string id)
         {
-            return this.UpdateUserAsync(id, UserStatus.InActive);
+            return this.UpdateUserAsync(id, UserStatusEnum.InActive);
         }
 
         public Task<User> EnableUserAsync(string id)
         {
-            return this.UpdateUserAsync(id, UserStatus.Active);
+            return this.UpdateUserAsync(id, UserStatusEnum.Active);
         }
 
-        public async Task<TransactionsAsyncMultipleResponses> GetTransactionsAsync()
+        public async Task<TransactionAsyncMultipleResponses> GetTransactionsAsync()
         {
             var rsp = await this.rest.GetAsync(this.MakeUrl(Client.PathTransactions)) as string;
-            return Json<TransactionsAsyncMultipleResponses>.Deserialize(rsp);
+            return Json<TransactionAsyncMultipleResponses>.Deserialize(rsp);
         }
 
         public async Task<TransactionAsyncSingleResponse> GetTransactionAsync(string id)
@@ -314,7 +321,7 @@ namespace RelationalAI
         public async Task<List<object>> GetTransactionProblemsAsync(string id)
         {
             var rsp = await this.rest.GetAsync(this.MakeUrl(string.Format("{0}/{1}/problems", Client.PathTransactions, id))) as string;
-            return ParseProblemsResult(rsp);
+            return this.ParseProblemsResult(rsp);
         }
 
         public async Task<TransactionAsyncCancelResponse> CancelTransactionAsync(string id)
@@ -323,43 +330,10 @@ namespace RelationalAI
             return Json<TransactionAsyncCancelResponse>.Deserialize(rsp);
         }
 
-        private List<object> ParseProblemsResult(string rsp)
-        {
-            var output = new List<object>();
-
-            var problems = JsonConvert.DeserializeObject(rsp);
-            foreach(var problem in problems as JArray)
-            {
-                var data = JsonConvert.SerializeObject(problem);
-                try
-                {
-                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
-                }
-                catch (SystemException)
-                {
-                    output.Add(Json<ClientProblem>.Deserialize(data));
-                }
-            }
-
-            return output;
-        }
-
         public async Task<string> DeleteTransactionAsync(string id)
         {
             var resp = await this.rest.DeleteAsync(this.MakeUrl(string.Format("{0}/{1}", Client.PathTransactions, id))) as string;
             return FormatResponse(resp);
-        }
-
-        private static string CreateMode(string source, bool overwrite)
-        {
-            if (source != null)
-            {
-                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
-            }
-            else
-            {
-                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
-            }
         }
 
         public async Task<List<Edb>> ListEdbsAsync(string database, string engine)
@@ -368,10 +342,13 @@ namespace RelationalAI
             List<DbAction> actions = new List<DbAction>() { DbAction.MakeListEdbAction() };
             var body = tx.Payload(actions);
             var resp = await this.rest.PostAsync(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).actions;
+            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).Actions;
             if (actionsResp.Count == 0)
+            {
                 return new List<Edb>();
-            return actionsResp[0].result.rels;
+            }
+
+            return actionsResp[0].Result.Rels;
         }
 
         public async Task<TransactionResult> LoadModelAsync(
@@ -405,27 +382,38 @@ namespace RelationalAI
             List<DbAction> actions = new List<DbAction>() { DbAction.MakeListModelsAction() };
             var body = tx.Payload(actions);
             var resp = await this.rest.PostAsync(this.MakeUrl(Client.PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).actions;
+            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).Actions;
             if (actionsResp.Count == 0)
+            {
                 return new List<Model>();
-            return actionsResp[0].result.models;
+            }
+
+            return actionsResp[0].Result.Models;
         }
 
         public async Task<List<string>> ListModelNamesAsync(string database, string engine)
         {
-            var models = await ListModelsAsync(database, engine);
+            var models = await this.ListModelsAsync(database, engine);
             List<string> result = new List<string>();
             for (var i = 0; i < models.Count; i++)
+            {
                 result.Add(models[i].Name);
+            }
+
             return result;
         }
 
         public async Task<Model> GetModelAsync(string database, string engine, string name)
         {
-            var models = await ListModelsAsync(database, engine);
+            var models = await this.ListModelsAsync(database, engine);
             foreach (var model in models)
+            {
                 if (model.Name.Equals(name))
+                {
                     return model;
+                }
+            }
+
             throw new SystemException($"model {name} not found.");
         }
 
@@ -460,32 +448,33 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var rsp = await ExecuteAsync(database, engine, source, readOnly, inputs);
+            var rsp = await this.ExecuteAsync(database, engine, source, readOnly, inputs);
             var id = rsp.Transaction.ID;
 
             // fast-path
             if (rsp.GotCompleteResult)
+            {
                 return rsp;
+            }
 
             // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r =>
                     !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
                 .RetryForeverWithBoundedDelay()
-                .ExecuteAsync(() => GetTransactionAsync(id));
+                .ExecuteAsync(() => this.GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
-            var results = await GetTransactionResultsAsync(id);
-            var metadata = await GetTransactionMetadataAsync(id);
-            var problems = await GetTransactionProblemsAsync(id);
+            var results = await this.GetTransactionResultsAsync(id);
+            var metadata = await this.GetTransactionMetadataAsync(id);
+            var problems = await this.GetTransactionProblemsAsync(id);
 
             return new TransactionAsyncResult(
                 transaction,
                 results,
                 metadata,
                 problems,
-                true
-            );
+                true);
         }
 
         public async Task<TransactionAsyncResult> ExecuteAsync(
@@ -505,50 +494,7 @@ namespace RelationalAI
                 return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), new List<object>());
             }
 
-            return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
-        }
-
-        private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
-        {
-            var transaction = files.Find(f => f.Name == "transaction");
-            var metadata = files.Find(f => f.Name == "metadata");
-            var problems = files.Find(f => f.Name == "problems");
-
-            if (transaction == null)
-            {
-                throw new SystemException("transaction part not found");
-            }
-            TransactionAsyncCompactResponse transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadString(transaction.Data));
-
-            if (metadata == null)
-            {
-                throw new SystemException("metadata part not found");
-            }
-            List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
-
-            List<object> problemsResult = null;
-            if (problems != null)
-            {
-                problemsResult = ParseProblemsResult(this.rest.ReadString(problems.Data));
-            }
-
-            var results = this.rest.ReadArrowFiles(files);
-
-            return new TransactionAsyncResult(
-                transactionResult,
-                results,
-                metadataResult,
-                problemsResult,
-                true
-            );
-        }
-
-        private string GenLoadJson(string relation)
-        {
-            var builder = new StringBuilder();
-            builder.Append("\ndef config:data = data\n");
-            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
-            return builder.ToString();
+            return this.ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
         }
 
         public Task<TransactionResult> LoadJsonAsync(
@@ -557,98 +503,12 @@ namespace RelationalAI
             string relation,
             string data)
         {
-            var inputs = new Dictionary<string, string>();
-            inputs.Add("data", data);
-            var source = GenLoadJson(relation);
-            return ExecuteV1Async(database, engine, source, false, inputs);
-        }
-
-        private void GenSchemaConfig(StringBuilder builder, CsvOptions options)
-        {
-            if (options == null)
-                return;
-            var schema = options.Schema;
-
-            if (schema == null)
-                return;
-
-            var isEmpty = true;
-
-            foreach(var entry in schema)
-                isEmpty = false;
-
-            if (isEmpty)
-                return;
-
-            var count = 0;
-            builder.Append("def config:schema =");
-            foreach (var entry in schema)
+            var inputs = new Dictionary<string, string>
             {
-                if (count > 0)
-                    builder.Append(';');
-                builder.AppendFormat("\n    :{0}, \"{1}\"", entry.Key, entry.Value);
-                count++;
-            }
-
-            builder.Append('\n');
-        }
-
-        private string GenLiteral(Int32 value)
-        {
-            return value.ToString();
-        }
-
-        private string GenLiteral(char value)
-        {
-            if (value == '\'')
-                return "'\\''";
-            return $"'{value}'";
-        }
-        private string GenLiteral(object value)
-        {
-            if (value == null)
-                throw new SystemException("Cannot generate literal from null value");
-
-            if (
-                value is int
-                || value is Int16
-                || value is Int32
-                || value is Int64
-            )
-                return GenLiteral(Convert.ToInt32(value));
-
-            if (value is char)
-                return GenLiteral(Convert.ToChar(value));
-
-            throw new SystemException($"Cannot generate type from {value.GetType()} value");
-        }
-        private void GenSyntaxOption(StringBuilder builder, string name, object value)
-        {
-            if (value == null)
-                return;
-
-            var lit = GenLiteral(value);
-            var def = $"def config:syntax:{name} = {lit}\n";
-            builder.Append(def);
-        }
-        private void GenSyntaxConfig(StringBuilder builder, CsvOptions options)
-        {
-            if (options == null)
-                return;
-            GenSyntaxOption(builder, "header_row", options.HeaderRow);
-            GenSyntaxOption(builder, "delim", options.Delim);
-            GenSyntaxOption(builder, "escapechar", options.EscapeChar);
-            GenSyntaxOption(builder, "quotechar", options.QuoteChar);
-        }
-        private string GenLoadCsv(string relation, CsvOptions options)
-        {
-            var builder = new StringBuilder();
-            GenSchemaConfig(builder, options);
-            GenSyntaxConfig(builder, options);
-            builder.Append("\n def config:data = data\n");
-            builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
-
-            return builder.ToString();
+                { "data", data },
+            };
+            var source = this.GenLoadJson(relation);
+            return this.ExecuteV1Async(database, engine, source, false, inputs);
         }
 
         public Task<TransactionResult> LoadCsvAsync(
@@ -658,10 +518,12 @@ namespace RelationalAI
             string data,
             CsvOptions options = null)
         {
-            var source = GenLoadCsv(relation, options);
-            var inputs = new Dictionary<string, string>();
-            inputs.Add("data", data);
-            return ExecuteV1Async(database, engine, source, false, inputs);
+            var source = this.GenLoadCsv(relation, options);
+            var inputs = new Dictionary<string, string>
+            {
+                { "data", data },
+            };
+            return this.ExecuteV1Async(database, engine, source, false, inputs);
         }
 
         public async Task<Database> CloneDatabaseAsync(
@@ -674,6 +536,18 @@ namespace RelationalAI
             var tx = new Transaction(this.context.Region, database, engine, mode, false, source);
             await this.rest.PostAsync(this.MakeUrl(Client.PathTransaction), tx.Payload(null), null, tx.QueryParams());
             return await this.GetDatabaseAsync(database);
+        }
+
+        private static string CreateMode(string source, bool overwrite)
+        {
+            if (source != null)
+            {
+                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+            }
+            else
+            {
+                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+            }
         }
 
         private static bool IsTerminalState(string state, string targetState)
@@ -701,6 +575,188 @@ namespace RelationalAI
             }
 
             return response;
+        }
+
+        private List<object> ParseProblemsResult(string rsp)
+        {
+            var output = new List<object>();
+
+            var problems = JsonConvert.DeserializeObject(rsp);
+            foreach (var problem in problems as JArray)
+            {
+                var data = JsonConvert.SerializeObject(problem);
+                try
+                {
+                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
+                }
+                catch (SystemException)
+                {
+                    output.Add(Json<ClientProblem>.Deserialize(data));
+                }
+            }
+
+            return output;
+        }
+
+        private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
+        {
+            var transaction = files.Find(f => f.Name == "transaction");
+            var metadata = files.Find(f => f.Name == "metadata");
+            var problems = files.Find(f => f.Name == "problems");
+
+            if (transaction == null)
+            {
+                throw new SystemException("transaction part not found");
+            }
+
+            TransactionAsyncCompactResponse transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(this.rest.ReadString(transaction.Data));
+
+            if (metadata == null)
+            {
+                throw new SystemException("metadata part not found");
+            }
+
+            List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
+
+            List<object> problemsResult = null;
+            if (problems != null)
+            {
+                problemsResult = this.ParseProblemsResult(this.rest.ReadString(problems.Data));
+            }
+
+            var results = this.rest.ReadArrowFiles(files);
+
+            return new TransactionAsyncResult(
+                transactionResult,
+                results,
+                metadataResult,
+                problemsResult,
+                true);
+        }
+
+        private string GenLoadJson(string relation)
+        {
+            var builder = new StringBuilder();
+            builder.Append("\ndef config:data = data\n");
+            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
+            return builder.ToString();
+        }
+
+        private void GenSchemaConfig(StringBuilder builder, CsvOptions options)
+        {
+            if (options == null)
+            {
+                return;
+            }
+
+            var schema = options.Schema;
+
+            if (schema == null)
+            {
+                return;
+            }
+
+            var isEmpty = true;
+
+            foreach (var entry in schema)
+            {
+                isEmpty = false;
+            }
+
+            if (isEmpty)
+            {
+                return;
+            }
+
+            var count = 0;
+            builder.Append("def config:schema =");
+            foreach (var entry in schema)
+            {
+                if (count > 0)
+                {
+                    builder.Append(';');
+                }
+
+                builder.AppendFormat("\n    :{0}, \"{1}\"", entry.Key, entry.Value);
+                count++;
+            }
+
+            builder.Append('\n');
+        }
+
+        private string GenLiteral(int value)
+        {
+            return value.ToString();
+        }
+
+        private string GenLiteral(char value)
+        {
+            if (value == '\'')
+            {
+                return "'\\''";
+            }
+
+            return $"'{value}'";
+        }
+
+        private string GenLiteral(object value)
+        {
+            if (value == null)
+            {
+                throw new SystemException("Cannot generate literal from null value");
+            }
+
+            if (
+                value is int
+                || value is short
+                || value is int
+                || value is long)
+            {
+                return this.GenLiteral(Convert.ToInt32(value));
+            }
+
+            if (value is char)
+            {
+                return this.GenLiteral(Convert.ToChar(value));
+            }
+
+            throw new SystemException($"Cannot generate type from {value.GetType()} value");
+        }
+
+        private void GenSyntaxOption(StringBuilder builder, string name, object value)
+        {
+            if (value == null)
+            {
+                return;
+            }
+
+            var lit = this.GenLiteral(value);
+            var def = $"def config:syntax:{name} = {lit}\n";
+            builder.Append(def);
+        }
+
+        private void GenSyntaxConfig(StringBuilder builder, CsvOptions options)
+        {
+            if (options == null)
+            {
+                return;
+            }
+
+            this.GenSyntaxOption(builder, "header_row", options.HeaderRow);
+            this.GenSyntaxOption(builder, "delim", options.Delim);
+            this.GenSyntaxOption(builder, "escapechar", options.EscapeChar);
+            this.GenSyntaxOption(builder, "quotechar", options.QuoteChar);
+        }
+
+        private string GenLoadCsv(string relation, CsvOptions options)
+        {
+            var builder = new StringBuilder();
+            this.GenSchemaConfig(builder, options);
+            this.GenSyntaxConfig(builder, options);
+            builder.Append("\n def config:data = data\n");
+            builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
+
+            return builder.ToString();
         }
 
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)
@@ -762,7 +818,7 @@ namespace RelationalAI
 
         private string MakeUrl(string path)
         {
-            return String.Format("{0}://{1}:{2}{3}", this.context.Scheme, this.context.Host, this.context.Port, path);
+            return string.Format("{0}://{1}:{2}{3}", this.context.Scheme, this.context.Host, this.context.Port, path);
         }
 
         public class Context : Rest.Context

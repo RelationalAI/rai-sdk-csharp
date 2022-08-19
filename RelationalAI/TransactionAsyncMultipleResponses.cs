@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncMultipleResponses.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -18,9 +22,8 @@ namespace RelationalAI
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class TransactionsAsyncMultipleResponses : Entity
+    public class TransactionAsyncMultipleResponses : Entity
     {
-
         [JsonProperty("transactions", Required = Required.Always)]
         public List<TransactionAsyncResponse> Transactions { get; set; }
     }

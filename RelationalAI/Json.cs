@@ -1,3 +1,7 @@
+// <copyright file="Json.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -18,7 +22,7 @@ namespace RelationalAI
 {
     using System;
     using Newtonsoft.Json;
-    
+
     public class Json<T>
     {
         public static T Deserialize(string data, string key = null)

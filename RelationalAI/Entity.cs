@@ -1,3 +1,7 @@
+// <copyright file="Entity.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -18,7 +22,7 @@ namespace RelationalAI
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
-    public abstract class Entity 
+    public abstract class Entity
     {
         public override string ToString()
         {

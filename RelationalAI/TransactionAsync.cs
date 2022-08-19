@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsync.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -19,15 +23,6 @@ namespace RelationalAI
 
     public class TransactionAsync : Entity
     {
-        public string Database { get; set; }
-
-        public string Engine { get; set; }
-
-        public string Source { get; set; }
-
-        public bool ReadOnly { get; set; }
-
-        public Dictionary<string, string> Inputs { get; set; }
         public TransactionAsync(
             string database,
             string engine,
@@ -39,17 +34,29 @@ namespace RelationalAI
             this.Engine = engine;
             this.ReadOnly = readOnly;
             this.Source = source;
-            this.Inputs = inputs == null ? new Dictionary<string, string>() : inputs;
+            this.Inputs = inputs ?? new Dictionary<string, string>();
         }
+
+        public string Database { get; set; }
+
+        public string Engine { get; set; }
+
+        public string Source { get; set; }
+
+        public bool ReadOnly { get; set; }
+
+        public Dictionary<string, string> Inputs { get; set; }
 
         // Construct the transaction payload and return serialized JSON string.
         public Dictionary<string, object> Payload()
         {
-            var data = new Dictionary<string, object>();
-            data.Add("dbname", this.Database);
-            data.Add("readonly", this.ReadOnly);
-            data.Add("engine_name", this.Engine);
-            data.Add("query", this.Source);
+            var data = new Dictionary<string, object>
+            {
+                { "dbname", this.Database },
+                { "readonly", this.ReadOnly },
+                { "engine_name", this.Engine },
+                { "query", this.Source },
+            };
 
             var actionInputs = new List<DbAction>();
             foreach (var entry in this.Inputs)

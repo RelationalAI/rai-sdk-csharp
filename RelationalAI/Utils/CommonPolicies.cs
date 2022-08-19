@@ -1,4 +1,8 @@
-﻿/*
+﻿// <copyright file="CommonPolicies.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
+/*
  * Copyright 2022 RelationalAI, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");

@@ -1,3 +1,7 @@
+// <copyright file="TransactionAsyncMetadataResponse.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -21,17 +25,17 @@ namespace RelationalAI
 
     public class TransactionAsyncMetadataResponse : Entity
     {
-        [JsonProperty("relationId", Required = Required.Always)]
-        public string RelationId { get; set; }
-
-        [JsonProperty("types", Required = Required.Always)]
-        public List<string> Types { get; set; }
-
         public TransactionAsyncMetadataResponse(string relationId, List<string> types)
         {
             this.RelationId = relationId;
             this.Types = types;
         }
+
+        [JsonProperty("relationId", Required = Required.Always)]
+        public string RelationId { get; set; }
+
+        [JsonProperty("types", Required = Required.Always)]
+        public List<string> Types { get; set; }
 
         public override bool Equals(object obj)
         {

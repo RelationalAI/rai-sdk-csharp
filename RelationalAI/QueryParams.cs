@@ -1,3 +1,7 @@
+// <copyright file="QueryParams.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -68,4 +72,3 @@ namespace RelationalAI
         }
     }
 }
-

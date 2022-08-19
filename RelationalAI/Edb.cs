@@ -1,3 +1,7 @@
+// <copyright file="Edb.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -21,12 +25,12 @@ namespace RelationalAI
     public class Edb : Entity
     {
         [JsonProperty("name", Required = Required.Always)]
-        public string Name;
+        public string Name { get; set; }
 
         [JsonProperty("keys", Required = Required.Always)]
-        public List<string> Keys;
+        public List<string> Keys { get; set; }
 
         [JsonProperty("values", Required = Required.Always)]
-        public List<string> Values;
+        public List<string> Values { get; set; }
     }
 }
