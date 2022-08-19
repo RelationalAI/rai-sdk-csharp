@@ -199,7 +199,7 @@ namespace RelationalAI
                                 values.Add(col[i]);
                             }
 
-                            output.Add(new ArrowRelation(col.Name, values));
+                            output.Add(new ArrowRelation(file.Name, values));
                         }
                     }
                 }
