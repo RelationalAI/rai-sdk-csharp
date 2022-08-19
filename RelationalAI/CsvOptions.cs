@@ -23,15 +23,19 @@ namespace RelationalAI
 
     public class CsvOptions
     {
-        public char? Delim;
-        public char? EscapeChar;
-        public int? HeaderRow;
-        public char? QuoteChar;
-        public Dictionary<string, string> Schema;
-
         public CsvOptions()
         {
         }
+
+        public char? Delim { get; set; }
+
+        public char? EscapeChar { get; set; }
+
+        public int? HeaderRow { get; set; }
+
+        public char? QuoteChar { get; set;  }
+
+        public Dictionary<string, string> Schema { get; set; }
 
         public CsvOptions WithDelim(char delim)
         {

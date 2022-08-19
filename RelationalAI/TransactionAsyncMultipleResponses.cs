@@ -22,7 +22,7 @@ namespace RelationalAI
     using System.Collections.Generic;
     using Newtonsoft.Json;
 
-    public class TransactionsAsyncMultipleResponses : Entity
+    public class TransactionAsyncMultipleResponses : Entity
     {
         [JsonProperty("transactions", Required = Required.Always)]
         public List<TransactionAsyncResponse> Transactions { get; set; }

@@ -267,7 +267,7 @@ namespace RelationalAI.Test
                 },
                 rel.Columns
             );
-            Assert.Equal(1, rel.RelKey.Values.Length);
+            Assert.Single(rel.RelKey.Values);
             Assert.Equal("Dates.Date", rel.RelKey.Values[0]);
 
             rel = findRelation(rsp.Output, ":price");
@@ -281,7 +281,7 @@ namespace RelationalAI.Test
                 },
                 rel.Columns
             );
-            Assert.Equal(1, rel.RelKey.Values.Length);
+            Assert.Single(rel.RelKey.Values);
             Assert.Equal("FixedPointDecimals.FixedDecimal{Int64, 2}", rel.RelKey.Values[0]);
 
             rel = findRelation(rsp.Output, ":quantity");
@@ -295,7 +295,7 @@ namespace RelationalAI.Test
                 },
                 rel.Columns
             );
-            Assert.Equal(1, rel.RelKey.Values.Length);
+            Assert.Single(rel.RelKey.Values);
             Assert.Equal("Int64", rel.RelKey.Values[0]);
 
             rel = findRelation(rsp.Output, ":cocktail");
@@ -309,7 +309,7 @@ namespace RelationalAI.Test
                 },
                 rel.Columns
             );
-            Assert.Equal(1, rel.RelKey.Values.Length);
+            Assert.Single(rel.RelKey.Values);
             Assert.Equal("String", rel.RelKey.Values[0]);
         }
 

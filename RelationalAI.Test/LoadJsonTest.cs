@@ -34,18 +34,19 @@ namespace RelationalAI.Test
 
             rel = findRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
-            Assert.Equal(new object[][] { new object[] { "Amira" } }, rel.Columns);
+
+            Assert.Single(rel.Columns);
+            Assert.Equal(new object [][] { new object[] {"Amira"} }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":age");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
-            Assert.Equal(new object[][] { new object[] { 32L } }, rel.Columns);
+            Assert.Single(rel.Columns);
+            Assert.Equal(new object [][] { new object[] { 32L } }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":height");
             Assert.NotNull(rel);
-            Assert.Equal(1, rel.Columns.Length);
-            Assert.Equal(new object[][] { new object[] { null } }, rel.Columns);
+            Assert.Single(rel.Columns);
+            Assert.Equal(new object [][] { new object [] { null } }, rel.Columns);
 
             rel = findRelation(rsp.Output, ":pets");
             Assert.NotNull(rel);

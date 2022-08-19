@@ -151,6 +151,68 @@ namespace RelationalAI
             };
         }
 
+        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
+        {
+            var output = new List<TransactionAsyncFile>();
+
+            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
+
+            foreach (var file in parser.Files)
+            {
+                MemoryStream memoryStream = new MemoryStream();
+                file.Data.CopyTo(memoryStream);
+                byte[] buffer = memoryStream.ToArray();
+                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
+                output.Add(txnAsyncFile);
+            }
+
+            return output;
+        }
+
+        public string ReadString(byte[] data)
+        {
+            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
+        }
+
+        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
+        {
+            var output = new List<ArrowRelation>();
+            foreach (var file in files)
+            {
+                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
+                {
+                    MemoryStream memoryStream = new MemoryStream(file.Data)
+                    {
+                        Position = 0,
+                    };
+
+                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
+                    RecordBatch recordBatch;
+                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                    {
+                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                        foreach (var col in df.Columns)
+                        {
+                            List<object> values = new List<object>();
+                            for (var i = 0; i < col.Length; i++)
+                            {
+                                values.Add(col[i]);
+                            }
+
+                            output.Add(new ArrowRelation(col.Name, values));
+                        }
+                    }
+                }
+            }
+
+            return output;
+        }
+
+        public MetadataInfo ReadMetadataProtobuf(byte[] data)
+        {
+            return MetadataInfo.Parser.ParseFrom(data);
+        }
+
         private HttpContent EncodeContent(object body)
         {
             if (body == null)
@@ -195,7 +257,8 @@ namespace RelationalAI
 
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
         {
-            headers = headers ?? new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            headers ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             if (!headers.ContainsKey("accept"))
             {
                 headers.Add("Accept", "application/json");
@@ -273,68 +336,6 @@ namespace RelationalAI
                 (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
-        }
-
-        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
-        {
-            var output = new List<TransactionAsyncFile>();
-
-            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
-
-            foreach (var file in parser.Files)
-            {
-                MemoryStream memoryStream = new MemoryStream();
-                file.Data.CopyTo(memoryStream);
-                byte[] buffer = memoryStream.ToArray();
-                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
-                output.Add(txnAsyncFile);
-            }
-
-            return output;
-        }
-
-        public string ReadString(byte[] data)
-        {
-            return System.Text.Encoding.UTF8.GetString(data, 0, data.Length);
-        }
-
-        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
-        {
-            var output = new List<ArrowRelation>();
-            foreach (var file in files)
-            {
-                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                {
-                    MemoryStream memoryStream = new MemoryStream(file.Data)
-                    {
-                        Position = 0,
-                    };
-
-                    ArrowStreamReader reader = new ArrowStreamReader(memoryStream);
-                    RecordBatch recordBatch;
-                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
-                    {
-                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                        foreach (var col in df.Columns)
-                        {
-                            List<object> values = new List<object>();
-                            for (var i = 0; i < col.Length; i++)
-                            {
-                                values.Add(col[i]);
-                            }
-
-                            output.Add(new ArrowRelation(file.Name, values));
-                        }
-                    }
-                }
-            }
-
-            return output;
-        }
-
-        public MetadataInfo ReadMetadataProtobuf(byte[] data)
-        {
-            return MetadataInfo.Parser.ParseFrom(data);
         }
 
         public class Context

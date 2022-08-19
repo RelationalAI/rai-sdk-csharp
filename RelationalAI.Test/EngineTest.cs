@@ -40,7 +40,9 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<SystemException>(async () => await client.GetEngineAsync(EngineName));
 
             engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+
+            engine = engines.Find( item => item.Name.Equals(EngineName) );
+
             Assert.Equal("DELETED", engine.State);
         }
 

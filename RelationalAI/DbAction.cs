@@ -71,15 +71,6 @@ namespace RelationalAI
             return result;
         }
 
-        private static DbAction MakeDeleteModelsAction(string[] names)
-        {
-            var result = new DbAction("ModifyWorkspaceAction")
-            {
-                { "delete_source", names },
-            };
-            return result;
-        }
-
         // Return a DbAction for isntalling the set of name => model pairs.
         public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
@@ -128,6 +119,20 @@ namespace RelationalAI
                 { "outputs", empty },
                 { "persist", empty },
             };
+
+            return result;
+        }
+
+        public static DbAction MakeQueryActionInput(string name, string value)
+        {
+            string[,] columns = { { value } };
+            var typename = Reltype(value);
+            var result = new DbAction("Relation")
+            {
+                { "columns", columns },
+                { "rel_key", MakeRelKey(name, typename) },
+            };
+
             return result;
         }
 
@@ -141,17 +146,15 @@ namespace RelationalAI
                 { "keys", keys },
                 { "value", values },
             };
+
             return result;
         }
 
-        public static DbAction MakeQueryActionInput(string name, string value)
+        private static DbAction MakeDeleteModelsAction(string[] names)
         {
-            string[,] columns = { { value } };
-            var typename = Reltype(value);
-            var result = new DbAction("Relation")
+            var result = new DbAction("ModifyWorkspaceAction")
             {
-                { "columns", columns },
-                { "rel_key", MakeRelKey(name, typename) },
+                { "delete_source", names },
             };
             return result;
         }

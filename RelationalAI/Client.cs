@@ -234,7 +234,7 @@ namespace RelationalAI
             return Json<CreateUserResponse>.Deserialize(resp).User;
         }
 
-        public async Task<User> UpdateUserAsync(string id, UserStatus status = UserStatus.None, List<Role> roles = null)
+        public async Task<User> UpdateUserAsync(string id, UserStatusEnum status = UserStatusEnum.None, List<Role> roles = null)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
             if (roles != null)
@@ -244,7 +244,7 @@ namespace RelationalAI
                 data.Add("roles", uniqueRoles);
             }
 
-            if (status != UserStatus.None)
+            if (status != UserStatusEnum.None)
             {
                 data.Add("status", status.Value());
             }
@@ -287,18 +287,18 @@ namespace RelationalAI
 
         public Task<User> DisableUserAsync(string id)
         {
-            return this.UpdateUserAsync(id, UserStatus.InActive);
+            return this.UpdateUserAsync(id, UserStatusEnum.InActive);
         }
 
         public Task<User> EnableUserAsync(string id)
         {
-            return this.UpdateUserAsync(id, UserStatus.Active);
+            return this.UpdateUserAsync(id, UserStatusEnum.Active);
         }
 
-        public async Task<TransactionsAsyncMultipleResponses> GetTransactionsAsync()
+        public async Task<TransactionAsyncMultipleResponses> GetTransactionsAsync()
         {
             var rsp = await this.rest.GetAsync(this.MakeUrl(Client.PathTransactions)) as string;
-            return Json<TransactionsAsyncMultipleResponses>.Deserialize(rsp);
+            return Json<TransactionAsyncMultipleResponses>.Deserialize(rsp);
         }
 
         public async Task<TransactionAsyncSingleResponse> GetTransactionAsync(string id)
@@ -354,39 +354,6 @@ namespace RelationalAI
             }
 
             return actionsResp[0].Result.Rels;
-        }
-
-        private List<object> ParseProblemsResult(string rsp)
-        {
-            var output = new List<object>();
-
-            var problems = JsonConvert.DeserializeObject(rsp);
-            foreach (var problem in problems as JArray)
-            {
-                var data = JsonConvert.SerializeObject(problem);
-                try
-                {
-                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
-                }
-                catch (SystemException)
-                {
-                    output.Add(Json<ClientProblem>.Deserialize(data));
-                }
-            }
-
-            return output;
-        }
-
-        private static string CreateMode(string source, bool overwrite)
-        {
-            if (source != null)
-            {
-                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
-            }
-            else
-            {
-                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
-            }
         }
 
         public async Task<TransactionResult> LoadModelAsync(
@@ -507,7 +474,12 @@ namespace RelationalAI
             var metadata = await this.GetTransactionMetadataAsync(id);
             var problems = await this.GetTransactionProblemsAsync(id);
 
-            return new TransactionAsyncResult(transaction, results, metadata, problems, true);
+            return new TransactionAsyncResult(
+                transaction,
+                results,
+                metadata,
+                problems,
+                true);
         }
 
         public async Task<TransactionAsyncResult> ExecuteAsync(
@@ -557,6 +529,78 @@ namespace RelationalAI
                 { "data", data },
             };
             return this.ExecuteV1Async(database, engine, source, false, inputs);
+        }
+
+        public async Task<Database> CloneDatabaseAsync(
+            string database,
+            string engine,
+            string source,
+            bool overwrite = false)
+        {
+            var mode = CreateMode(source, overwrite);
+            var tx = new Transaction(this.context.Region, database, engine, mode, false, source);
+            await this.rest.PostAsync(this.MakeUrl(Client.PathTransaction), tx.Payload(null), null, tx.QueryParams());
+            return await this.GetDatabaseAsync(database);
+        }
+
+        private static bool IsTerminalState(string state, string targetState)
+        {
+            return state == "FAILED" || state == targetState;
+        }
+
+        private static string FormatResponse(string response, string key = null)
+        {
+            try
+            {
+                // to return the formatted JSON
+                var json = JObject.Parse(response);
+                JToken result = json;
+                if (key != null && json.ContainsKey(key))
+                {
+                    result = json.GetValue(key);
+                }
+
+                return result.ToString();
+            }
+            catch
+            {
+                // ignore exception
+            }
+
+            return response;
+        }
+
+        private static string CreateMode(string source, bool overwrite)
+        {
+            if (source != null)
+            {
+                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+            }
+            else
+            {
+                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+            }
+        }
+
+        private List<object> ParseProblemsResult(string rsp)
+        {
+            var output = new List<object>();
+
+            var problems = JsonConvert.DeserializeObject(rsp);
+            foreach (var problem in problems as JArray)
+            {
+                var data = JsonConvert.SerializeObject(problem);
+                try
+                {
+                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
+                }
+                catch (SystemException)
+                {
+                    output.Add(Json<ClientProblem>.Deserialize(data));
+                }
+            }
+
+            return output;
         }
 
         private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
@@ -713,45 +757,6 @@ namespace RelationalAI
             builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
 
             return builder.ToString();
-        }
-
-        public async Task<Database> CloneDatabaseAsync(
-            string database,
-            string engine,
-            string source,
-            bool overwrite = false)
-        {
-            var mode = CreateMode(source, overwrite);
-            var tx = new Transaction(this.context.Region, database, engine, mode, false, source);
-            await this.rest.PostAsync(this.MakeUrl(Client.PathTransaction), tx.Payload(null), null, tx.QueryParams());
-            return await this.GetDatabaseAsync(database);
-        }
-
-        private static bool IsTerminalState(string state, string targetState)
-        {
-            return state == "FAILED" || state == targetState;
-        }
-
-        private static string FormatResponse(string response, string key = null)
-        {
-            try
-            {
-                // to return the formatted JSON
-                var json = JObject.Parse(response);
-                JToken result = json;
-                if (key != null && json.ContainsKey(key))
-                {
-                    result = json.GetValue(key);
-                }
-
-                return result.ToString();
-            }
-            catch
-            {
-                // ignore exception
-            }
-
-            return response;
         }
 
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)

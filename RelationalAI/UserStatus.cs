@@ -19,21 +19,21 @@
  */
 namespace RelationalAI
 {
-    public enum UserStatus
+    public enum UserStatusEnum
     {
         Active,
         InActive,
         None,
     }
 
-    internal static class UserStatuses
+    internal static class UserStatus
     {
-        public static string Value(this UserStatus status)
+        public static string Value(this UserStatusEnum status)
         {
             return status switch
             {
-                UserStatus.Active => "ACTIVE",
-                UserStatus.InActive => "INACTIVE",
+                UserStatusEnum.Active => "ACTIVE",
+                UserStatusEnum.InActive => "INACTIVE",
                 _ => "NONE",
             };
         }

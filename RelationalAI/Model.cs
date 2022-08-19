@@ -25,9 +25,9 @@ namespace RelationalAI
     public class Model : Entity
     {
         [JsonProperty("name", Required = Required.Always)]
-        public string Name;
+        public string Name { get; set; }
 
         [JsonProperty("value", Required = Required.Always)]
-        public string Value;
+        public string Value { get; set; }
     }
 }

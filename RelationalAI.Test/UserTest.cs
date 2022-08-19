@@ -40,11 +40,11 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("INACTIVE", rsp.Status);
 
-            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive);
+            rsp = await client.UpdateUserAsync(userId, UserStatusEnum.InActive);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("INACTIVE", rsp.Status);
 
-            rsp = await client.UpdateUserAsync(userId, UserStatus.Active);
+            rsp = await client.UpdateUserAsync(userId, UserStatusEnum.Active);
             Assert.Equal(userId, rsp.ID);
             Assert.Equal("ACTIVE", rsp.Status);
 
@@ -52,7 +52,8 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string> { "admin", "user" }, rsp.Roles);
 
-            rsp = await client.UpdateUserAsync(userId, UserStatus.InActive, new List<Role> { Role.User });
+            rsp = await client.UpdateUserAsync(userId, UserStatusEnum.InActive, new List<Role>{Role.User});
+
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string> { "user" }, rsp.Roles);
 
