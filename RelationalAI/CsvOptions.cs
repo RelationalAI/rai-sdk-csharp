@@ -33,7 +33,7 @@ namespace RelationalAI
 
         public int? HeaderRow { get; set; }
 
-        public char? QuoteChar { get; set;  }
+        public char? QuoteChar { get; set; }
 
         public Dictionary<string, string> Schema { get; set; }
 

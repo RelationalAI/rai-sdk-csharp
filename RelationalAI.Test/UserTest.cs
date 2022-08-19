@@ -52,7 +52,7 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string> { "admin", "user" }, rsp.Roles);
 
-            rsp = await client.UpdateUserAsync(userId, UserStatusEnum.InActive, new List<Role>{Role.User});
+            rsp = await client.UpdateUserAsync(userId, UserStatusEnum.InActive, new List<Role> { Role.User });
 
             Assert.Equal(userId, rsp.ID);
             Assert.Equal(new List<string> { "user" }, rsp.Roles);

@@ -41,7 +41,7 @@ namespace RelationalAI.Test
 
             engines = await client.ListEnginesAsync();
 
-            engine = engines.Find( item => item.Name.Equals(EngineName) );
+            engine = engines.Find(item => item.Name.Equals(EngineName));
 
             Assert.Equal("DELETED", engine.State);
         }
