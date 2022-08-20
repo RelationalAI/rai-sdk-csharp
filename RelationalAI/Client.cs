@@ -57,6 +57,18 @@ namespace RelationalAI
             return await GetDatabaseAsync(database);
         }
 
+        public async Task<Database> CloneDatabaseAsync(
+            string database,
+            string engine,
+            string source,
+            bool overwrite = false)
+        {
+            var mode = CreateMode(source, overwrite);
+            var tx = new Transaction(_context.Region, database, engine, mode, false, source);
+            await _rest.PostAsync(MakeUrl(PathTransaction), tx.Payload(null), null, tx.QueryParams());
+            return await GetDatabaseAsync(database);
+        }
+
         public async Task<Database> GetDatabaseAsync(string database)
         {
             var parameters = new Dictionary<string, string>
@@ -308,46 +320,10 @@ namespace RelationalAI
             return Json<TransactionAsyncCancelResponse>.Deserialize(rsp);
         }
 
-        private static List<object> ParseProblemsResult(string rsp)
-        {
-            var output = new List<object>();
-
-            var problems = JsonConvert.DeserializeObject(rsp);
-            if (!(problems is JArray problemsArray))
-            {
-                throw new SystemException("Unexpected format of problems");
-            }
-
-            foreach (var problem in problemsArray)
-            {
-                var data = JsonConvert.SerializeObject(problem);
-                try
-                {
-                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
-                }
-                catch (SystemException)
-                {
-                    output.Add(Json<ClientProblem>.Deserialize(data));
-                }
-            }
-
-            return output;
-        }
-
         public async Task<string> DeleteTransactionAsync(string id)
         {
             var resp = await _rest.DeleteAsync(MakeUrl($"{PathTransactions}/{id}")) as string;
             return FormatResponse(resp);
-        }
-
-        private static string CreateMode(string source, bool overwrite)
-        {
-            if (source != null)
-            {
-                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
-            }
-
-            return overwrite ? "CREATE_OVERWRITE" : "CREATE";
         }
 
         public async Task<List<Edb>> ListEdbsAsync(string database, string engine)
@@ -490,50 +466,6 @@ namespace RelationalAI
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
         }
 
-        private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
-        {
-            var transaction = files.Find(f => f.Name == "transaction");
-            var metadata = files.Find(f => f.Name == "metadata");
-            var problems = files.Find(f => f.Name == "problems");
-
-            if (transaction == null)
-            {
-                throw new SystemException("transaction part not found");
-            }
-
-            var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
-
-            if (metadata == null)
-            {
-                throw new SystemException("metadata part not found");
-            }
-
-            var metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(_rest.ReadString(metadata.Data));
-
-            List<object> problemsResult = null;
-            if (problems != null)
-            {
-                problemsResult = ParseProblemsResult(_rest.ReadString(problems.Data));
-            }
-
-            var results = _rest.ReadArrowFiles(files);
-
-            return new TransactionAsyncResult(
-                transactionResult,
-                results,
-                metadataResult,
-                problemsResult,
-                true);
-        }
-
-        private static string GenLoadJson(string relation)
-        {
-            var builder = new StringBuilder();
-            builder.Append("\ndef config:data = data\n");
-            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
-            return builder.ToString();
-        }
-
         public Task<TransactionResult> LoadJsonAsync(
             string database,
             string engine,
@@ -546,6 +478,44 @@ namespace RelationalAI
             };
             var source = GenLoadJson(relation);
             return ExecuteV1Async(database, engine, source, false, inputs);
+        }
+
+        public Task<TransactionResult> LoadCsvAsync(
+            string database,
+            string engine,
+            string relation,
+            string data,
+            CsvOptions options = null)
+        {
+            var source = GenLoadCsv(relation, options);
+            var inputs = new Dictionary<string, string>
+            {
+                { "data", data }
+            };
+            return ExecuteV1Async(database, engine, source, false, inputs);
+        }
+
+        private static string CreateMode(string source, bool overwrite)
+        {
+            if (source != null)
+            {
+                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+            }
+
+            return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+        }
+
+        private static bool IsTerminalState(string state, string targetState)
+        {
+            return state == "FAILED" || state == targetState;
+        }
+
+        private static string GenLoadJson(string relation)
+        {
+            var builder = new StringBuilder();
+            builder.Append("\ndef config:data = data\n");
+            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
+            return builder.ToString();
         }
 
         private static void GenSchemaConfig(StringBuilder builder, CsvOptions options)
@@ -628,38 +598,6 @@ namespace RelationalAI
             return builder.ToString();
         }
 
-        public Task<TransactionResult> LoadCsvAsync(
-            string database,
-            string engine,
-            string relation,
-            string data,
-            CsvOptions options = null)
-        {
-            var source = GenLoadCsv(relation, options);
-            var inputs = new Dictionary<string, string>
-            {
-                { "data", data }
-            };
-            return ExecuteV1Async(database, engine, source, false, inputs);
-        }
-
-        public async Task<Database> CloneDatabaseAsync(
-            string database,
-            string engine,
-            string source,
-            bool overwrite = false)
-        {
-            var mode = CreateMode(source, overwrite);
-            var tx = new Transaction(_context.Region, database, engine, mode, false, source);
-            await _rest.PostAsync(MakeUrl(PathTransaction), tx.Payload(null), null, tx.QueryParams());
-            return await GetDatabaseAsync(database);
-        }
-
-        private static bool IsTerminalState(string state, string targetState)
-        {
-            return state == "FAILED" || state == targetState;
-        }
-
         private static string FormatResponse(string response, string key = null)
         {
             try
@@ -681,24 +619,86 @@ namespace RelationalAI
             }
         }
 
+        private static JToken GetValueFromResponse(string response, string valueKey)
+        {
+            var json = JObject.Parse(response);
+            JToken result = json;
+            if (valueKey != null && json.ContainsKey(valueKey))
+            {
+                result = json.GetValue(valueKey);
+            }
+
+            return result;
+        }
+
+        private static List<object> ParseProblemsResult(string rsp)
+        {
+            var output = new List<object>();
+
+            var problems = JsonConvert.DeserializeObject(rsp);
+            if (!(problems is JArray problemsArray))
+            {
+                throw new SystemException("Unexpected format of problems");
+            }
+
+            foreach (var problem in problemsArray)
+            {
+                var data = JsonConvert.SerializeObject(problem);
+                try
+                {
+                    output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
+                }
+                catch (SystemException)
+                {
+                    output.Add(Json<ClientProblem>.Deserialize(data));
+                }
+            }
+
+            return output;
+        }
+
+        private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
+        {
+            var transaction = files.Find(f => f.Name == "transaction");
+            var metadata = files.Find(f => f.Name == "metadata");
+            var problems = files.Find(f => f.Name == "problems");
+
+            if (transaction == null)
+            {
+                throw new SystemException("transaction part not found");
+            }
+
+            if (metadata == null)
+            {
+                throw new SystemException("metadata part not found");
+            }
+
+            var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
+            var metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(_rest.ReadString(metadata.Data));
+
+            List<object> problemsResult = null;
+            if (problems != null)
+            {
+                problemsResult = ParseProblemsResult(_rest.ReadString(problems.Data));
+            }
+
+            var results = _rest.ReadArrowFiles(files);
+
+            return new TransactionAsyncResult(
+                transactionResult,
+                results,
+                metadataResult,
+                problemsResult,
+                true);
+        }
+
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)
         {
-            var url = MakeUrl(path);
-            var resp = await _rest.GetAsync(url, null, null, parameters);
-            if (!(resp is string resource))
-            {
-                throw new SystemException("Unexpected response type");
-            }
+            var response = await GetStringResponseAsync(path, parameters);
 
             try
             {
-                var json = JObject.Parse(resource);
-                JToken result = json;
-                if (key != null && json.ContainsKey(key))
-                {
-                    result = json.GetValue(key);
-                }
-
+                var result = GetValueFromResponse(response, key);
                 if (result is { Type: JTokenType.Array, HasValues: true })
                 {
                     // making sure there aren't more than one value
@@ -710,40 +710,41 @@ namespace RelationalAI
                     result = result.First;
                 }
 
-                return result?.ToString() ?? resource;
+                return result?.ToString() ?? response;
             }
             catch
             {
                 // ignore exception and return raw response
-                return resource;
+                return response;
             }
         }
 
         private async Task<string> ListCollectionsAsync(string path, string key = null, Dictionary<string, string> parameters = null)
         {
-            var url = MakeUrl(path);
-            var resp = await _rest.GetAsync(url, null, null, parameters);
-            if (!(resp is string resources))
-            {
-                throw new SystemException("Unexpected response type");
-            }
+            var response = await GetStringResponseAsync(path, parameters);
 
             try
             {
-                var json = JObject.Parse(resources);
-                JToken result = json;
-                if (key != null && json.ContainsKey(key))
-                {
-                    result = json.GetValue(key);
-                }
-
-                return result?.ToString() ?? resources;
+                var result = GetValueFromResponse(response, key);
+                return result?.ToString() ?? response;
             }
             catch
             {
                 // ignore exception and return raw response
-                return resources;
+                return response;
             }
+        }
+
+        private async Task<string> GetStringResponseAsync(string path, Dictionary<string, string> parameters = null)
+        {
+            var url = MakeUrl(path);
+            var response = await _rest.GetAsync(url, null, null, parameters);
+            if (!(response is string stringResponse))
+            {
+                throw new SystemException("Unexpected response type");
+            }
+
+            return stringResponse;
         }
 
         private string MakeUrl(string path)
@@ -756,6 +757,24 @@ namespace RelationalAI
             private string _host;
             private string _port;
             private string _scheme;
+
+            public string Host
+            {
+                get => _host;
+                set => _host = !string.IsNullOrEmpty(value) ? value : "localhost";
+            }
+
+            public string Port
+            {
+                get => _port;
+                set => _port = !string.IsNullOrEmpty(value) ? value : "443";
+            }
+
+            public string Scheme
+            {
+                get => _scheme;
+                set => _scheme = !string.IsNullOrEmpty(value) ? value : "https";
+            }
 
             public Context(
                 string host = null,
@@ -784,24 +803,6 @@ namespace RelationalAI
                 Region = (config.ContainsKey("region") && config["region"] != null) ? (string)config["region"] : null;
                 Credentials = (config.ContainsKey("credentials") && config["credentials"] != null) ?
                     (ICredentials)config["credentials"] : null;
-            }
-
-            public string Host
-            {
-                get => _host;
-                set => _host = !string.IsNullOrEmpty(value) ? value : "localhost";
-            }
-
-            public string Port
-            {
-                get => _port;
-                set => _port = !string.IsNullOrEmpty(value) ? value : "443";
-            }
-
-            public string Scheme
-            {
-                get => _scheme;
-                set => _scheme = !string.IsNullOrEmpty(value) ? value : "https";
             }
         }
     }

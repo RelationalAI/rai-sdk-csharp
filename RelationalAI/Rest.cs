@@ -118,6 +118,33 @@ namespace RelationalAI
             return await RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
+        public string ReadString(byte[] data)
+        {
+            return Encoding.UTF8.GetString(data, 0, data.Length);
+        }
+
+        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
+        {
+            var output = new List<ArrowRelation>();
+            foreach (var memoryStream in files
+                         .Where(file => "application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
+                         .Select(file => new MemoryStream(file.Data)))
+            {
+                memoryStream.Position = 0;
+
+                var reader = new ArrowStreamReader(memoryStream);
+                RecordBatch recordBatch;
+                while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                {
+                    var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object>().ToList() })
+                        .Select(t => new ArrowRelation(t.col.Name, t.values)));
+                }
+            }
+
+            return output;
+        }
+
         private static HttpContent EncodeContent(object body)
         {
             if (body == null)
@@ -132,21 +159,6 @@ namespace RelationalAI
             }
 
             return new ByteArrayContent(Encoding.UTF8.GetBytes(s));
-        }
-
-        private async Task<string> GetAccessTokenAsync(string host)
-        {
-            if (!(_context.Credentials is ClientCredentials creds))
-            {
-                throw new SystemException("credential not supported");
-            }
-
-            if (creds.AccessToken == null || creds.AccessToken.IsExpired)
-            {
-                creds.AccessToken = await RequestAccessTokenAsync(host, creds);
-            }
-
-            return creds.AccessToken.Token;
         }
 
         private static string GetHost(string url)
@@ -224,6 +236,39 @@ namespace RelationalAI
             return request;
         }
 
+        private static List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
+        {
+            var output = new List<TransactionAsyncFile>();
+
+            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
+
+            foreach (var file in parser.Files)
+            {
+                var memoryStream = new MemoryStream();
+                file.Data.CopyTo(memoryStream);
+                var buffer = memoryStream.ToArray();
+                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
+                output.Add(txnAsyncFile);
+            }
+
+            return output;
+        }
+
+        private async Task<string> GetAccessTokenAsync(string host)
+        {
+            if (!(_context.Credentials is ClientCredentials creds))
+            {
+                throw new SystemException("credential not supported");
+            }
+
+            if (creds.AccessToken == null || creds.AccessToken.IsExpired)
+            {
+                creds.AccessToken = await RequestAccessTokenAsync(host, creds);
+            }
+
+            return creds.AccessToken.Token;
+        }
+
         private async Task<AccessToken> RequestAccessTokenAsync(string host, ClientCredentials creds)
         {
             // Form the API request body.
@@ -250,7 +295,7 @@ namespace RelationalAI
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
-        public async Task<object> RequestHelperAsync(
+        private async Task<object> RequestHelperAsync(
             string method,
             string url,
             object data = null,
@@ -279,60 +324,9 @@ namespace RelationalAI
             };
         }
 
-        public List<TransactionAsyncFile> ParseMultipartResponse(byte[] content)
-        {
-            var output = new List<TransactionAsyncFile>();
-
-            var parser = MultipartFormDataParser.Parse(new MemoryStream(content));
-
-            foreach (var file in parser.Files)
-            {
-                var memoryStream = new MemoryStream();
-                file.Data.CopyTo(memoryStream);
-                var buffer = memoryStream.ToArray();
-                var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
-                output.Add(txnAsyncFile);
-            }
-
-            return output;
-        }
-
-        public string ReadString(byte[] data)
-        {
-            return Encoding.UTF8.GetString(data, 0, data.Length);
-        }
-
-        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
-        {
-            var output = new List<ArrowRelation>();
-            foreach (var memoryStream in files
-                         .Where(file => "application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                         .Select(file => new MemoryStream(file.Data)))
-            {
-                memoryStream.Position = 0;
-
-                var reader = new ArrowStreamReader(memoryStream);
-                RecordBatch recordBatch;
-                while ((recordBatch = reader.ReadNextRecordBatch()) != null)
-                {
-                    var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object>().ToList() })
-                        .Select(t => new ArrowRelation(t.col.Name, t.values)));
-                }
-            }
-
-            return output;
-        }
-
         public class Context
         {
             private string _region;
-
-            public Context(string region = null, ICredentials credentials = null)
-            {
-                Region = region;
-                Credentials = credentials;
-            }
 
             public ICredentials Credentials { get; set; }
 
@@ -340,6 +334,12 @@ namespace RelationalAI
             {
                 get => _region;
                 set => _region = !string.IsNullOrEmpty(value) ? value : "us-east";
+            }
+
+            public Context(string region = null, ICredentials credentials = null)
+            {
+                Region = region;
+                Credentials = credentials;
             }
         }
     }

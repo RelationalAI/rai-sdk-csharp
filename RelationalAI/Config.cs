@@ -42,6 +42,11 @@ namespace RelationalAI
             return ReadConfigFromInitData(data, profile);
         }
 
+        public static string GetRaiConfigPath()
+        {
+            return Path.Combine(GetRaiDir(), "config");
+        }
+
         private static Dictionary<string, object> ReadConfigFromInitData(IniData data, string profile)
         {
             string[] keys = { "host", "port", "scheme", "region" };
@@ -68,11 +73,6 @@ namespace RelationalAI
             }
 
             return null;
-        }
-
-        public static string GetRaiConfigPath()
-        {
-            return Path.Combine(GetRaiDir(), "config");
         }
 
         private static string GetRaiDir()

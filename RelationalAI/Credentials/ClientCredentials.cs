@@ -25,18 +25,6 @@ namespace RelationalAI.Credentials
         private string _clientSecret;
         private string _clientCredentialsUrl;
 
-        public ClientCredentials(string clientId, string clientSecret)
-        {
-            ClientId = clientId;
-            ClientSecret = clientSecret;
-        }
-
-        public ClientCredentials(string clientId, string clientSecret, string clientCredentialsUrl)
-            : this(clientId, clientSecret)
-        {
-            ClientCredentialsUrl = clientCredentialsUrl;
-        }
-
         public string ClientId
         {
             get => _clientId;
@@ -58,5 +46,17 @@ namespace RelationalAI.Credentials
         }
 
         public AccessToken AccessToken { get; set; }
+
+        public ClientCredentials(string clientId, string clientSecret)
+        {
+            ClientId = clientId;
+            ClientSecret = clientSecret;
+        }
+
+        public ClientCredentials(string clientId, string clientSecret, string clientCredentialsUrl)
+            : this(clientId, clientSecret)
+        {
+            ClientCredentialsUrl = clientCredentialsUrl;
+        }
     }
 }

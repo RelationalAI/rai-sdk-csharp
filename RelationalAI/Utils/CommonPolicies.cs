@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2022 RelationalAI, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -26,12 +26,12 @@ namespace RelationalAI.Utils
     /// </summary>
     public static class CommonPolicies
     {
+        private static AsyncPolicy RequestErrorResilience { get; }
+
         static CommonPolicies()
         {
             RequestErrorResilience = GetRequestErrorResiliencePolicy();
         }
-
-        private static AsyncPolicy RequestErrorResilience { get; }
 
         /// <summary>
         /// Creates a policy that can be used to produce synchronous API for async calls that may be taking a long
