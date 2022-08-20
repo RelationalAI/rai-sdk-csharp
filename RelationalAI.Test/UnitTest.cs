@@ -4,6 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using RelationalAI.Model;
+using RelationalAI.Model.Transaction;
+using RelationalAI.Services;
+using RelationalAI.Utils;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -15,7 +19,7 @@ namespace RelationalAI.Test
             Dictionary<string, object> config;
             if (File.Exists(Config.GetRaiConfigPath()))
             {
-                config = Config.Read(profile: "ey-dev-client");
+                config = Config.Read(profile: "default");
             }
             else
             {
