@@ -13,14 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-
-    public class TransactionsAsyncMultipleResponses : Entity
+    public class TransactionAsyncMultipleResponses : Entity
     {
-
         [JsonProperty("transactions", Required = Required.Always)]
         public List<TransactionAsyncResponse> Transactions { get; set; }
     }

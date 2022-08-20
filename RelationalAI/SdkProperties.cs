@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Diagnostics;
+using System.Reflection;
+
 namespace RelationalAI
 {
-    using System.Diagnostics;
-    using System.Reflection;
+    public static class SdkProperties
+    {
+        public static string Version { get; }
 
-    public static class SdkProperties {
-        public static string Version;
-        public static string ProductName;
+        public static string ProductName { get; }
 
         static SdkProperties()
         {

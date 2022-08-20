@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-
     public class TransactionAsyncResult : Entity
     {
         public bool GotCompleteResult { get; set; }
+
         public TransactionAsyncCompactResponse Transaction { get; set; }
+
         public List<ArrowRelation> Results { get; set; }
+
         public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
+
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
@@ -30,8 +35,7 @@ namespace RelationalAI
             List<ArrowRelation> results,
             List<TransactionAsyncMetadataResponse> metadata,
             List<object> problems,
-            bool gotCompleteResult = false
-        )
+            bool gotCompleteResult = false)
         {
             GotCompleteResult = gotCompleteResult;
             Transaction = transaction;

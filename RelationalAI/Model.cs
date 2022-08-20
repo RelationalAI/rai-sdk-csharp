@@ -13,16 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class Model : Entity
     {
         [JsonProperty("name", Required = Required.Always)]
-        public string Name;
+        public string Name { get; set; }
 
         [JsonProperty("value", Required = Required.Always)]
-        public string Value;
+        public string Value { get; set; }
     }
 }

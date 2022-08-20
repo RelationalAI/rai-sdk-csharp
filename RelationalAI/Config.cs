@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using IniParser;
+using IniParser.Model;
+using RelationalAI.Credentials;
+
 namespace RelationalAI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Runtime.InteropServices;
-    using IniParser;
-    using IniParser.Model;
-    using Credentials;
-
     public class Config
     {
         public static Dictionary<string, object> Read(string path = null, string profile = "default")
@@ -58,23 +59,23 @@ namespace RelationalAI
 
         private static ICredentials ReadClientCredentials(IniData data, string profile)
         {
-            var clientID = GetIniValue(data, profile, "client_id", null);
+            var clientId = GetIniValue(data, profile, "client_id", null);
             var clientSecret = GetIniValue(data, profile, "client_secret", null);
-            var clientCredentialsURL = GetIniValue(data, profile, "client_credentials_url", null);
-            if (clientID != null && clientSecret != null)
+            var clientCredentialsUrl = GetIniValue(data, profile, "client_credentials_url", null);
+            if (clientId != null && clientSecret != null)
             {
-                return new ClientCredentials(clientID, clientSecret, clientCredentialsURL);
+                return new ClientCredentials(clientId, clientSecret, clientCredentialsUrl);
             }
 
             return null;
         }
 
-        public static string GetRAIConfigPath()
+        public static string GetRaiConfigPath()
         {
-            return Path.Combine(GetRAIDir(), "config");
+            return Path.Combine(GetRaiDir(), "config");
         }
 
-        private static string GetRAIDir()
+        private static string GetRaiDir()
         {
             var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
             var home = Environment.GetEnvironmentVariable(envHome);
@@ -91,7 +92,7 @@ namespace RelationalAI
         {
             var parser = new FileIniDataParser();
 
-            path = !string.IsNullOrEmpty(path) ? path : GetRAIConfigPath();
+            path = !string.IsNullOrEmpty(path) ? path : GetRaiConfigPath();
             if (!File.Exists(path))
             {
                 throw new FileNotFoundException(path + " does not exist");

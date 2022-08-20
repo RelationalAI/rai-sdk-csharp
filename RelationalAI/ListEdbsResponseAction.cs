@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class ListEdbsResponseAction : Entity
     {
         [JsonProperty("result", Required = Required.Always)]
-        public ListEdbsResponseResult result { get; set; }
+        public ListEdbsResponseResult Result { get; set; }
     }
 }

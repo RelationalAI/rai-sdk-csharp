@@ -27,7 +27,7 @@ namespace RelationalAI.Examples
             var context = new Client.Context(config);
             var client = new Client(context);
             var transactions = await client.GetTransactionsAsync();
-            foreach(var transaction in transactions.Transactions)
+            foreach (var transaction in transactions.Transactions)
             {
                 Console.WriteLine(transaction);
             }

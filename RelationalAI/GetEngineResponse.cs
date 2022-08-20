@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-
     public class GetEngineResponse : Entity
     {
         [JsonProperty("computes", Required = Required.AllowNull)]

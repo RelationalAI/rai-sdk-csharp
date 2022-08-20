@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class TransactionAsyncSingleResponse : Entity
     {
-
         [JsonProperty("transaction", Required = Required.Always)]
         public TransactionAsyncResponse Transaction { get; set; }
     }

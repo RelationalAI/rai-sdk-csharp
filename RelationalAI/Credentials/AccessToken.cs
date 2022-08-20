@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+using System;
+
 namespace RelationalAI.Credentials
 {
-    using System;
     public class AccessToken
     {
-        private DateTime _createdOn;
+        private readonly DateTime _createdOn;
         private int _expiresIn;
 
         public AccessToken(string token, int expiresIn)
@@ -32,7 +33,7 @@ namespace RelationalAI.Credentials
         public int ExpiresIn
         {
             get => _expiresIn;
-            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");  
+            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
         }
 
         public bool IsExpired => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds

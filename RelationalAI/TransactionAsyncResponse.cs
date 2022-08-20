@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class TransactionAsyncResponse : TransactionAsyncCompactResponse
     {
-
         [JsonProperty("account_name", Required = Required.Always)]
         public string AccountName { get; set; }
 
@@ -54,8 +54,8 @@ namespace RelationalAI
             string databaseName,
             bool readOnly,
             string query,
-            string lastRequestedInterval
-        ) : base(id, state)
+            string lastRequestedInterval)
+            : base(id, state)
         {
             AccountName = accountName;
             CreatedBy = createdBy;

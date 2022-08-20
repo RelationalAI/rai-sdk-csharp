@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-
     public class OAuthClientEx : OAuthClient
     {
         [JsonProperty("permissions", Required = Required.Always)]
         public List<string> Permissions { get; set; }
 
-        [JsonProperty("secret",  Required = Required.Always)]
+        [JsonProperty("secret", Required = Required.Always)]
         public string Secret { get; set; }
     }
 }

@@ -31,7 +31,7 @@ namespace RelationalAI.Examples
             var context = new Client.Context(config);
             var client = new Client(context);
             var metadataList = await client.GetTransactionMetadataAsync(id);
-            foreach(var metadata in metadataList)
+            foreach (var metadata in metadataList)
             {
                 Console.WriteLine(metadata);
             }

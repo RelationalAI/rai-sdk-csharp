@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-
-    public abstract class Entity 
+    public abstract class Entity
     {
         public override string ToString()
         {
@@ -27,7 +28,7 @@ namespace RelationalAI
 
         public string ToString(bool indent)
         {
-            return JObject.FromObject(this).ToString();
+            return JObject.FromObject(this).ToString(indent ? Formatting.Indented : Formatting.None);
         }
     }
 }

@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using System.Linq;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using System.Linq;
-    using Newtonsoft.Json;
-
     public class TransactionAsyncMetadataResponse : Entity
     {
         [JsonProperty("relationId", Required = Required.Always)]
-        public string RelationId { get; set; }
+        public string RelationId { get; }
 
         [JsonProperty("types", Required = Required.Always)]
-        public List<string> Types { get; set; }
+        public List<string> Types { get; }
 
         public TransactionAsyncMetadataResponse(string relationId, List<string> types)
         {

@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class Source : Entity
     {
         [JsonProperty("rel_key", Required = Required.Always)]
@@ -27,6 +28,5 @@ namespace RelationalAI
 
         [JsonProperty("type", Required = Required.Always)]
         public string Type { get; set; }
-
     }
 }

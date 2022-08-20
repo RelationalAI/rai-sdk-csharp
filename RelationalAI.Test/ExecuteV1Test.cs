@@ -6,9 +6,9 @@ namespace RelationalAI.Test
 {
     public class ExecuteTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
 
         [Fact]
         public async Task ExecuteV1Test()
@@ -27,8 +27,8 @@ namespace RelationalAI.Test
             var relation = output[0];
             var relKey = relation.RelKey;
             Assert.Equal("output", relKey.Name);
-            Assert.Equal(relKey.Keys, new[] {"Int64", "Int64", "Int64"} );
-            Assert.Equal(relKey.Values, new[] {"Int64"} );
+            Assert.Equal(relKey.Keys, new[] { "Int64", "Int64", "Int64" });
+            Assert.Equal(relKey.Values, new[] { "Int64" });
             var columns = relation.Columns;
             var expected = new[]
             {
@@ -45,8 +45,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

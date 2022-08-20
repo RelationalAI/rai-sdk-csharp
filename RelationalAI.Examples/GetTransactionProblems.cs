@@ -31,7 +31,7 @@ namespace RelationalAI.Examples
             var context = new Client.Context(config);
             var client = new Client(context);
             var problems = await client.GetTransactionProblemsAsync(id);
-            foreach(var problem in problems)
+            foreach (var problem in problems)
             {
                 Console.WriteLine(problem);
             }

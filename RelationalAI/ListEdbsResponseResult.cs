@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-
     public class ListEdbsResponseResult : Entity
     {
         [JsonProperty("rels", Required = Required.Always)]
-        public List<Edb> rels { get; set; }
+        public List<Edb> Rels { get; set; }
     }
 }

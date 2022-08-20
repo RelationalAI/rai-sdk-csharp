@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
+using System;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System;
-    using Newtonsoft.Json;
-
     public class Json<T>
     {
         public static T Deserialize(string data, string key = null)

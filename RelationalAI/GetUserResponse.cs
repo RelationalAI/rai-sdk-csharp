@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class GetUserResponse : Entity
     {
         [JsonProperty("user", Required = Required.Always)]

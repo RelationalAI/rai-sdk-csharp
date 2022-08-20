@@ -13,23 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
 namespace RelationalAI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     // Represents a "database action", which is an argument to a transaction.
     public class DbAction : Dictionary<string, object>
     {
-        public DbAction() { }
+        public DbAction()
+        {
+        }
 
         public DbAction(string type)
         {
             Add("type", type);
         }
 
-        // Wrapps each of the given action in a LabeledAction.
+        // Wraps each of the given action in a LabeledAction.
         public static List<DbAction> MakeActions(List<DbAction> actions)
         {
             var ix = 0;
@@ -57,7 +60,7 @@ namespace RelationalAI
             return result;
         }
 
-        // Return a DbAction for installing the single named model. 
+        // Return a DbAction for installing the single named model.
         public static DbAction MakeInstallAction(string name, string model)
         {
             var result = new DbAction("InstallAction")
@@ -67,7 +70,7 @@ namespace RelationalAI
             return result;
         }
 
-        // Return a DbAction for isntalling the set of name => model pairs.
+        // Return a DbAction for installing the set of name => model pairs.
         public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
             var sources = models.Select(entry => MakeQuerySource(entry.Key, entry.Value)).ToArray();
@@ -108,6 +111,7 @@ namespace RelationalAI
             {
                 actionInputs.AddRange(inputs.Select(entry => MakeQueryActionInput(entry.Key, entry.Value)));
             }
+
             string[] empty = { };
             var result = new DbAction("QueryAction")
             {
@@ -136,7 +140,7 @@ namespace RelationalAI
             var result = new DbAction("Source")
             {
                 { "name", name },
-                { "path", "" },
+                { "path", string.Empty },
                 { "value", model }
             };
             return result;

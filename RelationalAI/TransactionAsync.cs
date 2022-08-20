@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using System.Linq;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     public class TransactionAsync : Entity
     {
         public string Database { get; set; }
@@ -29,6 +30,7 @@ namespace RelationalAI
         public bool ReadOnly { get; set; }
 
         public Dictionary<string, string> Inputs { get; set; }
+
         public TransactionAsync(
             string database,
             string engine,
@@ -43,7 +45,10 @@ namespace RelationalAI
             Inputs = inputs ?? new Dictionary<string, string>();
         }
 
-        // Construct the transaction payload and return serialized JSON string.
+        /// <summary>
+        /// Constructs the transaction payload.
+        /// </summary>
+        /// <returns>The serialized transaction payload.</returns>
         public Dictionary<string, object> Payload()
         {
             var data = new Dictionary<string, object>
@@ -61,13 +66,16 @@ namespace RelationalAI
             return data;
         }
 
-        // Returns the query params corresponding to the transaction state.
+        /// <summary>
+        /// Creates the query params corresponding to the transaction state.
+        /// </summary>
+        /// <returns>The query params.</returns>
         public Dictionary<string, string> QueryParams()
         {
             var result = new Dictionary<string, string>
             {
                 { "dbname", Database },
-                { "engine_name", Engine },
+                { "engine_name", Engine }
             };
 
             return result;

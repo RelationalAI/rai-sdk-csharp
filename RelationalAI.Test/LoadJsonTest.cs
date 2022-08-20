@@ -6,10 +6,10 @@ namespace RelationalAI.Test
 {
     public class LoadJsonTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
-        string sample = "{" +
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+        string _sample = "{" +
             "\"name\":\"Amira\",\n" +
             "\"age\":32,\n" +
             "\"height\":null,\n" +
@@ -23,40 +23,40 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", _sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
-            var rel = findRelation(rsp.Output, ":name");
+            var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
             Assert.Single(rel.Columns);
-            Assert.Equal(new[] { new object[] {"Amira"} }, rel.Columns);
+            Assert.Equal(new[] { new object[] { "Amira" } }, rel.Columns);
 
-            rel = findRelation(rsp.Output, ":age");
+            rel = FindRelation(rsp.Output, ":age");
             Assert.NotNull(rel);
             Assert.Single(rel.Columns);
             Assert.Equal(new[] { new object[] { 32L } }, rel.Columns);
 
-            rel = findRelation(rsp.Output, ":height");
+            rel = FindRelation(rsp.Output, ":height");
             Assert.NotNull(rel);
             Assert.Single(rel.Columns);
-            Assert.Equal(new[] { new object [] { null } }, rel.Columns);
+            Assert.Equal(new[] { new object[] { null } }, rel.Columns);
 
-            rel = findRelation(rsp.Output, ":pets");
+            rel = FindRelation(rsp.Output, ":pets");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(new[] { new object [] { 1L, 2L }, new object [] { "dog", "rabbit" } }, rel.Columns);
+            Assert.Equal(new[] { new object[] { 1L, 2L }, new object[] { "dog", "rabbit" } }, rel.Columns);
         }
 
         public override async Task DisposeAsync()
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

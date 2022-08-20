@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+
 namespace RelationalAI
 {
-    using System;
     public enum Permission
     {
         CreateAccessKey,
@@ -44,73 +46,44 @@ namespace RelationalAI
         CreateUser,
         ListUsers,
         ReadUser,
-        UpdateUser,
+        UpdateUser
     }
 
-    static class Permissions
+    public static class Permissions
     {
-
         public static string Value(this Permission permission)
         {
-            switch (permission)
+            return permission switch
             {
-                case Permission.CreateAccessKey:
-                    return "create:accesskey";
-                case Permission.ListAccessKeys:
-                    return "list:accesskey";
-                case Permission.ReadCreditsUsage:
-                    return "read:credits_usage";
-                case Permission.CreateDatabase:
-                    return "create:database";
-                case Permission.DeleteDatabase:
-                    return "delete:database"; ;
-                case Permission.ListDatabases:
-                    return "list:database"; ;
-                case Permission.UpdateDatabase:
-                    return "update:database"; ;
-                case Permission.CreateCompute:
-                    return "create:compute";
-                case Permission.DeleteCompute:
-                    return "delete:compute";
-                case Permission.ListComputes:
-                    return "list:compute";
-                case Permission.ReadCompute:
-                    return "read:compute";
-                case Permission.CreateOAuthClient:
-                    return "create:oauth_client";
-                case Permission.DeleteOAuthClient:
-                    return "delete:oauth_client";
-                case Permission.ListOAuthClient:
-                    return "list:oauth_client";
-                case Permission.ReadOAuthClient:
-                    return "read:oauth_client";
-                case Permission.RotateOAuthClientSecret:
-                    return "rotate:oauth_client";
-                case Permission.UpdateOAuthClient:
-                    return "update:oauth_client";
-                case Permission.ListPermissions:
-                    return "list:permission";
-                case Permission.ListRoles:
-                    return "list:role";
-                case Permission.ReadRole:
-                    return "read:role";
-                case Permission.RunTransaction:
-                    return "run:transaction";
-                case Permission.ReadTransaction:
-                    return "read:transaction";
-                case Permission.DeleteTransaction:
-                    return "delete:transaction";
-                case Permission.CreateUser:
-                    return "create:user";
-                case Permission.ListUsers:
-                    return "list:user";
-                case Permission.ReadUser:
-                    return "read:user";
-                case Permission.UpdateUser:
-                    return "update:user";
-                default:
-                    throw new ArgumentException($"permission '{permission}' not supported");
-            }
+                Permission.CreateAccessKey => "create:accesskey",
+                Permission.ListAccessKeys => "list:accesskey",
+                Permission.ReadCreditsUsage => "read:credits_usage",
+                Permission.CreateDatabase => "create:database",
+                Permission.DeleteDatabase => "delete:database",
+                Permission.ListDatabases => "list:database",
+                Permission.UpdateDatabase => "update:database",
+                Permission.CreateCompute => "create:compute",
+                Permission.DeleteCompute => "delete:compute",
+                Permission.ListComputes => "list:compute",
+                Permission.ReadCompute => "read:compute",
+                Permission.CreateOAuthClient => "create:oauth_client",
+                Permission.DeleteOAuthClient => "delete:oauth_client",
+                Permission.ListOAuthClient => "list:oauth_client",
+                Permission.ReadOAuthClient => "read:oauth_client",
+                Permission.RotateOAuthClientSecret => "rotate:oauth_client",
+                Permission.UpdateOAuthClient => "update:oauth_client",
+                Permission.ListPermissions => "list:permission",
+                Permission.ListRoles => "list:role",
+                Permission.ReadRole => "read:role",
+                Permission.RunTransaction => "run:transaction",
+                Permission.ReadTransaction => "read:transaction",
+                Permission.DeleteTransaction => "delete:transaction",
+                Permission.CreateUser => "create:user",
+                Permission.ListUsers => "list:user",
+                Permission.ReadUser => "read:user",
+                Permission.UpdateUser => "update:user",
+                _ => throw new ArgumentException($"permission '{permission}' not supported")
+            };
         }
     }
 }

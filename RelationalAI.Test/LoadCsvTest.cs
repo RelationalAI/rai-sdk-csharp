@@ -7,10 +7,10 @@ namespace RelationalAI.Test
 {
     public class LoadCsvTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
-        string sample = "" +
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+        string _sample = "" +
             "cocktail,quantity,price,date\n" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
@@ -25,14 +25,14 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", _sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
-            var rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -44,7 +44,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -56,7 +56,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -68,7 +68,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -81,7 +81,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string sampleNoHeader = "" +
+        string _sampleNoHeader = "" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
             "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
@@ -96,14 +96,14 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithHeaderRow(0);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", sampleNoHeader, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", _sampleNoHeader, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_no_header");
 
-            var rel = findRelation(rsp.Output, ":COL1");
+            var rel = FindRelation(rsp.Output, ":COL1");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -116,7 +116,7 @@ namespace RelationalAI.Test
             );
 
 
-            rel = findRelation(rsp.Output, ":COL2");
+            rel = FindRelation(rsp.Output, ":COL2");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -128,7 +128,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":COL3");
+            rel = FindRelation(rsp.Output, ":COL3");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -140,7 +140,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":COL4");
+            rel = FindRelation(rsp.Output, ":COL4");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -153,7 +153,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string sampleAltSyntax = "" +
+        string _sampleAltSyntax = "" +
             "cocktail|quantity|price|date\n" +
             "'martini'|2|12.50|'2020-01-01'\n" +
             "'sazerac'|4|14.25|'2020-02-02'\n" +
@@ -169,14 +169,14 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", sampleAltSyntax, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", _sampleAltSyntax, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_alt_syntax");
 
-            var rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -188,7 +188,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -200,7 +200,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -212,7 +212,7 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -242,14 +242,14 @@ namespace RelationalAI.Test
             };
 
             var opts = new CsvOptions().WithSchema(schema);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", _sample, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
-            var rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -263,7 +263,7 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("Dates.Date", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -277,7 +277,7 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("FixedPointDecimals.FixedDecimal{Int64, 2}", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -291,7 +291,7 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("Int64", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
@@ -310,8 +310,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

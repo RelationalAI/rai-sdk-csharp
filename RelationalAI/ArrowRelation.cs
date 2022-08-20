@@ -14,14 +14,16 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
+using System.Linq;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using System.Linq;
     public class ArrowRelation : Entity
     {
-        public string RelationId { get; set; }
-        public List<object> Table { get; set; }
+        public string RelationId { get; }
+
+        public List<object> Table { get; }
 
         public ArrowRelation(string relationId, List<object> table)
         {

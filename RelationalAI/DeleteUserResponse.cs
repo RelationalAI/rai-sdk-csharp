@@ -13,14 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class DeleteUserResponse : Entity
     {
         [JsonProperty("user_id", Required = Required.Always)]
-        public string ID { get; set; }
+        public string Id { get; set; }
 
         [JsonProperty("message", Required = Required.Always)]
         public string Message { get; set; }

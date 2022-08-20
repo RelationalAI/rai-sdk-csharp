@@ -26,7 +26,7 @@ namespace RelationalAI.Examples
             var context = new Client.Context(config);
             var client = new Client(context);
             var users = await client.ListUsersAsync();
-            foreach(var user in users)
+            foreach (var user in users)
             {
                 Console.WriteLine(user.ToString(true));
             }

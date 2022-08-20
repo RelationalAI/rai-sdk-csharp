@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace RelationalAI.Examples
 {
     public class GetOAuthClient
-    {   
+    {
         public static Command GetCommand()
         {
             var cmd = new Command("GetOAuthClient", "--id <Client ID> --profile <Profile name>"){

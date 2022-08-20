@@ -13,15 +13,15 @@ namespace RelationalAI.Test
         public Client CreateClient()
         {
             Dictionary<string, object> config;
-            if(File.Exists(Config.GetRAIConfigPath()))
+            if (File.Exists(Config.GetRaiConfigPath()))
             {
-                config = Config.Read(profile: "default");
+                config = Config.Read(profile: "ey-dev-client");
             }
             else
             {
-                var client_id = Environment.GetEnvironmentVariable("CLIENT_ID");
-                var client_secret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
-                var client_credentials_url = Environment.GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
+                var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
+                var clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
+                var clientCredentialsUrl = Environment.GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
 
                 var configStr = $@"
                 [default]
@@ -29,9 +29,9 @@ namespace RelationalAI.Test
                 region=us-east
                 port=443
                 scheme=https
-                client_id={client_id}
-                client_secret={client_secret}
-                client_credentials_url={client_credentials_url}
+                client_id={clientId}
+                client_secret={clientSecret}
+                client_credentials_url={clientCredentialsUrl}
                 ";
                 config = Config.Read(new MemoryStream(Encoding.UTF8.GetBytes(configStr)));
             }
@@ -44,7 +44,7 @@ namespace RelationalAI.Test
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
-        public Relation findRelation(Relation[] relations, string colName)
+        public Relation FindRelation(Relation[] relations, string colName)
         {
             return relations
                 .FirstOrDefault(relation => relation.RelKey.Keys.Length != 0 && relation.RelKey.Keys[0].Equals(colName));

@@ -19,8 +19,11 @@ namespace RelationalAI
     public class TransactionAsyncFile : Entity
     {
         public string Name { get; set; }
+
         public byte[] Data { get; set; }
+
         public string Filename { get; set; }
+
         public string ContentType { get; set; }
 
         public TransactionAsyncFile(string name, byte[] data, string filename, string contentType)

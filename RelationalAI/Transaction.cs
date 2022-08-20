@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-
     public class Transaction : Entity
     {
         public string Region { get; set; }
@@ -53,7 +54,11 @@ namespace RelationalAI
             Source = source;
         }
 
-        // Construct the transaction payload and return serialized JSON string.
+        /// <summary>
+        /// Constructs the transaction payload.
+        /// </summary>
+        /// <param name="actions">List of actions.</param>
+        /// <returns>The serialized transaction payload.</returns>
         public Dictionary<string, object> Payload(List<DbAction> actions)
         {
             var data = new Dictionary<string, object>
@@ -71,6 +76,7 @@ namespace RelationalAI
             {
                 data.Add("computeName", Engine);
             }
+
             if (Source != null)
             {
                 data.Add("source_dbname", Source);
@@ -79,15 +85,18 @@ namespace RelationalAI
             return data;
         }
 
-        // Returns the query params corresponding to the transaction state.
+        /// <summary>
+        /// Creates the query params corresponding to the transaction state.
+        /// </summary>
+        /// <returns>The query params.</returns>
         public Dictionary<string, string> QueryParams()
         {
             var result = new Dictionary<string, string>
-            { 
+            {
                 { "region", Region },
                 { "dbname", Database },
                 { "compute_name", Engine },
-                { "open_mode", GetMode(Mode) },
+                { "open_mode", GetMode(Mode) }
             };
 
             if (Source != null)

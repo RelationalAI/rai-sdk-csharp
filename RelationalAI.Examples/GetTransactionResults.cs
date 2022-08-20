@@ -30,7 +30,7 @@ namespace RelationalAI.Examples
             var config = Config.Read("", profile);
             var context = new Client.Context(config);
             var client = new Client(context);
-            foreach( var result in await client.GetTransactionResultsAsync(id))
+            foreach (var result in await client.GetTransactionResultsAsync(id))
             {
                 Console.WriteLine(result);
             }

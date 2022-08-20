@@ -13,17 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+
 namespace RelationalAI
 {
-    using System;
-
     public enum Role
     {
         User,
         Admin
     }
 
-    static class Roles
+    public static class Roles
     {
         public static string Value(this Role role)
         {

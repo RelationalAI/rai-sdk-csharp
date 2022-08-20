@@ -13,31 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
+using System.Web;
+using Apache.Arrow;
+using Apache.Arrow.Ipc;
+using HttpMultipartParser;
+using Microsoft.Data.Analysis;
+using Newtonsoft.Json;
+using RelationalAI.Credentials;
+
 namespace RelationalAI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Net.Http;
-    using System.Net.Http.Headers;
-    using System.Text;
-    using System.Threading.Tasks;
-    using System.Web;
-    using Apache.Arrow;
-    using Apache.Arrow.Ipc;
-    using HttpMultipartParser;
-    using Microsoft.Data.Analysis;
-    using Newtonsoft.Json;
-    using Credentials;
-
     public class Rest
     {
-        private Context context;
+        private readonly Context _context;
 
         public Rest(Context context)
         {
-            this.context = context;
+            _context = context;
         }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
@@ -108,7 +109,7 @@ namespace RelationalAI
             {
                 foreach (var (key, value) in headers)
                 {
-                   caseInsensitiveHeaders.Add(key, value);
+                    caseInsensitiveHeaders.Add(key, value);
                 }
             }
 
@@ -117,7 +118,7 @@ namespace RelationalAI
             return await RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
 
-        private HttpContent EncodeContent(object body)
+        private static HttpContent EncodeContent(object body)
         {
             if (body == null)
             {
@@ -135,7 +136,7 @@ namespace RelationalAI
 
         private async Task<string> GetAccessTokenAsync(string host)
         {
-            if (!(context.Credentials is ClientCredentials creds))
+            if (!(_context.Credentials is ClientCredentials creds))
             {
                 throw new SystemException("credential not supported");
             }
@@ -148,17 +149,17 @@ namespace RelationalAI
             return creds.AccessToken.Token;
         }
 
-        private string GetHost(string url)
+        private static string GetHost(string url)
         {
             return new Uri(url).Host;
         }
 
-        private string GetUserAgent()
+        private static string GetUserAgent()
         {
             return $"rai-sdk-csharp/{SdkProperties.Version}";
         }
 
-        private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
+        private static Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
         {
             headers ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
             if (!headers.ContainsKey("accept"))
@@ -184,7 +185,7 @@ namespace RelationalAI
             return headers;
         }
 
-        private HttpRequestMessage PrepareHttpRequest(
+        private static HttpRequestMessage PrepareHttpRequest(
             string method,
             Uri uri,
             HttpContent content,
@@ -228,14 +229,23 @@ namespace RelationalAI
             // Form the API request body.
             var data = new Dictionary<string, string>
             {
-                {"client_id", creds.ClientID},
-                {"client_secret", creds.ClientSecret},
-                {"audience", $"https://{host}" },
-                {"grant_type", "client_credentials"}
+                { "client_id", creds.ClientId },
+                { "client_secret", creds.ClientSecret },
+                { "audience", $"https://{host}" },
+                { "grant_type", "client_credentials" }
             };
-            var resp = await RequestHelperAsync("POST", creds.ClientCredentialsURL, data) as string;
-            var result =
-                (Dictionary<string, string>)JsonConvert.DeserializeObject(resp, typeof(Dictionary<string, string>));
+            var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
+            if (!(resp is string stringResponse))
+            {
+                throw new SystemException("Unexpected response type");
+            }
+
+            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
+
+            if (result == null)
+            {
+                throw new SystemException("Unexpected access token response format");
+            }
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
@@ -283,6 +293,7 @@ namespace RelationalAI
                 var txnAsyncFile = new TransactionAsyncFile(file.Name, buffer, file.FileName, file.ContentType);
                 output.Add(txnAsyncFile);
             }
+
             return output;
         }
 
@@ -293,7 +304,7 @@ namespace RelationalAI
 
         public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
-            var output = new List<ArrowRelation> ();
+            var output = new List<ArrowRelation>();
             foreach (var memoryStream in files
                          .Where(file => "application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
                          .Select(file => new MemoryStream(file.Data)))
@@ -302,20 +313,21 @@ namespace RelationalAI
 
                 var reader = new ArrowStreamReader(memoryStream);
                 RecordBatch recordBatch;
-                while((recordBatch = reader.ReadNextRecordBatch()) != null)
+                while ((recordBatch = reader.ReadNextRecordBatch()) != null)
                 {
                     var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object?>().ToList() })
+                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object>().ToList() })
                         .Select(t => new ArrowRelation(t.col.Name, t.values)));
                 }
-            } 
+            }
 
             return output;
         }
 
         public class Context
         {
-            private string region;
+            private string _region;
+
             public Context(string region = null, ICredentials credentials = null)
             {
                 Region = region;
@@ -326,8 +338,8 @@ namespace RelationalAI
 
             public string Region
             {
-                get => region;
-                set => region = !string.IsNullOrEmpty(value) ? value : "us-east";
+                get => _region;
+                set => _region = !string.IsNullOrEmpty(value) ? value : "us-east";
             }
         }
     }

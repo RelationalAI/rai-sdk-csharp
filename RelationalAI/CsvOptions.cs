@@ -13,17 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 using System.Collections.Generic;
 
 namespace RelationalAI
 {
     public class CsvOptions
     {
-        public char? Delim;
-        public char? EscapeChar;
-        public int? HeaderRow;
-        public char? QuoteChar;
-        public Dictionary<string, string> Schema;
+        public char? Delim { get; private set; }
+
+        public char? EscapeChar { get; private set; }
+
+        public int? HeaderRow { get; private set; }
+
+        public char? QuoteChar { get; private set; }
+
+        public Dictionary<string, string> Schema { get; private set; }
 
         public CsvOptions WithDelim(char delim)
         {
@@ -31,22 +36,26 @@ namespace RelationalAI
             return this;
         }
 
-        public CsvOptions WithEscapeChar(char escapeChar) {
+        public CsvOptions WithEscapeChar(char escapeChar)
+        {
             EscapeChar = escapeChar;
             return this;
         }
 
-        public CsvOptions WithHeaderRow(int headerRow) {
+        public CsvOptions WithHeaderRow(int headerRow)
+        {
             HeaderRow = headerRow;
             return this;
         }
 
-        public CsvOptions WithQuoteChar(char quoteChar) {
+        public CsvOptions WithQuoteChar(char quoteChar)
+        {
             QuoteChar = quoteChar;
             return this;
         }
 
-        public CsvOptions WithSchema(Dictionary<string, string> schema) {
+        public CsvOptions WithSchema(Dictionary<string, string> schema)
+        {
             Schema = schema;
             return this;
         }

@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
+using System.Collections.Generic;
+using System.Text;
+using System.Web;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using System.Text;
-    using System.Web;
-
-    // Represents a collection of query paramters. The values may be String,
-    // String[], int, Boolean or null.
+    /// <summary>
+    /// Represents a collection of query parameters. The values may be String,
+    /// String[], int, Boolean or null.
+    /// </summary>
     public class QueryParams : Dictionary<string, object>
     {
-        // Returns a query string encoded in the format the RAI REST API expects.
+        /// <summary>
+        /// Creates a query string encoded in the format the RAI REST API expects.
+        /// </summary>
+        /// <returns>The RAI REST API formatted query string.</returns>
         public string Encode()
         {
             var result = new StringBuilder();
@@ -67,4 +72,3 @@ namespace RelationalAI
         }
     }
 }
-

@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System.Collections.Generic;
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-
     public class IntegrityConstraintViolation : Entity
     {
         [JsonProperty("type", Required = Required.Always)]
@@ -25,6 +26,5 @@ namespace RelationalAI
 
         [JsonProperty("sources", Required = Required.Always)]
         public List<Source> Sources { get; set; }
-
     }
 }

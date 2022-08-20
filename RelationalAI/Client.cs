@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Polly;
+using RelationalAI.Credentials;
+using RelationalAI.Utils;
+
 namespace RelationalAI
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using Newtonsoft.Json;
-    using Newtonsoft.Json.Linq;
-    using Polly;
-    using Credentials;
-    using Utils;
-
     public class Client
     {
         private const string PathEngine = "/compute";
@@ -34,13 +35,13 @@ namespace RelationalAI
         private const string PathTransactions = "/transactions";
         private const string PathUsers = "/users";
         private const string PathOAuthClients = "/oauth-clients";
-        private readonly Rest rest;
-        private readonly Context context;
+        private readonly Rest _rest;
+        private readonly Context _context;
 
         public Client(Context context)
         {
-            this.context = context;
-            rest = new Rest(context);
+            _context = context;
+            _rest = new Rest(context);
         }
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)
@@ -51,8 +52,8 @@ namespace RelationalAI
         public async Task<Database> CreateDatabaseAsync(string database, string engine, bool overwrite)
         {
             var mode = CreateMode(null, overwrite);
-            var transaction = new Transaction(context.Region, database, engine, mode);
-            await rest.PostAsync(MakeUrl(PathTransaction), transaction.Payload(null), null, transaction.QueryParams());
+            var transaction = new Transaction(_context.Region, database, engine, mode);
+            await _rest.PostAsync(MakeUrl(PathTransaction), transaction.Payload(null), null, transaction.QueryParams());
             return await GetDatabaseAsync(database);
         }
 
@@ -60,7 +61,7 @@ namespace RelationalAI
         {
             var parameters = new Dictionary<string, string>
             {
-                { "name", database },
+                { "name", database }
             };
 
             var resp = await GetResourceAsync(PathDatabase, null, parameters);
@@ -84,9 +85,9 @@ namespace RelationalAI
         {
             var data = new Dictionary<string, string>
             {
-                { "name", database },
+                { "name", database }
             };
-            var resp = await rest.DeleteAsync(MakeUrl(PathDatabase), data) as string;
+            var resp = await _rest.DeleteAsync(MakeUrl(PathDatabase), data) as string;
             return Json<DeleteDatabaseResponse>.Deserialize(resp);
         }
 
@@ -94,11 +95,11 @@ namespace RelationalAI
         {
             var data = new Dictionary<string, string>
             {
-                { "region", context.Region },
+                { "region", _context.Region },
                 { "name", engine },
-                { "size", size.ToString() },
+                { "size", size.ToString() }
             };
-            var resp = await rest.PutAsync(MakeUrl(PathEngine), data) as string;
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data) as string;
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
@@ -124,7 +125,7 @@ namespace RelationalAI
             var parameters = new Dictionary<string, string>
             {
                 { "name", engine },
-                { "deleted_on", string.Empty },
+                { "deleted_on", string.Empty }
             };
             var resp = await GetResourceAsync(PathEngine, null, parameters);
             var engines = Json<GetEngineResponse>.Deserialize(resp).Engines;
@@ -147,9 +148,9 @@ namespace RelationalAI
         {
             var data = new Dictionary<string, string>
             {
-                { "name", engine },
+                { "name", engine }
             };
-            var resp = await rest.DeleteAsync(MakeUrl(PathEngine), data) as string;
+            var resp = await _rest.DeleteAsync(MakeUrl(PathEngine), data) as string;
             return Json<DeleteEngineResponse>.Deserialize(resp);
         }
 
@@ -171,9 +172,9 @@ namespace RelationalAI
             var data = new Dictionary<string, object>
             {
                 { "name", name },
-                { "permissions", uniquePermissions },
+                { "permissions", uniquePermissions }
             };
-            var resp = await rest.PostAsync(MakeUrl(PathOAuthClients), data) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathOAuthClients), data) as string;
             return Json<CreateOAuthClientResponse>.Deserialize(resp).OAuthClient;
         }
 
@@ -199,7 +200,7 @@ namespace RelationalAI
 
         public async Task<DeleteOAuthClientResponse> DeleteOAuthClientAsync(string id)
         {
-            var resp = await rest.DeleteAsync(MakeUrl($"{PathOAuthClients}/{id}")) as string;
+            var resp = await _rest.DeleteAsync(MakeUrl($"{PathOAuthClients}/{id}")) as string;
             return Json<DeleteOAuthClientResponse>.Deserialize(resp);
         }
 
@@ -210,9 +211,9 @@ namespace RelationalAI
             var data = new Dictionary<string, object>
             {
                 { "email", email },
-                { "roles", uniqueRoles },
+                { "roles", uniqueRoles }
             };
-            var resp = await rest.PostAsync(MakeUrl(PathUsers), data) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathUsers), data) as string;
             return Json<CreateUserResponse>.Deserialize(resp).User;
         }
 
@@ -225,12 +226,13 @@ namespace RelationalAI
                 roles.ForEach(r => uniqueRoles.Add(r.Value()));
                 data.Add("roles", uniqueRoles);
             }
+
             if (status != UserStatus.None)
             {
                 data.Add("status", status.Value());
             }
 
-            var resp = await rest.PatchAsync(MakeUrl($"{PathUsers}/{id}"), data) as string;
+            var resp = await _rest.PatchAsync(MakeUrl($"{PathUsers}/{id}"), data) as string;
             return Json<UpdateUserResponse>.Deserialize(resp).User;
         }
 
@@ -256,7 +258,7 @@ namespace RelationalAI
 
         public async Task<DeleteUserResponse> DeleteUserAsync(string id)
         {
-            var resp = await rest.DeleteAsync(MakeUrl($"{PathUsers}/{id}")) as string;
+            var resp = await _rest.DeleteAsync(MakeUrl($"{PathUsers}/{id}")) as string;
             return Json<DeleteUserResponse>.Deserialize(resp);
         }
 
@@ -270,48 +272,53 @@ namespace RelationalAI
             return UpdateUserAsync(id, UserStatus.Active);
         }
 
-        public async Task<TransactionsAsyncMultipleResponses> GetTransactionsAsync()
+        public async Task<TransactionAsyncMultipleResponses> GetTransactionsAsync()
         {
-            var rsp = await rest.GetAsync(MakeUrl(PathTransactions)) as string;
-            return Json<TransactionsAsyncMultipleResponses>.Deserialize(rsp);
+            var rsp = await _rest.GetAsync(MakeUrl(PathTransactions)) as string;
+            return Json<TransactionAsyncMultipleResponses>.Deserialize(rsp);
         }
 
         public async Task<TransactionAsyncSingleResponse> GetTransactionAsync(string id)
         {
-            var rsp = await rest.GetAsync(MakeUrl($"{PathTransactions}/{id}")) as string;
+            var rsp = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}")) as string;
             return Json<TransactionAsyncSingleResponse>.Deserialize(rsp);
         }
 
         public async Task<List<ArrowRelation>> GetTransactionResultsAsync(string id)
         {
-            var files = await rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/results")) as List<TransactionAsyncFile>;
-            return rest.ReadArrowFiles(files);
+            var files = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/results")) as List<TransactionAsyncFile>;
+            return _rest.ReadArrowFiles(files);
         }
 
         public async Task<List<TransactionAsyncMetadataResponse>> GetTransactionMetadataAsync(string id)
         {
-            var rsp = await rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/metadata")) as string;
+            var rsp = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/metadata")) as string;
             return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
         }
 
         public async Task<List<object>> GetTransactionProblemsAsync(string id)
         {
-            var rsp = await rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/problems")) as string;
+            var rsp = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/problems")) as string;
             return ParseProblemsResult(rsp);
         }
 
         public async Task<TransactionAsyncCancelResponse> CancelTransactionAsync(string id)
         {
-            var rsp = await rest.PostAsync(MakeUrl($"{PathTransactions}/{id}/cancel"), new Dictionary<string, object>()) as string;
+            var rsp = await _rest.PostAsync(MakeUrl($"{PathTransactions}/{id}/cancel"), new Dictionary<string, object>()) as string;
             return Json<TransactionAsyncCancelResponse>.Deserialize(rsp);
         }
 
-        private List<object> ParseProblemsResult(string rsp)
+        private static List<object> ParseProblemsResult(string rsp)
         {
             var output = new List<object>();
 
             var problems = JsonConvert.DeserializeObject(rsp);
-            foreach(var problem in problems as JArray)
+            if (!(problems is JArray problemsArray))
+            {
+                throw new SystemException("Unexpected format of problems");
+            }
+
+            foreach (var problem in problemsArray)
             {
                 var data = JsonConvert.SerializeObject(problem);
                 try
@@ -329,7 +336,7 @@ namespace RelationalAI
 
         public async Task<string> DeleteTransactionAsync(string id)
         {
-            var resp = await rest.DeleteAsync(MakeUrl($"{PathTransactions}/{id}")) as string;
+            var resp = await _rest.DeleteAsync(MakeUrl($"{PathTransactions}/{id}")) as string;
             return FormatResponse(resp);
         }
 
@@ -345,13 +352,12 @@ namespace RelationalAI
 
         public async Task<List<Edb>> ListEdbsAsync(string database, string engine)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeListEdbAction() };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).actions;
-            
-            return actionsResp.Count == 0 ? new List<Edb>() : actionsResp[0].result.rels;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var actionsResp = Json<ListEdbsResponse>.Deserialize(resp).Actions;
+            return actionsResp.Count == 0 ? new List<Edb>() : actionsResp[0].Result.Rels;
         }
 
         public async Task<TransactionResult> LoadModelAsync(
@@ -360,10 +366,10 @@ namespace RelationalAI
             string name,
             string model)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeInstallAction(name, model) };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
             return Json<TransactionResult>.Deserialize(resp);
         }
 
@@ -372,21 +378,21 @@ namespace RelationalAI
             string engine,
             Dictionary<string, string> models)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeInstallAction(models) };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
             return Json<TransactionResult>.Deserialize(resp);
         }
 
         public async Task<List<Model>> ListModelsAsync(string database, string engine)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeListModelsAction() };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).actions;
-            return actionsResp.Count == 0 ? new List<Model>() : actionsResp[0].result.models;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).Actions;
+            return actionsResp.Count == 0 ? new List<Model>() : actionsResp[0].Result.Models;
         }
 
         public async Task<List<string>> ListModelNamesAsync(string database, string engine)
@@ -406,10 +412,10 @@ namespace RelationalAI
 
         public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeDeleteModelAction(name) };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
             return Json<TransactionResult>.Deserialize(resp);
         }
 
@@ -421,10 +427,10 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var tx = new Transaction(context.Region, database, engine, "OPEN", readOnly);
+            var tx = new Transaction(_context.Region, database, engine, "OPEN", readOnly);
             var actions = new List<DbAction> { DbAction.MakeQueryAction(source, inputs) };
             var body = tx.Payload(actions);
-            var resp = await rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
+            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
             return Json<TransactionResult>.Deserialize(resp);
         }
 
@@ -436,11 +442,13 @@ namespace RelationalAI
             Dictionary<string, string> inputs = null)
         {
             var rsp = await ExecuteAsync(database, engine, source, readOnly, inputs);
-            var id = rsp.Transaction.ID;
+            var id = rsp.Transaction.Id;
 
             // fast-path
             if (rsp.GotCompleteResult)
+            {
                 return rsp;
+            }
 
             // slow-path
             var transactionResponse = await Policy
@@ -459,8 +467,7 @@ namespace RelationalAI
                 results,
                 metadata,
                 problems,
-                true
-            );
+                true);
         }
 
         public async Task<TransactionAsyncResult> ExecuteAsync(
@@ -472,7 +479,7 @@ namespace RelationalAI
         {
             var tx = new TransactionAsync(database, engine, readOnly, source, inputs);
             var body = tx.Payload();
-            var rsp = await rest.PostAsync(MakeUrl(PathTransactions), body, null, tx.QueryParams());
+            var rsp = await _rest.PostAsync(MakeUrl(PathTransactions), body, null, tx.QueryParams());
 
             if (rsp is string s)
             {
@@ -493,32 +500,33 @@ namespace RelationalAI
             {
                 throw new SystemException("transaction part not found");
             }
-            var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(rest.ReadString(transaction.Data));
+
+            var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
 
             if (metadata == null)
             {
                 throw new SystemException("metadata part not found");
             }
-            var metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rest.ReadString(metadata.Data));
+
+            var metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(_rest.ReadString(metadata.Data));
 
             List<object> problemsResult = null;
             if (problems != null)
             {
-                problemsResult = ParseProblemsResult(rest.ReadString(problems.Data));
+                problemsResult = ParseProblemsResult(_rest.ReadString(problems.Data));
             }
 
-            var results = rest.ReadArrowFiles(files);
+            var results = _rest.ReadArrowFiles(files);
 
             return new TransactionAsyncResult(
                 transactionResult,
                 results,
                 metadataResult,
                 problemsResult,
-                true
-            );
+                true);
         }
 
-        private string GenLoadJson(string relation)
+        private static string GenLoadJson(string relation)
         {
             var builder = new StringBuilder();
             builder.Append("\ndef config:data = data\n");
@@ -540,20 +548,14 @@ namespace RelationalAI
             return ExecuteV1Async(database, engine, source, false, inputs);
         }
 
-        private void GenSchemaConfig(StringBuilder builder, CsvOptions options)
+        private static void GenSchemaConfig(StringBuilder builder, CsvOptions options)
         {
             var schema = options?.Schema;
 
-            if (schema == null)
+            if (schema == null || schema.Count == 0)
+            {
                 return;
-
-            var isEmpty = true;
-
-            foreach(var entry in schema)
-                isEmpty = false;
-
-            if (isEmpty)
-                return;
+            }
 
             var config = schema.Aggregate(
                 "def config:schema =",
@@ -563,54 +565,59 @@ namespace RelationalAI
             builder.Append('\n');
         }
 
-        private string GenLiteral(Int32 value)
+        private static string GenLiteral(Int64 value)
         {
             return value.ToString();
         }
 
-        private string GenLiteral(char value)
+        private static string GenLiteral(char value)
         {
-            if (value == '\'')
-                return "'\\''";
-            return $"'{value}'";
+            return value == '\'' ? "'\\''" : $"'{value}'";
         }
-        private string GenLiteral(object value)
+
+        private static string GenLiteral(object value)
+        {
+            switch (value)
+            {
+                case null:
+                    throw new SystemException("Cannot generate literal from null value");
+                case Int16 _:
+                case Int32 _:
+                case Int64 _:
+                    return GenLiteral(Convert.ToInt64(value));
+                case char c:
+                    return GenLiteral(c);
+                default:
+                    throw new SystemException($"Cannot generate type from {value.GetType()} value");
+            }
+        }
+
+        private static void GenSyntaxOption(StringBuilder builder, string name, object value)
         {
             if (value == null)
-                throw new SystemException("Cannot generate literal from null value");
-
-            if (
-                value is int
-                || value is Int16
-                || value is Int32
-                || value is Int64
-            )
-                return GenLiteral(Convert.ToInt32(value));
-
-            if (value is char)
-                return GenLiteral(Convert.ToChar(value));
-
-            throw new SystemException($"Cannot generate type from {value.GetType()} value");
-        }
-        private void GenSyntaxOption(StringBuilder builder, string name, object value)
-        {
-            if (value == null)
+            {
                 return;
+            }
 
             var lit = GenLiteral(value);
             var def = $"def config:syntax:{name} = {lit}\n";
             builder.Append(def);
         }
-        private void GenSyntaxConfig(StringBuilder builder, CsvOptions options)
+
+        private static void GenSyntaxConfig(StringBuilder builder, CsvOptions options)
         {
             if (options == null)
+            {
                 return;
+            }
+
             GenSyntaxOption(builder, "header_row", options.HeaderRow);
             GenSyntaxOption(builder, "delim", options.Delim);
             GenSyntaxOption(builder, "escapechar", options.EscapeChar);
             GenSyntaxOption(builder, "quotechar", options.QuoteChar);
         }
-        private string GenLoadCsv(string relation, CsvOptions options)
+
+        private static string GenLoadCsv(string relation, CsvOptions options)
         {
             var builder = new StringBuilder();
             GenSchemaConfig(builder, options);
@@ -643,8 +650,8 @@ namespace RelationalAI
             bool overwrite = false)
         {
             var mode = CreateMode(source, overwrite);
-            var tx = new Transaction(context.Region, database, engine, mode, false, source);
-            await rest.PostAsync(MakeUrl(PathTransaction), tx.Payload(null), null, tx.QueryParams());
+            var tx = new Transaction(_context.Region, database, engine, mode, false, source);
+            await _rest.PostAsync(MakeUrl(PathTransaction), tx.Payload(null), null, tx.QueryParams());
             return await GetDatabaseAsync(database);
         }
 
@@ -665,23 +672,27 @@ namespace RelationalAI
                     result = json.GetValue(key);
                 }
 
-                return result.ToString();
+                return result?.ToString() ?? response;
             }
             catch
             {
-                // ignore exception
+                // ignore exception and return initial response as is
+                return response;
             }
-
-            return response;
         }
 
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)
         {
             var url = MakeUrl(path);
-            var resp = await rest.GetAsync(url, null, null, parameters) as string;
+            var resp = await _rest.GetAsync(url, null, null, parameters);
+            if (!(resp is string resource))
+            {
+                throw new SystemException("Unexpected response type");
+            }
+
             try
             {
-                var json = JObject.Parse(resp);
+                var json = JObject.Parse(resource);
                 JToken result = json;
                 if (key != null && json.ContainsKey(key))
                 {
@@ -699,49 +710,52 @@ namespace RelationalAI
                     result = result.First;
                 }
 
-                return result.ToString();
+                return result?.ToString() ?? resource;
             }
             catch
             {
-                // ignore exception
+                // ignore exception and return raw response
+                return resource;
             }
-
-            return resp;
         }
 
         private async Task<string> ListCollectionsAsync(string path, string key = null, Dictionary<string, string> parameters = null)
         {
             var url = MakeUrl(path);
-            var resp = await rest.GetAsync(url, null, null, parameters) as string;
+            var resp = await _rest.GetAsync(url, null, null, parameters);
+            if (!(resp is string resources))
+            {
+                throw new SystemException("Unexpected response type");
+            }
+
             try
             {
-                var json = JObject.Parse(resp);
+                var json = JObject.Parse(resources);
                 JToken result = json;
                 if (key != null && json.ContainsKey(key))
                 {
                     result = json.GetValue(key);
                 }
 
-                return result.ToString();
+                return result?.ToString() ?? resources;
             }
             catch
             {
-                // ignore exception
+                // ignore exception and return raw response
+                return resources;
             }
-
-            return resp;
         }
 
         private string MakeUrl(string path)
         {
-            return $"{context.Scheme}://{context.Host}:{context.Port}{path}";
+            return $"{_context.Scheme}://{_context.Host}:{_context.Port}{path}";
         }
 
         public class Context : Rest.Context
         {
-            private string host;
-            private string port;
-            private string scheme;
+            private string _host;
+            private string _port;
+            private string _scheme;
 
             public Context(
                 string host = null,
@@ -759,33 +773,35 @@ namespace RelationalAI
 
             public Context(Dictionary<string, object> config)
             {
-                if (config != null)
+                if (config == null)
                 {
-                    Host = (config.ContainsKey("host") && config["host"] != null) ? (string)config["host"] : null;
-                    Port = (config.ContainsKey("port") && config["port"] != null) ? (string)config["port"] : null;
-                    Scheme = (config.ContainsKey("scheme") && config["scheme"] != null) ? (string)config["scheme"] : null;
-                    Region = (config.ContainsKey("region") && config["region"] != null) ? (string)config["region"] : null;
-                    Credentials = (config.ContainsKey("credentials") && config["credentials"] != null) ?
-                        (ICredentials)config["credentials"] : null;
+                    return;
                 }
+
+                Host = (config.ContainsKey("host") && config["host"] != null) ? (string)config["host"] : null;
+                Port = (config.ContainsKey("port") && config["port"] != null) ? (string)config["port"] : null;
+                Scheme = (config.ContainsKey("scheme") && config["scheme"] != null) ? (string)config["scheme"] : null;
+                Region = (config.ContainsKey("region") && config["region"] != null) ? (string)config["region"] : null;
+                Credentials = (config.ContainsKey("credentials") && config["credentials"] != null) ?
+                    (ICredentials)config["credentials"] : null;
             }
 
             public string Host
             {
-                get => host;
-                set => host = !string.IsNullOrEmpty(value) ? value : "localhost";
+                get => _host;
+                set => _host = !string.IsNullOrEmpty(value) ? value : "localhost";
             }
 
             public string Port
             {
-                get => port;
-                set => port = !string.IsNullOrEmpty(value) ? value : "443";
+                get => _port;
+                set => _port = !string.IsNullOrEmpty(value) ? value : "443";
             }
 
             public string Scheme
             {
-                get => scheme;
-                set => scheme = !string.IsNullOrEmpty(value) ? value : "https";
+                get => _scheme;
+                set => _scheme = !string.IsNullOrEmpty(value) ? value : "https";
             }
         }
     }

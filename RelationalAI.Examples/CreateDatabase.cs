@@ -35,7 +35,7 @@ namespace RelationalAI.Examples
             var config = Config.Read("", profile);
             var context = new Client.Context(config);
             var client = new Client(context);
-            Console.WriteLine("Creating Database: "+ database);
+            Console.WriteLine("Creating Database: " + database);
             Console.WriteLine(await client.CreateDatabaseAsync(database, engine));
         }
 

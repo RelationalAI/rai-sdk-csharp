@@ -6,10 +6,10 @@ namespace RelationalAI.Test
 {
     public class ModelsTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
-        string testModel = "def R = \"hello\", \"world\"";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+        string _testModel = "def R = \"hello\", \"world\"";
 
         [Fact]
         public async Task ModelsTest()
@@ -19,7 +19,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
+            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", _testModel);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
@@ -28,10 +28,10 @@ namespace RelationalAI.Test
             Assert.Equal("test_model", model.Name);
 
             var modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
-            var modelName = modelNames.Find( item => item.Equals("test_model") );
+            var modelName = modelNames.Find(item => item.Equals("test_model"));
 
             var models = await client.ListModelsAsync(Dbname, EngineName);
-            model = models.Find( item => item.Name.Equals("test_model") );
+            model = models.Find(item => item.Name.Equals("test_model"));
             Assert.NotNull(model);
 
             var deleteRsp = await client.DeleteModelAsync(Dbname, EngineName, "test_model");
@@ -39,14 +39,14 @@ namespace RelationalAI.Test
             Assert.Empty(deleteRsp.Output);
             Assert.Empty(deleteRsp.Problems);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model") );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
 
             modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
-            modelName = modelNames.Find( item => item.Equals("test_model") );
+            modelName = modelNames.Find(item => item.Equals("test_model"));
             Assert.Null(modelName);
 
             models = await client.ListModelsAsync(Dbname, EngineName);
-            model = models.Find( item => item.Name.Equals("test_model") );
+            model = models.Find(item => item.Name.Equals("test_model"));
             Assert.Null(model);
         }
 
@@ -54,8 +54,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

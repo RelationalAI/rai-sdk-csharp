@@ -13,10 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using Newtonsoft.Json;
+
 namespace RelationalAI
 {
-    using Newtonsoft.Json;
-
     public class DeleteEngineStatus : Entity
     {
         [JsonProperty("name", Required = Required.Always)]
@@ -25,7 +26,7 @@ namespace RelationalAI
         [JsonProperty("state", Required = Required.Always)]
         public string State { get; set; }
 
-        [JsonProperty("messsage")]
+        [JsonProperty("message")]
         public string Message { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Copyright 2022 RelationalAI, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+using System;
+using System.Net.Http;
+using Polly;
+
 namespace RelationalAI.Utils
 {
-    using System;
-    using System.Net.Http;
-    using Polly;
-
     /// <summary>
     /// Defines a number of commonly used policies and extension methods to use them
     /// to allow retrying operations based on various conditions.
