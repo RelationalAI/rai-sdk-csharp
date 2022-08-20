@@ -11,7 +11,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        string _sample = "" +
+        const string _sample = "" +
             "cocktail,quantity,price,date\n" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
@@ -82,7 +82,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string _sampleNoHeader = "" +
+        const string _sampleNoHeader = "" +
             "\"martini\",2,12.50,\"2020-01-01\"\n" +
             "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
             "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
@@ -154,7 +154,7 @@ namespace RelationalAI.Test
             );
         }
 
-        string _sampleAltSyntax = "" +
+        const string _sampleAltSyntax = "" +
             "cocktail|quantity|price|date\n" +
             "'martini'|2|12.50|'2020-01-01'\n" +
             "'sazerac'|4|14.25|'2020-02-02'\n" +

@@ -9,7 +9,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        string _testModel = "def R = \"hello\", \"world\"";
+        const string _testModel = "def R = \"hello\", \"world\"";
 
         [Fact]
         public async Task ModelsTest()

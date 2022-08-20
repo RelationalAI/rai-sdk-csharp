@@ -20,7 +20,9 @@ using System.Linq;
 
 namespace RelationalAI.Model.Transaction
 {
-    // Represents a "database action", which is an argument to a transaction.
+    /// <summary>
+    /// Represents a "database action", which is an argument to a transaction.
+    /// </summary>
     public class DbAction : Dictionary<string, object>
     {
         public DbAction()
@@ -32,7 +34,11 @@ namespace RelationalAI.Model.Transaction
             Add("type", type);
         }
 
-        // Wraps each of the given action in a LabeledAction.
+        /// <summary>
+        /// Wraps each of the given action in a LabeledAction.
+        /// </summary>
+        /// <param name="actions">The actions to wrap.</param>
+        /// <returns>The list of wrapped actions.</returns>
         public static List<DbAction> MakeActions(List<DbAction> actions)
         {
             var ix = 0;
@@ -51,7 +57,7 @@ namespace RelationalAI.Model.Transaction
             return MakeDeleteModelsAction(new[] { name });
         }
 
-        private static DbAction MakeDeleteModelsAction(string[] names)
+        public static DbAction MakeDeleteModelsAction(string[] names)
         {
             var result = new DbAction("ModifyWorkspaceAction")
             {
@@ -60,7 +66,12 @@ namespace RelationalAI.Model.Transaction
             return result;
         }
 
-        // Return a DbAction for installing the single named model.
+        /// <summary>
+        /// Create a DbAction for installing the single named model.
+        /// </summary>
+        /// <param name="name">The name of the model to install.</param>
+        /// <param name="model">The model to install.</param>
+        /// <returns>The install action.</returns>
         public static DbAction MakeInstallAction(string name, string model)
         {
             var result = new DbAction("InstallAction")
@@ -70,7 +81,11 @@ namespace RelationalAI.Model.Transaction
             return result;
         }
 
-        // Return a DbAction for installing the set of name => model pairs.
+        /// <summary>
+        /// Created a DbAction for installing the set of name => model pairs.
+        /// </summary>
+        /// <param name="models">Dictionary of the named models to install.</param>
+        /// <returns>The install action.</returns>
         public static DbAction MakeInstallAction(Dictionary<string, string> models)
         {
             var sources = models.Select(entry => MakeQuerySource(entry.Key, entry.Value)).ToArray();
@@ -91,7 +106,7 @@ namespace RelationalAI.Model.Transaction
             return new DbAction("ListEdbAction");
         }
 
-        private static DbAction MakeRelKey(string name, string key)
+        public static DbAction MakeRelKey(string name, string key)
         {
             string[] keys = { key };
             string[] values = { };

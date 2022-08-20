@@ -17,6 +17,5 @@ namespace RelationalAI
 {
     public class Show
     {
-        
     }
 }

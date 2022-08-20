@@ -9,7 +9,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        string _sample = "{" +
+        const string _sample = "{" +
             "\"name\":\"Amira\",\n" +
             "\"age\":32,\n" +
             "\"height\":null,\n" +

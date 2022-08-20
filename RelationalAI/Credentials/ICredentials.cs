@@ -18,6 +18,5 @@ namespace RelationalAI.Credentials
 {
     public interface ICredentials
     {
-
     }
 }

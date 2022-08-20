@@ -65,10 +65,10 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<SystemException>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
-        string _testModel =
+        const string _testModel =
                 "def R = \"hello\", \"world\"";
 
-        string _testJson = "{" +
+        const string _testJson = "{" +
                 "\"name\":\"Amira\",\n" +
                 "\"age\":32,\n" +
                 "\"height\":null,\n" +
