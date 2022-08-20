@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using RelationalAI.Model.Engine;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -16,17 +17,17 @@ namespace RelationalAI.Test
 
             var createRsp = await client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);
-            Assert.Equal("PROVISIONED", createRsp.State);
+            Assert.True(EngineState.Provisioned.IsEqual(createRsp.State));
 
             var engine = await client.GetEngineAsync(EngineName);
             Assert.Equal(engine.Name, EngineName);
-            Assert.Equal("PROVISIONED", engine.State);
+            Assert.True(EngineState.Provisioned.IsEqual(engine.State));
 
             var engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
-            engines = await client.ListEnginesAsync("PROVISIONED");
+            engines = await client.ListEnginesAsync(EngineState.Provisioned.Value());
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
@@ -40,7 +41,7 @@ namespace RelationalAI.Test
 
             engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.Equal("DELETED", engine.State);
+            Assert.True(EngineState.Deleted.IsEqual(engine.State));
         }
 
         public override async Task DisposeAsync()

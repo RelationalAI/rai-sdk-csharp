@@ -23,7 +23,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
 using RelationalAI.Credentials;
-using RelationalAI.Model;
 using RelationalAI.Model.Database;
 using RelationalAI.Model.Edb;
 using RelationalAI.Model.Engine;
@@ -127,11 +126,12 @@ namespace RelationalAI.Services
         {
             await CreateEngineAsync(engine, size);
             var resp = await Policy
-                    .HandleResult<Engine>(e => !IsTerminalState(e.State, "PROVISIONED"))
+                    .HandleResult<Engine>(e => !EngineStates.TryConvert(e.State, out var state) ||
+                                               !state.IsTerminalState(EngineState.Provisioned))
                     .Retry30Min()
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
-            if (resp.State != "PROVISIONED")
+            if (!EngineState.Provisioned.IsEqual(resp.State))
             {
                 // TODO: replace with a better error during introducing the exceptions hierarchy
                 throw new SystemException("Failed to provision engine");
@@ -178,7 +178,7 @@ namespace RelationalAI.Services
         {
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
-                .HandleResult<Engine>(e => !IsTerminalState(e.State, "DELETED"))
+                .HandleResult<Engine>(e => !EngineStates.TryConvert(e.State, out var state) || !state.IsFinalState())
                 .Retry15Min()
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
@@ -511,11 +511,6 @@ namespace RelationalAI.Services
             }
 
             return overwrite ? "CREATE_OVERWRITE" : "CREATE";
-        }
-
-        private static bool IsTerminalState(string state, string targetState)
-        {
-            return state == "FAILED" || state == targetState;
         }
 
         private static string GenLoadJson(string relation)

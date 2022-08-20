@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RelationalAI.Model;
 using RelationalAI.Model.Transaction;
 using RelationalAI.Services;
 using RelationalAI.Utils;

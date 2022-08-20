@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using RelationalAI.Model.Database;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -19,25 +20,25 @@ namespace RelationalAI.Test
 
             var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, false);
             Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal("CREATED", createRsp.State);
+            Assert.True(DatabaseState.Created.IsEqual(createRsp.State));
 
             createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, true);
             Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal("CREATED", createRsp.State);
+            Assert.True(DatabaseState.Created.IsEqual(createRsp.State));
 
             var database = await client.GetDatabaseAsync(Dbname);
             Assert.Equal(Dbname, database.Name);
-            Assert.Equal("CREATED", database.State);
+            Assert.True(DatabaseState.Created.IsEqual(database.State));
 
             var databases = await client.ListDatabasesAsync();
             database = databases.Find(db => db.Name == Dbname);
             Assert.Equal(Dbname, database.Name);
-            Assert.Equal("CREATED", database.State);
+            Assert.True(DatabaseState.Created.IsEqual(database.State));
 
-            databases = await client.ListDatabasesAsync("CREATED");
+            databases = await client.ListDatabasesAsync(DatabaseState.Created.Value());
             database = databases.Find(db => db.Name == Dbname);
             Assert.Equal(Dbname, database.Name);
-            Assert.Equal("CREATED", database.State);
+            Assert.True(DatabaseState.Created.IsEqual(database.State));
 
             databases = await client.ListDatabasesAsync("NONESENSE");
             Assert.Empty(databases);
@@ -84,7 +85,7 @@ namespace RelationalAI.Test
             // create a fresh database
             var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName);
             Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal("CREATED", createRsp.State);
+            Assert.True(DatabaseState.Created.IsEqual(createRsp.State));
 
             // load some data and model
             var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", _testJson);
@@ -101,18 +102,18 @@ namespace RelationalAI.Test
             var databaseCloneName = $"{Dbname}-clone";
             createRsp = await client.CloneDatabaseAsync(databaseCloneName, EngineName, Dbname, true);
             Assert.Equal(databaseCloneName, createRsp.Name);
-            Assert.Equal("CREATED", createRsp.State);
+            Assert.True(DatabaseState.Created.IsEqual(createRsp.State));
 
             // make sure the database exists
             var database = await client.GetDatabaseAsync(databaseCloneName);
             Assert.Equal(databaseCloneName, database.Name);
-            Assert.Equal("CREATED", database.State);
+            Assert.True(DatabaseState.Created.IsEqual(database.State));
 
             var databases = await client.ListDatabasesAsync();
             database = databases.Find(db => db.Name == databaseCloneName);
             Assert.NotNull(database);
             Assert.Equal(databaseCloneName, database.Name);
-            Assert.Equal("CREATED", database.State);
+            Assert.True(DatabaseState.Created.IsEqual(database.State));
 
             // make sure the data was cloned
             var rsp = await client.ExecuteV1Async(databaseCloneName, EngineName, "test_data", true);
