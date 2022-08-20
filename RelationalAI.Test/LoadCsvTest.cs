@@ -11,12 +11,13 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        const string _sample = "" +
-            "cocktail,quantity,price,date\n" +
-            "\"martini\",2,12.50,\"2020-01-01\"\n" +
-            "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
-            "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
-            "\"bellini\",3,12.25,\"2020-04-04\"\n";
+
+        private const string Sample = "" +
+                                      "cocktail,quantity,price,date\n" +
+                                      "\"martini\",2,12.50,\"2020-01-01\"\n" +
+                                      "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
+                                      "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
+                                      "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         [Fact]
         public async Task LoadCsvtTest()
@@ -26,7 +27,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", _sample);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
@@ -82,11 +83,11 @@ namespace RelationalAI.Test
             );
         }
 
-        const string _sampleNoHeader = "" +
-            "\"martini\",2,12.50,\"2020-01-01\"\n" +
-            "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
-            "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
-            "\"bellini\",3,12.25,\"2020-04-04\"\n";
+        private const string SampleNoHeader = "" +
+                                              "\"martini\",2,12.50,\"2020-01-01\"\n" +
+                                              "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
+                                              "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
+                                              "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         [Fact]
         public async Task LoadCsvNoHeaderTest()
@@ -97,7 +98,7 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithHeaderRow(0);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", _sampleNoHeader, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", SampleNoHeader, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
@@ -154,12 +155,12 @@ namespace RelationalAI.Test
             );
         }
 
-        const string _sampleAltSyntax = "" +
-            "cocktail|quantity|price|date\n" +
-            "'martini'|2|12.50|'2020-01-01'\n" +
-            "'sazerac'|4|14.25|'2020-02-02'\n" +
-            "'cosmopolitan'|4|11.00|'2020-03-03'\n" +
-            "'bellini'|3|12.25|'2020-04-04'\n";
+        private const string SampleAltSyntax = "" +
+                                               "cocktail|quantity|price|date\n" +
+                                               "'martini'|2|12.50|'2020-01-01'\n" +
+                                               "'sazerac'|4|14.25|'2020-02-02'\n" +
+                                               "'cosmopolitan'|4|11.00|'2020-03-03'\n" +
+                                               "'bellini'|3|12.25|'2020-04-04'\n";
 
         [Fact]
         public async Task LoadCsvAltSyntaxTest()
@@ -170,7 +171,7 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", _sampleAltSyntax, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", SampleAltSyntax, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
@@ -243,7 +244,7 @@ namespace RelationalAI.Test
             };
 
             var opts = new CsvOptions().WithSchema(schema);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", _sample, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);

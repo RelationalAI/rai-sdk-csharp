@@ -9,11 +9,12 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        const string _sample = "{" +
-            "\"name\":\"Amira\",\n" +
-            "\"age\":32,\n" +
-            "\"height\":null,\n" +
-            "\"pets\":[\"dog\",\"rabbit\"]}";
+
+        private const string Sample = "{" +
+                                      "\"name\":\"Amira\",\n" +
+                                      "\"age\":32,\n" +
+                                      "\"height\":null,\n" +
+                                      "\"pets\":[\"dog\",\"rabbit\"]}";
 
         [Fact]
         public async Task LoadJsontTest()
@@ -23,7 +24,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", _sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);

@@ -9,7 +9,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
-        const string _testModel = "def R = \"hello\", \"world\"";
+        private const string TestModel = "def R = \"hello\", \"world\"";
 
         [Fact]
         public async Task ModelsTest()
@@ -19,7 +19,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", _testModel);
+            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", TestModel);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);

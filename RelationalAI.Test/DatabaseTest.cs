@@ -65,14 +65,13 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<SystemException>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
-        const string _testModel =
-                "def R = \"hello\", \"world\"";
+        private const string TestModel = "def R = \"hello\", \"world\"";
 
-        const string _testJson = "{" +
-                "\"name\":\"Amira\",\n" +
-                "\"age\":32,\n" +
-                "\"height\":null,\n" +
-                "\"pets\":[\"dog\",\"rabbit\"]}";
+        private const string TestJson = "{" +
+                                        "\"name\":\"Amira\",\n" +
+                                        "\"age\":32,\n" +
+                                        "\"height\":null,\n" +
+                                        "\"pets\":[\"dog\",\"rabbit\"]}";
 
         [Fact]
         public async Task DatabaseCloneTest()
@@ -88,12 +87,12 @@ namespace RelationalAI.Test
             Assert.True(DatabaseState.Created.IsEqual(createRsp.State));
 
             // load some data and model
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", _testJson);
+            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", TestJson);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", _testModel);
+            loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", TestModel);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
