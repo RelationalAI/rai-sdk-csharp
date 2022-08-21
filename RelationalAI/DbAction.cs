@@ -119,6 +119,7 @@ namespace RelationalAI
                 { "outputs", empty },
                 { "persist", empty },
             };
+
             return result;
         }
 
@@ -131,15 +132,7 @@ namespace RelationalAI
                 { "columns", columns },
                 { "rel_key", MakeRelKey(name, typename) },
             };
-            return result;
-        }
 
-        private static DbAction MakeDeleteModelsAction(string[] names)
-        {
-            var result = new DbAction("ModifyWorkspaceAction")
-            {
-                { "delete_source", names },
-            };
             return result;
         }
 
@@ -152,6 +145,16 @@ namespace RelationalAI
                 { "name", name },
                 { "keys", keys },
                 { "value", values },
+            };
+
+            return result;
+        }
+
+        private static DbAction MakeDeleteModelsAction(string[] names)
+        {
+            var result = new DbAction("ModifyWorkspaceAction")
+            {
+                { "delete_source", names },
             };
             return result;
         }

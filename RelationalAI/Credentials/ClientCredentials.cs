@@ -23,10 +23,10 @@ namespace RelationalAI.Credentials
 
     public class ClientCredentials : ICredentials
     {
-        private static string defaultClientCredentialsURL = "https://login.relationalai.com/oauth/token";
+        private static readonly string DefaultClientCredentialsURL = "https://login.relationalai.com/oauth/token";
         private string clientID;
         private string clientSecret;
-        private string clientCredentialsURL = ClientCredentials.defaultClientCredentialsURL;
+        private string clientCredentialsURL = ClientCredentials.DefaultClientCredentialsURL;
         private AccessToken accessToken;
 
         public ClientCredentials(string clientID, string clientSecret)
@@ -58,7 +58,7 @@ namespace RelationalAI.Credentials
         public string ClientCredentialsURL
         {
             get => this.clientCredentialsURL;
-            set => this.clientCredentialsURL = !string.IsNullOrEmpty(value) ? value : defaultClientCredentialsURL;
+            set => this.clientCredentialsURL = !string.IsNullOrEmpty(value) ? value : DefaultClientCredentialsURL;
         }
 
         public AccessToken AccessToken

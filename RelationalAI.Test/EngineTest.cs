@@ -24,23 +24,25 @@ namespace RelationalAI.Test
             Assert.Equal("PROVISIONED", engine.State);
 
             var engines = await client.ListEnginesAsync();
-            engine = engines.Find( item => item.Name.Equals(EngineName) );
+            engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
             engines = await client.ListEnginesAsync("PROVISIONED");
-            engine = engines.Find( item => item.Name.Equals(EngineName) );
+            engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
             engines = await client.ListEnginesAsync("NONSENSE");
-            engine = engines.Find( item => item.Name.Equals(EngineName) );
+            engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.Null(engine);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteEngineWaitAsync(EngineName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteEngineWaitAsync(EngineName));
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetEngineAsync(EngineName) );
+            await Assert.ThrowsAsync<SystemException>(async () => await client.GetEngineAsync(EngineName));
 
             engines = await client.ListEnginesAsync();
-            engine = engines.Find( item => item.Name.Equals(EngineName) );
+
+            engine = engines.Find(item => item.Name.Equals(EngineName));
+
             Assert.Equal("DELETED", engine.State);
         }
 
@@ -48,7 +50,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }

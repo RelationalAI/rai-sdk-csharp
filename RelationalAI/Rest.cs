@@ -33,6 +33,7 @@ namespace RelationalAI
     using Microsoft.Data.Analysis;
     using Newtonsoft.Json;
     using RelationalAI.Credentials;
+    using Relationalai.Protocol;
 
     public class Rest
     {
@@ -111,7 +112,7 @@ namespace RelationalAI
             {
                 foreach (var kv in headers)
                 {
-                   caseInsensitiveHeaders.Add(kv.Key, kv.Value);
+                    caseInsensitiveHeaders.Add(kv.Key, kv.Value);
                 }
             }
 
@@ -144,6 +145,7 @@ namespace RelationalAI
             return contentType.ToLower() switch
             {
                 "application/json" => this.ReadString(content),
+                "application/x-protobuf" => this.ReadMetadataProtobuf(content),
                 "multipart/form-data" => this.ParseMultipartResponse(content),
                 _ => throw new SystemException($"unsupported content-type: {contentType}")
             };
@@ -197,13 +199,18 @@ namespace RelationalAI
                                 values.Add(col[i]);
                             }
 
-                            output.Add(new ArrowRelation(col.Name, values));
+                            output.Add(new ArrowRelation(file.Name, values));
                         }
                     }
                 }
             }
 
             return output;
+        }
+
+        public MetadataInfo ReadMetadataProtobuf(byte[] data)
+        {
+            return MetadataInfo.Parser.ParseFrom(data);
         }
 
         private HttpContent EncodeContent(object body)
@@ -251,6 +258,7 @@ namespace RelationalAI
         private Dictionary<string, string> GetDefaultHeaders(Uri uri, Dictionary<string, string> headers = null)
         {
             headers ??= new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
             if (!headers.ContainsKey("accept"))
             {
                 headers.Add("Accept", "application/json");

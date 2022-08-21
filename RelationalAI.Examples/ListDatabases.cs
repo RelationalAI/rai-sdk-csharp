@@ -34,7 +34,7 @@ namespace RelationalAI.Examples
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
             List<Database> databases = await client.ListDatabasesAsync(state);
-            foreach(var database in databases) 
+            foreach (var database in databases)
             {
                 Console.WriteLine(database);
             }

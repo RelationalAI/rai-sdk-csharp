@@ -9,7 +9,7 @@ using RelationalAI;
 namespace RelationalAI.Examples
 {
     public class DeleteOAuthClient
-    {   
+    {
         public static Command GetCommand()
         {
             var cmd = new Command("DeleteOAuthClient", "--id <Client ID> --profile <Profile name>"){

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
@@ -21,7 +21,7 @@ namespace RelationalAI.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Get an asynchronous transaction metadata.";
+            cmd.Description = "Get an asynchronous transaction protobuf metadata.";
             cmd.Handler = CommandHandler.Create<string, string>(Run);
             return cmd;
         }
@@ -31,11 +31,9 @@ namespace RelationalAI.Examples
             Dictionary<string, object> config = Config.Read("", profile);
             Client.Context context = new Client.Context(config);
             Client client = new Client(context);
-            var metadataList = await client.GetTransactionMetadataAsync(id);
-            foreach(var metadata in metadataList)
-            {
-                Console.WriteLine(metadata);
-            }
+
+            var metadata = await client.GetTransactionMetadataAsync(id);
+            Console.WriteLine(metadata);
         }
     }
 }

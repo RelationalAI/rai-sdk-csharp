@@ -13,7 +13,7 @@ namespace RelationalAI.Test
         public Client CreateClient()
         {
             Dictionary<string, object> config;
-            if(File.Exists(Config.GetRAIConfigPath()))
+            if (File.Exists(Config.GetRAIConfigPath()))
             {
                 config = Config.Read(profile: "default");
             }
@@ -46,7 +46,7 @@ namespace RelationalAI.Test
 
         public Relation findRelation(Relation[] relations, string colName)
         {
-            foreach(var relation in relations)
+            foreach (var relation in relations)
             {
                 var keys = relation.RelKey.Keys;
                 if (keys.Length == 0)

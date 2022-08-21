@@ -27,6 +27,7 @@ namespace RelationalAI
     using Newtonsoft.Json.Linq;
     using Polly;
     using RelationalAI.Credentials;
+    using Relationalai.Protocol;
     using RelationalAI.Utils;
 
     public class Client
@@ -312,10 +313,14 @@ namespace RelationalAI
             return this.rest.ReadArrowFiles(files);
         }
 
-        public async Task<List<TransactionAsyncMetadataResponse>> GetTransactionMetadataAsync(string id)
+        public async Task<MetadataInfo> GetTransactionMetadataAsync(string id)
         {
-            var rsp = await this.rest.GetAsync(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id))) as string;
-            return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
+            var headers = new Dictionary<string, string>()
+            {
+                { "accept", "application/x-protobuf" },
+            };
+
+            return await this.rest.GetAsync(this.MakeUrl(string.Format("{0}/{1}/metadata", Client.PathTransactions, id)), headers: headers) as MetadataInfo;
         }
 
         public async Task<List<object>> GetTransactionProblemsAsync(string id)
@@ -491,7 +496,7 @@ namespace RelationalAI
             if (rsp is string)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(rsp as string);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), new List<object>());
+                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
             return this.ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
@@ -538,18 +543,6 @@ namespace RelationalAI
             return await this.GetDatabaseAsync(database);
         }
 
-        private static string CreateMode(string source, bool overwrite)
-        {
-            if (source != null)
-            {
-                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
-            }
-            else
-            {
-                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
-            }
-        }
-
         private static bool IsTerminalState(string state, string targetState)
         {
             return state == "FAILED" || state == targetState;
@@ -577,6 +570,18 @@ namespace RelationalAI
             return response;
         }
 
+        private static string CreateMode(string source, bool overwrite)
+        {
+            if (source != null)
+            {
+                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+            }
+            else
+            {
+                return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+            }
+        }
+
         private List<object> ParseProblemsResult(string rsp)
         {
             var output = new List<object>();
@@ -601,7 +606,7 @@ namespace RelationalAI
         private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
         {
             var transaction = files.Find(f => f.Name == "transaction");
-            var metadata = files.Find(f => f.Name == "metadata");
+            var metadata = files.Find(f => f.Name == "metadata.proto");
             var problems = files.Find(f => f.Name == "problems");
 
             if (transaction == null)
@@ -616,7 +621,7 @@ namespace RelationalAI
                 throw new SystemException("metadata part not found");
             }
 
-            List<TransactionAsyncMetadataResponse> metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(this.rest.ReadString(metadata.Data));
+            var metadataProto = this.rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;
             if (problems != null)
@@ -626,12 +631,7 @@ namespace RelationalAI
 
             var results = this.rest.ReadArrowFiles(files);
 
-            return new TransactionAsyncResult(
-                transactionResult,
-                results,
-                metadataResult,
-                problemsResult,
-                true);
+            return new TransactionAsyncResult(transactionResult, results, metadataProto, problemsResult, true);
         }
 
         private string GenLoadJson(string relation)

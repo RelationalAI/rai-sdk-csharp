@@ -27,8 +27,9 @@ namespace RelationalAI.Test
             var relation = output[0];
             var relKey = relation.RelKey;
             Assert.Equal("output", relKey.Name);
-            Assert.Equal(relKey.Keys, new string[] {"Int64", "Int64", "Int64"} );
-            Assert.Equal(relKey.Values, new string[] {"Int64"} );
+            Assert.Equal(relKey.Keys, new string[] { "Int64", "Int64", "Int64" });
+            Assert.Equal(relKey.Values, new string[] { "Int64" });
+
             var columns = relation.Columns;
             var expected = new object[][]
             {
@@ -45,8 +46,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch {}
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch {}
+            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
+            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
         }
     }
 }
