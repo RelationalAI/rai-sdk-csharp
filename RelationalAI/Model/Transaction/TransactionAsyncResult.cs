@@ -15,6 +15,7 @@
  */
 
 using System.Collections.Generic;
+using Relationalai.Protocol;
 
 namespace RelationalAI.Model.Transaction
 {
@@ -26,14 +27,14 @@ namespace RelationalAI.Model.Transaction
 
         public List<ArrowRelation> Results { get; set; }
 
-        public List<TransactionAsyncMetadataResponse> Metadata { get; set; }
+        public MetadataInfo Metadata { get; set; }
 
         public List<object> Problems { get; set; }
 
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
-            List<TransactionAsyncMetadataResponse> metadata,
+            MetadataInfo metadata,
             List<object> problems,
             bool gotCompleteResult = false)
         {

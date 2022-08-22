@@ -30,6 +30,7 @@ using Microsoft.Data.Analysis;
 using Newtonsoft.Json;
 using RelationalAI.Credentials;
 using RelationalAI.Model.Transaction;
+using Relationalai.Protocol;
 
 namespace RelationalAI.Services
 {
@@ -127,23 +128,32 @@ namespace RelationalAI.Services
         public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
             var output = new List<ArrowRelation>();
-            foreach (var memoryStream in files
-                         .Where(file => "application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
-                         .Select(file => new MemoryStream(file.Data)))
+            foreach (var file in files)
             {
-                memoryStream.Position = 0;
-
-                var reader = new ArrowStreamReader(memoryStream);
-                RecordBatch recordBatch;
-                while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
                 {
-                    var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                    output.AddRange(df.Columns.Select(col => new { col, values = col.Cast<object>().ToList() })
-                        .Select(t => new ArrowRelation(t.col.Name, t.values)));
+                    var memoryStream = new MemoryStream(file.Data)
+                    {
+                        Position = 0,
+                    };
+
+                    var reader = new ArrowStreamReader(memoryStream);
+                    RecordBatch recordBatch;
+                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                    {
+                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
+                        output.AddRange(df.Columns.Select(col => col.Cast<object>().ToList())
+                            .Select(values => new ArrowRelation(file.Name, values)));
+                    }
                 }
             }
 
             return output;
+        }
+
+        public MetadataInfo ReadMetadataProtobuf(byte[] data)
+        {
+            return MetadataInfo.Parser.ParseFrom(data);
         }
 
         private static HttpContent EncodeContent(object body)
@@ -320,6 +330,7 @@ namespace RelationalAI.Services
             return contentType.ToLower() switch
             {
                 "application/json" => ReadString(content),
+                "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
                 _ => throw new SystemException($"unsupported content-type: {contentType}")
             };

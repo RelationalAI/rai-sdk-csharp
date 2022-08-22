@@ -30,6 +30,7 @@ using RelationalAI.Model.OAuthClient;
 using RelationalAI.Model.RelModel;
 using RelationalAI.Model.Transaction;
 using RelationalAI.Model.User;
+using Relationalai.Protocol;
 using RelationalAI.Utils;
 
 namespace RelationalAI.Services
@@ -310,10 +311,14 @@ namespace RelationalAI.Services
             return _rest.ReadArrowFiles(files);
         }
 
-        public async Task<List<TransactionAsyncMetadataResponse>> GetTransactionMetadataAsync(string id)
+        public async Task<MetadataInfo> GetTransactionMetadataAsync(string id)
         {
-            var rsp = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/metadata")) as string;
-            return Json<List<TransactionAsyncMetadataResponse>>.Deserialize(rsp);
+            var headers = new Dictionary<string, string>
+            {
+                { "accept", "application/x-protobuf" },
+            };
+
+            return await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/metadata"), headers: headers) as MetadataInfo;
         }
 
         public async Task<List<object>> GetTransactionProblemsAsync(string id)
@@ -468,7 +473,7 @@ namespace RelationalAI.Services
             if (rsp is string s)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(s);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), new List<TransactionAsyncMetadataResponse>(), new List<object>());
+                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
@@ -663,7 +668,7 @@ namespace RelationalAI.Services
         private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
         {
             var transaction = files.Find(f => f.Name == "transaction");
-            var metadata = files.Find(f => f.Name == "metadata");
+            var metadata = files.Find(f => f.Name == "metadata.proto");
             var problems = files.Find(f => f.Name == "problems");
 
             if (transaction == null)
@@ -677,7 +682,7 @@ namespace RelationalAI.Services
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
-            var metadataResult = Json<List<TransactionAsyncMetadataResponse>>.Deserialize(_rest.ReadString(metadata.Data));
+            var metadataProto = _rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;
             if (problems != null)
@@ -687,12 +692,7 @@ namespace RelationalAI.Services
 
             var results = _rest.ReadArrowFiles(files);
 
-            return new TransactionAsyncResult(
-                transactionResult,
-                results,
-                metadataResult,
-                problemsResult,
-                true);
+            return new TransactionAsyncResult(transactionResult, results, metadataProto, problemsResult, true);
         }
 
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)

@@ -38,6 +38,10 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="HttpMultipartParser" Version="5.1.0" />
+    <PackageReference Include="Apache.Arrow" Version="7.0.0" />
+    <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.0" />
+    <ProjectReference Include="..\RelationalAI.Protos\RelationalAI.Protos.csproj" />
   </ItemGroup>
 
 </Project>
