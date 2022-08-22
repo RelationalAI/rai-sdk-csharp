@@ -536,11 +536,11 @@ namespace RelationalAI.Services
             }
 
             var config = schema.Aggregate(
-                "def config:schema =",
+                "def config:schema = {",
                 (current, entry) => current + $"\n    :{entry.Key}, \"{entry.Value}\";");
 
             builder.Append(config);
-            builder.Append('\n');
+            builder.Append("\n}\n");
         }
 
         private static string GenLiteral(Int64 value)
