@@ -1,6 +1,6 @@
 using System;
 using System.Threading.Tasks;
-using RelationalAI.Model.Engine;
+using RelationalAI.Models.Engine;
 using Xunit;
 
 namespace RelationalAI.Test

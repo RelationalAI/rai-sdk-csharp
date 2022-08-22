@@ -23,13 +23,13 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
 using RelationalAI.Credentials;
-using RelationalAI.Model.Database;
-using RelationalAI.Model.Edb;
-using RelationalAI.Model.Engine;
-using RelationalAI.Model.OAuthClient;
-using RelationalAI.Model.RelModel;
-using RelationalAI.Model.Transaction;
-using RelationalAI.Model.User;
+using RelationalAI.Models.Database;
+using RelationalAI.Models.Edb;
+using RelationalAI.Models.Engine;
+using RelationalAI.Models.OAuthClient;
+using RelationalAI.Models.RelModel;
+using RelationalAI.Models.Transaction;
+using RelationalAI.Models.User;
 using Relationalai.Protocol;
 using RelationalAI.Utils;
 
@@ -374,14 +374,14 @@ namespace RelationalAI.Services
             return Json<TransactionResult>.Deserialize(resp);
         }
 
-        public async Task<List<Model.RelModel.Model>> ListModelsAsync(string database, string engine)
+        public async Task<List<Model>> ListModelsAsync(string database, string engine)
         {
             var tx = new Transaction(_context.Region, database, engine, "OPEN");
             var actions = new List<DbAction> { DbAction.MakeListModelsAction() };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
             var actionsResp = Json<ListModelsResponse>.Deserialize(resp).Actions;
-            return actionsResp.Count == 0 ? new List<Model.RelModel.Model>() : actionsResp[0].Result.Models;
+            return actionsResp.Count == 0 ? new List<Model>() : actionsResp[0].Result.Models;
         }
 
         public async Task<List<string>> ListModelNamesAsync(string database, string engine)
@@ -391,7 +391,7 @@ namespace RelationalAI.Services
             return modelNames;
         }
 
-        public async Task<Model.RelModel.Model> GetModelAsync(string database, string engine, string name)
+        public async Task<Model> GetModelAsync(string database, string engine, string name)
         {
             var models = await ListModelsAsync(database, engine);
 

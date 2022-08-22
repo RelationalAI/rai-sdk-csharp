@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RelationalAI.Model.User;
+using RelationalAI.Models.User;
 using Xunit;
 
 namespace RelationalAI.Test

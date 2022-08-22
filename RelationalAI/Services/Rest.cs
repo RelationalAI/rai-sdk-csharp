@@ -29,7 +29,7 @@ using HttpMultipartParser;
 using Microsoft.Data.Analysis;
 using Newtonsoft.Json;
 using RelationalAI.Credentials;
-using RelationalAI.Model.Transaction;
+using RelationalAI.Models.Transaction;
 using Relationalai.Protocol;
 
 namespace RelationalAI.Services

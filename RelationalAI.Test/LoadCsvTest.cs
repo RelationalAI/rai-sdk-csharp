@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using RelationalAI.Model.Transaction;
+using RelationalAI.Models.Transaction;
 using Xunit;
 
 namespace RelationalAI.Test
