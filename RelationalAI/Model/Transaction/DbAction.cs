@@ -57,15 +57,6 @@ namespace RelationalAI.Model.Transaction
             return MakeDeleteModelsAction(new[] { name });
         }
 
-        public static DbAction MakeDeleteModelsAction(string[] names)
-        {
-            var result = new DbAction("ModifyWorkspaceAction")
-            {
-                { "delete_source", names }
-            };
-            return result;
-        }
-
         /// <summary>
         /// Create a DbAction for installing the single named model.
         /// </summary>
@@ -106,19 +97,6 @@ namespace RelationalAI.Model.Transaction
             return new DbAction("ListEdbAction");
         }
 
-        public static DbAction MakeRelKey(string name, string key)
-        {
-            string[] keys = { key };
-            string[] values = { };
-            var result = new DbAction("RelKey")
-            {
-                { "name", name },
-                { "keys", keys },
-                { "value", values }
-            };
-            return result;
-        }
-
         public static DbAction MakeQueryAction(string source, Dictionary<string, string> inputs)
         {
             var actionInputs = new List<DbAction>();
@@ -146,6 +124,28 @@ namespace RelationalAI.Model.Transaction
             {
                 { "columns", columns },
                 { "rel_key", MakeRelKey(name, typename) }
+            };
+            return result;
+        }
+
+        private static DbAction MakeDeleteModelsAction(string[] names)
+        {
+            var result = new DbAction("ModifyWorkspaceAction")
+            {
+                { "delete_source", names }
+            };
+            return result;
+        }
+
+        private static DbAction MakeRelKey(string name, string key)
+        {
+            string[] keys = { key };
+            string[] values = { };
+            var result = new DbAction("RelKey")
+            {
+                { "name", name },
+                { "keys", keys },
+                { "value", values }
             };
             return result;
         }

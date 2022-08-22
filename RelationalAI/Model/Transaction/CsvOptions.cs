@@ -30,6 +30,10 @@ namespace RelationalAI.Model.Transaction
 
         public Dictionary<string, string> Schema { get; private set; }
 
+        public CsvOptions()
+        {
+        }
+
         public CsvOptions WithDelim(char delim)
         {
             Delim = delim;
