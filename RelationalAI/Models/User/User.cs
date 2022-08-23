@@ -32,8 +32,7 @@ namespace RelationalAI.Models.User
         [JsonProperty("account_name", Required = Required.Always)]
         public string AccountName { get; set; }
 
-        [JsonProperty("roles", Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        [JsonProperty("roles", Required = Required.Always, ItemConverterType = typeof(StringEnumConverter))]
         public List<Role> Roles { get; set; }
 
         [JsonProperty("status", Required = Required.Always)]
