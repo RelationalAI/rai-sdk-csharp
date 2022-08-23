@@ -35,13 +35,13 @@ namespace RelationalAI.Test
             Assert.Equal(Dbname, database.Name);
             Assert.Equal(DatabaseState.Created, database.State);
 
-            databases = await client.ListDatabasesAsync(DatabaseState.Created.Value());
+            databases = await client.ListDatabasesAsync(DatabaseState.Created);
             database = databases.Find(db => db.Name == Dbname);
             Assert.Equal(Dbname, database.Name);
             Assert.Equal(DatabaseState.Created, database.State);
 
-            databases = await client.ListDatabasesAsync("NONESENSE");
-            Assert.Empty(databases);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+                client.ListDatabasesAsync((DatabaseState)1000));
 
             var edbs = await client.ListEdbsAsync(Dbname, EngineName);
             var edb = edbs.Find(item => item.Name.Equals("rel"));

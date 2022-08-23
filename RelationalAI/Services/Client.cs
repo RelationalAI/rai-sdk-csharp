@@ -89,12 +89,12 @@ namespace RelationalAI.Services
             return dbs.Count > 0 ? dbs[0] : throw new SystemException("not found");
         }
 
-        public async Task<List<Database>> ListDatabasesAsync(string state = null)
+        public async Task<List<Database>> ListDatabasesAsync(DatabaseState? state = null)
         {
             var parameters = new Dictionary<string, string>();
             if (state != null)
             {
-                parameters.Add("state", state);
+                parameters.Add("state", state.Value.Value());
             }
 
             var resp = await ListCollectionsAsync(PathDatabase, null, parameters);
@@ -152,12 +152,12 @@ namespace RelationalAI.Services
             return engines.Count > 0 ? engines[0] : throw new SystemException("not found");
         }
 
-        public async Task<List<Engine>> ListEnginesAsync(string state = null)
+        public async Task<List<Engine>> ListEnginesAsync(EngineState? state = null)
         {
             var parameters = new Dictionary<string, string>();
             if (state != null)
             {
-                parameters.Add("state", state);
+                parameters.Add("state", state.Value.Value());
             }
 
             var resp = await ListCollectionsAsync(PathEngine, null, parameters);

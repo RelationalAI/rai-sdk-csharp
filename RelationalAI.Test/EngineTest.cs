@@ -27,13 +27,12 @@ namespace RelationalAI.Test
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
-            engines = await client.ListEnginesAsync(EngineState.Provisioned.Value());
+            engines = await client.ListEnginesAsync(EngineState.Provisioned);
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
-            engines = await client.ListEnginesAsync("NONSENSE");
-            engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.Null(engine);
+            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+                client.ListEnginesAsync((EngineState)1500));
 
             await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteEngineWaitAsync(EngineName));
 

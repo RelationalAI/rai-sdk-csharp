@@ -2,6 +2,7 @@ using System;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
+using RelationalAI.Models.Engine;
 using RelationalAI.Services;
 using RelationalAI.Utils;
 
@@ -12,7 +13,7 @@ namespace RelationalAI.Examples
         public static Command GetCommand()
         {
             var cmd = new Command("ListEngines", "--state <State> --profile <Profile name>"){
-                new Option<string>("--state"){
+                new Option<EngineState>("--state"){
                     IsRequired = false,
                     Description = "To list engines in a paricular state. For example, DELETED"
                 },
@@ -23,11 +24,11 @@ namespace RelationalAI.Examples
                 }
             };
             cmd.Description = "Lists engines.";
-            cmd.Handler = CommandHandler.Create<string, string>(Run);
+            cmd.Handler = CommandHandler.Create<EngineState?, string>(Run);
             return cmd;
         }
 
-        private static async Task Run(string state = null, string profile = "default")
+        private static async Task Run(EngineState? state = null, string profile = "default")
         {
             var config = Config.Read("", profile);
             var context = new Client.Context(config);

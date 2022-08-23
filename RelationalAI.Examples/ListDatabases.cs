@@ -2,6 +2,7 @@ using System;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
+using RelationalAI.Models.Database;
 using RelationalAI.Services;
 using RelationalAI.Utils;
 
@@ -12,7 +13,7 @@ namespace RelationalAI.Examples
         public static Command GetCommand()
         {
             var cmd = new Command("ListDatabases", "--state <State> --profile <Profile name>"){
-                new Option<string>("--state"){
+                new Option<DatabaseState>("--state"){
                     IsRequired = false,
                     Description = "To list databases in a paricular state. For example, CREATED"
                 },
@@ -23,11 +24,11 @@ namespace RelationalAI.Examples
                 }
             };
             cmd.Description = "List databases";
-            cmd.Handler = CommandHandler.Create<string, string>(Run);
+            cmd.Handler = CommandHandler.Create<DatabaseState?, string>(Run);
             return cmd;
         }
 
-        private static async Task Run(string state = null, string profile = "default")
+        private static async Task Run(DatabaseState? state = null, string profile = "default")
         {
             var config = Config.Read("", profile);
             var context = new Client.Context(config);
