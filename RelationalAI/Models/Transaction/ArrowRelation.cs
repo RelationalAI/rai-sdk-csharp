@@ -21,15 +21,15 @@ namespace RelationalAI.Models.Transaction
 {
     public class ArrowRelation : Entity
     {
-        public string RelationId { get; }
-
-        public List<object> Table { get; }
-
         public ArrowRelation(string relationId, List<object> table)
         {
             RelationId = relationId;
             Table = table;
         }
+
+        public string RelationId { get; }
+
+        public List<object> Table { get; }
 
         public override bool Equals(object obj)
         {

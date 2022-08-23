@@ -21,16 +21,6 @@ namespace RelationalAI.Models.Transaction
 {
     public class TransactionAsync : Entity
     {
-        public string Database { get; set; }
-
-        public string Engine { get; set; }
-
-        public string Source { get; set; }
-
-        public bool ReadOnly { get; set; }
-
-        public Dictionary<string, string> Inputs { get; set; }
-
         public TransactionAsync(
             string database,
             string engine,
@@ -44,6 +34,16 @@ namespace RelationalAI.Models.Transaction
             Source = source;
             Inputs = inputs ?? new Dictionary<string, string>();
         }
+
+        public string Database { get; set; }
+
+        public string Engine { get; set; }
+
+        public string Source { get; set; }
+
+        public bool ReadOnly { get; set; }
+
+        public Dictionary<string, string> Inputs { get; set; }
 
         /// <summary>
         /// Constructs the transaction payload.

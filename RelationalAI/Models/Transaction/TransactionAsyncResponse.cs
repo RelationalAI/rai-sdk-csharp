@@ -20,6 +20,29 @@ namespace RelationalAI.Models.Transaction
 {
     public class TransactionAsyncResponse : TransactionAsyncCompactResponse
     {
+        public TransactionAsyncResponse(
+            string id,
+            TransactionAsyncState state,
+            string accountName,
+            string createdBy,
+            long createdOn,
+            long finishedAt,
+            string databaseName,
+            bool readOnly,
+            string query,
+            string lastRequestedInterval)
+            : base(id, state)
+        {
+            AccountName = accountName;
+            CreatedBy = createdBy;
+            CreatedOn = createdOn;
+            FinishedAt = finishedAt;
+            DatabaseName = databaseName;
+            ReadOnly = readOnly;
+            Query = query;
+            LastRequestedInterval = lastRequestedInterval;
+        }
+
         [JsonProperty("account_name", Required = Required.Always)]
         public string AccountName { get; set; }
 
@@ -43,28 +66,5 @@ namespace RelationalAI.Models.Transaction
 
         [JsonProperty("last_requested_interval", Required = Required.Always)]
         public string LastRequestedInterval { get; set; }
-
-        public TransactionAsyncResponse(
-            string id,
-            TransactionAsyncState state,
-            string accountName,
-            string createdBy,
-            long createdOn,
-            long finishedAt,
-            string databaseName,
-            bool readOnly,
-            string query,
-            string lastRequestedInterval)
-            : base(id, state)
-        {
-            AccountName = accountName;
-            CreatedBy = createdBy;
-            CreatedOn = createdOn;
-            FinishedAt = finishedAt;
-            DatabaseName = databaseName;
-            ReadOnly = readOnly;
-            Query = query;
-            LastRequestedInterval = lastRequestedInterval;
-        }
     }
 }

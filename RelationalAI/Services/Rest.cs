@@ -340,18 +340,18 @@ namespace RelationalAI.Services
         {
             private string _region;
 
+            public Context(string region = null, ICredentials credentials = null)
+            {
+                Region = region;
+                Credentials = credentials;
+            }
+
             public ICredentials Credentials { get; set; }
 
             public string Region
             {
                 get => _region;
                 set => _region = !string.IsNullOrEmpty(value) ? value : "us-east";
-            }
-
-            public Context(string region = null, ICredentials credentials = null)
-            {
-                Region = region;
-                Credentials = credentials;
             }
         }
     }

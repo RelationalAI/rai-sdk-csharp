@@ -21,16 +21,6 @@ namespace RelationalAI.Models.Transaction
 {
     public class TransactionAsyncResult : Entity
     {
-        public bool GotCompleteResult { get; set; }
-
-        public TransactionAsyncCompactResponse Transaction { get; set; }
-
-        public List<ArrowRelation> Results { get; set; }
-
-        public MetadataInfo Metadata { get; set; }
-
-        public List<object> Problems { get; set; }
-
         public TransactionAsyncResult(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
@@ -44,5 +34,15 @@ namespace RelationalAI.Models.Transaction
             Metadata = metadata;
             Problems = problems;
         }
+
+        public bool GotCompleteResult { get; set; }
+
+        public TransactionAsyncCompactResponse Transaction { get; set; }
+
+        public List<ArrowRelation> Results { get; set; }
+
+        public MetadataInfo Metadata { get; set; }
+
+        public List<object> Problems { get; set; }
     }
 }

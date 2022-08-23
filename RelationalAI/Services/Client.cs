@@ -759,24 +759,6 @@ namespace RelationalAI.Services
             private string _port;
             private string _scheme;
 
-            public string Host
-            {
-                get => _host;
-                set => _host = !string.IsNullOrEmpty(value) ? value : "localhost";
-            }
-
-            public string Port
-            {
-                get => _port;
-                set => _port = !string.IsNullOrEmpty(value) ? value : "443";
-            }
-
-            public string Scheme
-            {
-                get => _scheme;
-                set => _scheme = !string.IsNullOrEmpty(value) ? value : "https";
-            }
-
             public Context(
                 string host = null,
                 string port = null,
@@ -804,6 +786,24 @@ namespace RelationalAI.Services
                 Region = (config.ContainsKey("region") && config["region"] != null) ? (string)config["region"] : null;
                 Credentials = (config.ContainsKey("credentials") && config["credentials"] != null) ?
                     (ICredentials)config["credentials"] : null;
+            }
+
+            public string Host
+            {
+                get => _host;
+                set => _host = !string.IsNullOrEmpty(value) ? value : "localhost";
+            }
+
+            public string Port
+            {
+                get => _port;
+                set => _port = !string.IsNullOrEmpty(value) ? value : "443";
+            }
+
+            public string Scheme
+            {
+                get => _scheme;
+                set => _scheme = !string.IsNullOrEmpty(value) ? value : "https";
             }
         }
     }

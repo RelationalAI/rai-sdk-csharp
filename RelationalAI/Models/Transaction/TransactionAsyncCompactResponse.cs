@@ -22,17 +22,17 @@ namespace RelationalAI.Models.Transaction
 {
     public class TransactionAsyncCompactResponse : Entity
     {
+        public TransactionAsyncCompactResponse(string id, TransactionAsyncState state)
+        {
+            Id = id;
+            State = state;
+        }
+
         [JsonProperty("id", Required = Required.Always)]
         public string Id { get; set; }
 
         [JsonProperty("state", Required = Required.Always)]
         [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
         public TransactionAsyncState State { get; set; }
-
-        public TransactionAsyncCompactResponse(string id, TransactionAsyncState state)
-        {
-            Id = id;
-            State = state;
-        }
     }
 }

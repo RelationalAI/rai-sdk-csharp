@@ -21,10 +21,6 @@ namespace RelationalAI
 {
     public static class SdkProperties
     {
-        public static string Version { get; }
-
-        public static string ProductName { get; }
-
         static SdkProperties()
         {
             var assembly = Assembly.GetExecutingAssembly();
@@ -33,5 +29,9 @@ namespace RelationalAI
             Version = fileVersionInfo.ProductVersion;
             ProductName = fileVersionInfo.ProductName;
         }
+
+        public static string Version { get; }
+
+        public static string ProductName { get; }
     }
 }

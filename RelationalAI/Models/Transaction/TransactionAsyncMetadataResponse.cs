@@ -22,17 +22,17 @@ namespace RelationalAI.Models.Transaction
 {
     public class TransactionAsyncMetadataResponse : Entity
     {
-        [JsonProperty("relationId", Required = Required.Always)]
-        public string RelationId { get; }
-
-        [JsonProperty("types", Required = Required.Always)]
-        public List<string> Types { get; }
-
         public TransactionAsyncMetadataResponse(string relationId, List<string> types)
         {
             RelationId = relationId;
             Types = types;
         }
+
+        [JsonProperty("relationId", Required = Required.Always)]
+        public string RelationId { get; }
+
+        [JsonProperty("types", Required = Required.Always)]
+        public List<string> Types { get; }
 
         public override bool Equals(object obj)
         {

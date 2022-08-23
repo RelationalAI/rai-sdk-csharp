@@ -20,6 +20,22 @@ namespace RelationalAI.Models.Transaction
 {
     public class Transaction : Entity
     {
+        public Transaction(
+            string region,
+            string database,
+            string engine,
+            TransactionMode mode,
+            bool readOnly = false,
+            string source = null)
+        {
+            Region = region;
+            Database = database;
+            Engine = engine;
+            Mode = mode;
+            ReadOnly = readOnly;
+            Source = source;
+        }
+
         public string Region { get; set; }
 
         public string Database { get; set; }
@@ -37,22 +53,6 @@ namespace RelationalAI.Models.Transaction
         public bool NoWaitDurable { get; set; }
 
         public int Version { get; set; }
-
-        public Transaction(
-            string region,
-            string database,
-            string engine,
-            TransactionMode mode,
-            bool readOnly = false,
-            string source = null)
-        {
-            Region = region;
-            Database = database;
-            Engine = engine;
-            Mode = mode;
-            ReadOnly = readOnly;
-            Source = source;
-        }
 
         /// <summary>
         /// Constructs the transaction payload.
