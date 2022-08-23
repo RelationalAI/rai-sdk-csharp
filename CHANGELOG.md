@@ -12,7 +12,7 @@
   - `ListEnginesAsync` accepts optional `state` parameter of `EngineState?` type.
 * Made structural changes that include moving classes from `RelationalAI` namespace to the following namespaces:
   - `RelationalAI.Models.Database` namespace: `CreateDatabaseResponse`, `Database`, `DeleteDatabaseResponse`, `GetDatabaseResponse`, `ListDatabasesResponse`.
-  - `RelationalAI.Models.Edb` namespace: ``Edb`, `ListEdbsResponse`, `ListEdbsResponseAction`, `ListEdbsResponseResult`.
+  - `RelationalAI.Models.Edb` namespace: `Edb`, `ListEdbsResponse`, `ListEdbsResponseAction`, `ListEdbsResponseResult`.
   - `RelationalAI.Models.Engine` namespace: `CreateEngineResponse`, `DeleteEngineResponse`, `DeleteEngineStatus`, `Engine`, `EngineSize`, `GetEngineResponse`, `ListEnginesResponse`.
   - `RelationalAI.Models.OAuthClient` namespace: `CreateOAuthClientResponse`, `DeleteOAuthClientResponse`, `GetOAuthClientResponse`, `ListOAuthClientResponse`, `OAuthClient`, `OAuthClientEx`, `Permission`.
   - `RelationalAI.Models.RelModel` namespace: `ListModelsResponse`, `ListModelsResponseAction`, `ListModelsResponseResult`, `Model`.
