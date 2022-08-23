@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.7.0-alpha
+* Replaced String properties with Enums in the following models returned by corresponding API methods:
+  - `Database`.`State` property is of `DatabaseState` type.
+  - `Engine`.`State` and `DeleteEngineStatus`.`State` properties are of `EngineState` type, `Engine`.`Size` property is of `EngineSize` type.
+  - `Transaction`.`Mode` property is of `TransactionMode` type.
+  - `TransactionAsyncCompactResponse`.`State` property is of `TransactionAsyncState` type.
+  - `User`.`Status` property is of `UserStatus` type and `User`.`Roles` property is of `List<Role>` type.
+* Changed the following API methods to accept Enum parameters instead of Strings:
+  - `ListDatabasesAsync` accepts optional `state` parameter of `DatabaseState?` type.
+  - `ListEnginesAsync` accepts optional `state` parameter of `EngineState?` type.
+* Made structural changes that include moving classes from `RelationalAI` namespace to the following namespaces:
+  - `RelationalAI.Models.Database` namespace: `CreateDatabaseResponse`, `Database`, `DeleteDatabaseResponse`, `GetDatabaseResponse`, `ListDatabasesResponse`.
+  - `RelationalAI.Models.Edb` namespace: ``Edb`, `ListEdbsResponse`, `ListEdbsResponseAction`, `ListEdbsResponseResult`.
+  - `RelationalAI.Models.Engine` namespace: `CreateEngineResponse`, `DeleteEngineResponse`, `DeleteEngineStatus`, `Engine`, `EngineSize`, `GetEngineResponse`, `ListEnginesResponse`.
+  - `RelationalAI.Models.OAuthClient` namespace: `CreateOAuthClientResponse`, `DeleteOAuthClientResponse`, `GetOAuthClientResponse`, `ListOAuthClientResponse`, `OAuthClient`, `OAuthClientEx`, `Permission`.
+  - `RelationalAI.Models.RelModel` namespace: `ListModelsResponse`, `ListModelsResponseAction`, `ListModelsResponseResult`, `Model`.
+  - `RelationalAI.Models.Transaction` namespace: `ArrowRelation`, `ClientProblem`, `CsvOptions`, `DbAction`, `IntegrityConstraintViolation`, `Relation`, `RelKey`, `Source`, `Transaction`, `TransactionAsync`, `TransactionAsyncCancelResponse`, `TransactionAsyncCompactResponse`, `TransactionAsyncFile`, `TransactionAsyncMetadataResponse`, `TransactionAsyncMultipleResponses`, `TransactionAsyncResponse`, `TransactionAsyncResult`, `TransactionAsyncSingleResponse`, `TransactionResult`.
+  - `RelationalAI.Models.User` namespace: `CreateUserResponse`, `DeleteUserResponse`, `GetUserResponse`, `ListUsersResponse`, `Role`, `UpdateUserResponse`, `User`, `UserStatus`.
+  - `RelationalAI.Services` namespace: `Client`, `Rest`.
+* Added more exceptions thrown in the cases of unexpected responses from RAI REST API, such as:
+  - `SystemException` with message "Unexpected format of problems" thrown when SDK fails to parse transaction problems.
+
 ## v0.6.0-alpha
 * Deprecated metadata json format.
 * Removed `TransactionAsyncMetadataResponse` model.
