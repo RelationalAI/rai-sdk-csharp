@@ -15,6 +15,8 @@
  */
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace RelationalAI.Models.Engine
 {
@@ -39,9 +41,11 @@ namespace RelationalAI.Models.Engine
         public string DeletedOn { get; set; }
 
         [JsonProperty("size")]
-        public string Size { get; set; }
+        [JsonConverter(typeof(StringEnumConverter))]
+        public EngineSize Size { get; set; }
 
         [JsonProperty("state")]
-        public string State { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public EngineState State { get; set; }
     }
 }

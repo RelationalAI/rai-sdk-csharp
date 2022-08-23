@@ -15,6 +15,8 @@
  */
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace RelationalAI.Models.Database
 {
@@ -45,6 +47,7 @@ namespace RelationalAI.Models.Database
         public string DefaultEngine { get; set; }
 
         [JsonProperty("state", Required = Required.Always)]
-        public string State { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public DatabaseState State { get; set; }
     }
 }

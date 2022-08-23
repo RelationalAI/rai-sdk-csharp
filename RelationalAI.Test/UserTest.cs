@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using RelationalAI.Models.User;
 using Xunit;
@@ -20,8 +21,8 @@ namespace RelationalAI.Test
 
             var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);
-            Assert.Equal("ACTIVE", rsp.Status);
-            Assert.Equal(new List<string> { "user" }, rsp.Roles);
+            Assert.Equal(UserStatus.Active, rsp.Status);
+            Assert.True(new List<Role> { Role.User }.SequenceEqual(rsp.Roles));
 
             rsp = await client.FindUserAsync(UserEmail);
             var userId = rsp.Id;
@@ -39,23 +40,23 @@ namespace RelationalAI.Test
 
             rsp = await client.DisableUserAsync(userId);
             Assert.Equal(userId, rsp.Id);
-            Assert.Equal("INACTIVE", rsp.Status);
+            Assert.Equal(UserStatus.InActive, rsp.Status);
 
             rsp = await client.UpdateUserAsync(userId, UserStatus.InActive);
             Assert.Equal(userId, rsp.Id);
-            Assert.Equal("INACTIVE", rsp.Status);
+            Assert.Equal(UserStatus.InActive, rsp.Status);
 
             rsp = await client.UpdateUserAsync(userId, UserStatus.Active);
             Assert.Equal(userId, rsp.Id);
-            Assert.Equal("ACTIVE", rsp.Status);
+            Assert.Equal(UserStatus.Active, rsp.Status);
 
             rsp = await client.UpdateUserAsync(userId, roles: new List<Role> { Role.Admin, Role.User });
             Assert.Equal(userId, rsp.Id);
-            Assert.Equal(new List<string> { "admin", "user" }, rsp.Roles);
+            Assert.True(new List<Role> { Role.Admin, Role.User }.SequenceEqual(rsp.Roles));
 
             rsp = await client.UpdateUserAsync(userId, UserStatus.InActive, new List<Role> { Role.User });
             Assert.Equal(userId, rsp.Id);
-            Assert.Equal(new List<string> { "user" }, rsp.Roles);
+            Assert.True(new List<Role> { Role.User }.SequenceEqual(rsp.Roles));
 
             // cleanup
             await client.DeleteUserAsync(userId);

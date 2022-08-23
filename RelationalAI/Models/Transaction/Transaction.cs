@@ -26,7 +26,7 @@ namespace RelationalAI.Models.Transaction
 
         public string Engine { get; set; }
 
-        public string Mode { get; set; }
+        public TransactionMode Mode { get; set; }
 
         public string Source { get; set; }
 
@@ -42,7 +42,7 @@ namespace RelationalAI.Models.Transaction
             string region,
             string database,
             string engine,
-            string mode,
+            TransactionMode mode,
             bool readOnly = false,
             string source = null)
         {
@@ -107,9 +107,9 @@ namespace RelationalAI.Models.Transaction
             return result;
         }
 
-        private static string GetMode(string mode)
+        private static string GetMode(TransactionMode? mode)
         {
-            return mode ?? "OPEN";
+            return (mode ?? TransactionMode.Open).Value();
         }
     }
 }

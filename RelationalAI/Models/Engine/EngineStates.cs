@@ -15,10 +15,12 @@
  */
 
 using System;
-using System.Linq;
 
 namespace RelationalAI.Models.Engine
 {
+    /// <summary>
+    /// Represents all engine lifetime states.
+    /// </summary>
     public enum EngineState
     {
         Requested,
@@ -60,30 +62,6 @@ namespace RelationalAI.Models.Engine
                 EngineState.DeletionFailed => "DELETION_FAILED",
                 _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Engine state is not supported")
             };
-        }
-
-        /// <summary>
-        /// Compares <paramref name="value"/> to string value of <paramref name="state"/>.
-        /// </summary>
-        /// <param name="state">Engine state.</param>
-        /// <param name="value">String value to compare.</param>
-        /// <returns>If passed string value is equal to string representation of enum value.</returns>
-        public static bool IsEqual(this EngineState state, string value)
-        {
-            return state.Value() == value;
-        }
-
-        /// <summary>
-        /// Converts string value to enum value equivalent.
-        /// </summary>
-        /// <param name="value">The string value to convert.</param>
-        /// <param name="state">The corresponding enum value if it was found.</param>
-        /// <returns>If corresponding enum value was found.</returns>
-        public static bool TryConvert(string value, out EngineState state)
-        {
-            var values = Enum.GetValues(typeof(EngineState)).Cast<EngineState>().ToArray();
-            state = values.FirstOrDefault(v => v.IsEqual(value));
-            return values.Any(v => v.IsEqual(value));
         }
 
         /// <summary>

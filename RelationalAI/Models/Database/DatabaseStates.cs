@@ -15,10 +15,12 @@
  */
 
 using System;
-using System.Linq;
 
 namespace RelationalAI.Models.Database
 {
+    /// <summary>
+    /// Represents all database lifetime states.
+    /// </summary>
     public enum DatabaseState
     {
         Created,
@@ -28,7 +30,7 @@ namespace RelationalAI.Models.Database
     }
 
     /// <summary>
-    /// Extension methods for DatabaseState enum such as conversion to string, terminal states identification.
+    /// Extension methods for DatabaseState enum such as conversion to string, final states identification.
     /// </summary>
     public static class DatabaseStates
     {
@@ -46,32 +48,8 @@ namespace RelationalAI.Models.Database
                 DatabaseState.Creating => "CREATING",
                 DatabaseState.CreationFailed => "CREATION_FAILED",
                 DatabaseState.Deleted => "DELETED",
-                _ => throw new ArgumentOutOfRangeException(nameof(state), state, null)
+                _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Database state is not supported")
             };
-        }
-
-        /// <summary>
-        /// Compares <paramref name="value"/> to string value of <paramref name="state"/>.
-        /// </summary>
-        /// <param name="state">Database state.</param>
-        /// <param name="value">String value to compare.</param>
-        /// <returns>If passed string value is equal to string representation of enum value.</returns>
-        public static bool IsEqual(this DatabaseState state, string value)
-        {
-            return state.Value() == value;
-        }
-
-        /// <summary>
-        /// Converts string value to enum value equivalent.
-        /// </summary>
-        /// <param name="value">The string value to convert.</param>
-        /// <param name="state">The corresponding enum value if it was found.</param>
-        /// <returns>If corresponding enum value was found.</returns>
-        public static bool TryConvert(string value, out DatabaseState state)
-        {
-            var values = Enum.GetValues(typeof(DatabaseState)).Cast<DatabaseState>().ToArray();
-            state = values.FirstOrDefault(v => IsEqual(v, value));
-            return values.Any(v => v.IsEqual(value));
         }
 
         /// <summary>

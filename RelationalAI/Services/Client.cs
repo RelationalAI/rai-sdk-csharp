@@ -127,12 +127,11 @@ namespace RelationalAI.Services
         {
             await CreateEngineAsync(engine, size);
             var resp = await Policy
-                    .HandleResult<Engine>(e => !EngineStates.TryConvert(e.State, out var state) ||
-                                               !state.IsTerminalState(EngineState.Provisioned))
+                    .HandleResult<Engine>(e => !e.State.IsTerminalState(EngineState.Provisioned))
                     .Retry30Min()
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
-            if (!EngineState.Provisioned.IsEqual(resp.State))
+            if (resp.State != EngineState.Provisioned)
             {
                 // TODO: replace with a better error during introducing the exceptions hierarchy
                 throw new SystemException("Failed to provision engine");
@@ -179,7 +178,7 @@ namespace RelationalAI.Services
         {
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
-                .HandleResult<Engine>(e => !EngineStates.TryConvert(e.State, out var state) || !state.IsFinalState())
+                .HandleResult<Engine>(e => !e.State.IsFinalState())
                 .Retry15Min()
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
@@ -341,7 +340,7 @@ namespace RelationalAI.Services
 
         public async Task<List<Edb>> ListEdbsAsync(string database, string engine)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
             var actions = new List<DbAction> { DbAction.MakeListEdbAction() };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -355,7 +354,7 @@ namespace RelationalAI.Services
             string name,
             string model)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
             var actions = new List<DbAction> { DbAction.MakeInstallAction(name, model) };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -367,7 +366,7 @@ namespace RelationalAI.Services
             string engine,
             Dictionary<string, string> models)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
             var actions = new List<DbAction> { DbAction.MakeInstallAction(models) };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -376,7 +375,7 @@ namespace RelationalAI.Services
 
         public async Task<List<Model>> ListModelsAsync(string database, string engine)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
             var actions = new List<DbAction> { DbAction.MakeListModelsAction() };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -401,7 +400,7 @@ namespace RelationalAI.Services
 
         public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN");
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
             var actions = new List<DbAction> { DbAction.MakeDeleteModelAction(name) };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -416,7 +415,7 @@ namespace RelationalAI.Services
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
-            var tx = new Transaction(_context.Region, database, engine, "OPEN", readOnly);
+            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open, readOnly);
             var actions = new List<DbAction> { DbAction.MakeQueryAction(source, inputs) };
             var body = tx.Payload(actions);
             var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
@@ -441,8 +440,7 @@ namespace RelationalAI.Services
 
             // slow-path
             var transactionResponse = await Policy
-                .HandleResult<TransactionAsyncSingleResponse>(r =>
-                    !(r.Transaction.State.Equals("COMPLETED") || r.Transaction.State.Equals("ABORTED")))
+                .HandleResult<TransactionAsyncSingleResponse>(r => !r.Transaction.State.IsFinalState())
                 .RetryForeverWithBoundedDelay()
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
@@ -508,14 +506,14 @@ namespace RelationalAI.Services
             return ExecuteV1Async(database, engine, source, false, inputs);
         }
 
-        private static string CreateMode(string source, bool overwrite)
+        private static TransactionMode CreateMode(string source, bool overwrite)
         {
             if (source != null)
             {
-                return overwrite ? "CLONE_OVERWRITE" : "CLONE";
+                return overwrite ? TransactionMode.CloneOverwrite : TransactionMode.Clone;
             }
 
-            return overwrite ? "CREATE_OVERWRITE" : "CREATE";
+            return overwrite ? TransactionMode.CreateOverwrite : TransactionMode.Create;
         }
 
         private static string GenLoadJson(string relation)

@@ -46,7 +46,7 @@ namespace RelationalAI.Models.Transaction
 
         public TransactionAsyncResponse(
             string id,
-            string state,
+            TransactionAsyncState state,
             string accountName,
             string createdBy,
             long createdOn,

@@ -15,6 +15,8 @@
  */
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace RelationalAI.Models.Transaction
 {
@@ -24,9 +26,10 @@ namespace RelationalAI.Models.Transaction
         public string Id { get; set; }
 
         [JsonProperty("state", Required = Required.Always)]
-        public string State { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public TransactionAsyncState State { get; set; }
 
-        public TransactionAsyncCompactResponse(string id, string state)
+        public TransactionAsyncCompactResponse(string id, TransactionAsyncState state)
         {
             Id = id;
             State = state;

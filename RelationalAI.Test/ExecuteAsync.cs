@@ -36,9 +36,9 @@ namespace RelationalAI.Test
 
             var problems = new List<object>();
 
-            Assert.Equal(rsp.Results, results);
-            Assert.Equal(rsp.Metadata.ToString(), metadata.ToString());
-            Assert.Equal(rsp.Problems, problems);
+            Assert.Equal(results, rsp.Results);
+            Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
+            Assert.Equal(problems, rsp.Problems);
         }
 
         public override async Task DisposeAsync()

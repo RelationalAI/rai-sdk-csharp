@@ -16,7 +16,7 @@
 
 using System;
 
-namespace RelationalAI.Models.User
+namespace RelationalAI.Models.OAuthClient
 {
     public enum Permission
     {
@@ -82,7 +82,7 @@ namespace RelationalAI.Models.User
                 Permission.ListUsers => "list:user",
                 Permission.ReadUser => "read:user",
                 Permission.UpdateUser => "update:user",
-                _ => throw new ArgumentException($"permission '{permission}' not supported")
+                _ => throw new ArgumentOutOfRangeException(nameof(permission), permission, "Permission is not supported")
             };
         }
     }

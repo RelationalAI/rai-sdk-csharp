@@ -16,6 +16,8 @@
 
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace RelationalAI.Models.User
 {
@@ -31,10 +33,12 @@ namespace RelationalAI.Models.User
         public string AccountName { get; set; }
 
         [JsonProperty("roles", Required = Required.Always)]
-        public List<string> Roles { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public List<Role> Roles { get; set; }
 
         [JsonProperty("status", Required = Required.Always)]
-        public string Status { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public UserStatus Status { get; set; }
 
         [JsonProperty("id_providers", Required = Required.Always)]
         public List<string> IdProviders { get; set; }

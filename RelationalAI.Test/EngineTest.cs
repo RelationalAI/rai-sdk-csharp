@@ -17,11 +17,11 @@ namespace RelationalAI.Test
 
             var createRsp = await client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);
-            Assert.True(EngineState.Provisioned.IsEqual(createRsp.State));
+            Assert.Equal(EngineState.Provisioned, createRsp.State);
 
             var engine = await client.GetEngineAsync(EngineName);
             Assert.Equal(engine.Name, EngineName);
-            Assert.True(EngineState.Provisioned.IsEqual(engine.State));
+            Assert.Equal(EngineState.Provisioned, engine.State);
 
             var engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
@@ -41,7 +41,7 @@ namespace RelationalAI.Test
 
             engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.True(EngineState.Deleted.IsEqual(engine.State));
+            Assert.Equal(EngineState.Deleted, engine.State);
         }
 
         public override async Task DisposeAsync()
