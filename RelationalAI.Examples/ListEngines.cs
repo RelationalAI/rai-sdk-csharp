@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
-using RelationalAI;
-
+using RelationalAI.Models.Engine;
+using RelationalAI.Services;
+using RelationalAI.Utils;
 
 namespace RelationalAI.Examples
 {
@@ -13,7 +13,7 @@ namespace RelationalAI.Examples
         public static Command GetCommand()
         {
             var cmd = new Command("ListEngines", "--state <State> --profile <Profile name>"){
-                new Option<string>("--state"){
+                new Option<EngineState>("--state"){
                     IsRequired = false,
                     Description = "To list engines in a paricular state. For example, DELETED"
                 },
@@ -24,16 +24,16 @@ namespace RelationalAI.Examples
                 }
             };
             cmd.Description = "Lists engines.";
-            cmd.Handler = CommandHandler.Create<string, string>(Run);
+            cmd.Handler = CommandHandler.Create<EngineState?, string>(Run);
             return cmd;
         }
 
-        private static async Task Run(string state = null, string profile = "default")
+        private static async Task Run(EngineState? state = null, string profile = "default")
         {
-            Dictionary<string, object> config = Config.Read("", profile);
-            Client.Context context = new Client.Context(config);
-            Client client = new Client(context);
-            List<Engine> engines = await client.ListEnginesAsync(state);
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
+            var engines = await client.ListEnginesAsync(state);
             foreach (var engine in engines)
             {
                 Console.WriteLine(engine.ToString(true));

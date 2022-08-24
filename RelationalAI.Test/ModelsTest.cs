@@ -6,20 +6,20 @@ namespace RelationalAI.Test
 {
     public class ModelsTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
-        readonly string testModel = "def R = \"hello\", \"world\"";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+        private const string TestModel = "def R = \"hello\", \"world\"";
 
         [Fact]
         public async Task ModelsTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", testModel);
+            var loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", TestModel);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);

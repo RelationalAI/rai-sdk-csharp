@@ -6,14 +6,14 @@ namespace RelationalAI.Test
 {
     public class ExecuteTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
 
         [Fact]
         public async Task ExecuteV1Test()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -27,11 +27,10 @@ namespace RelationalAI.Test
             var relation = output[0];
             var relKey = relation.RelKey;
             Assert.Equal("output", relKey.Name);
-            Assert.Equal(relKey.Keys, new string[] { "Int64", "Int64", "Int64" });
-            Assert.Equal(relKey.Values, new string[] { "Int64" });
-
+            Assert.Equal(relKey.Keys, new[] { "Int64", "Int64", "Int64" });
+            Assert.Equal(relKey.Values, new[] { "Int64" });
             var columns = relation.Columns;
-            var expected = new object[][]
+            var expected = new[]
             {
                 new object[] {1L, 2L, 3L, 4L, 5L},
                 new object[] {1L, 4L, 9L, 16L, 25L},

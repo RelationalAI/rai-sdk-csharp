@@ -1,21 +1,22 @@
 using System;
-using System.IO;
 using System.Collections.Generic;
+using System.IO;
 using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
+using RelationalAI.Models.Transaction;
 
 namespace RelationalAI.Test
 {
     public class ExecuteAsyncTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
         [Fact]
         public async Task ExecuteAsyncTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -35,9 +36,9 @@ namespace RelationalAI.Test
 
             var problems = new List<object>();
 
-            Assert.Equal(rsp.Results, results);
-            Assert.Equal(rsp.Metadata.ToString(), metadata.ToString());
-            Assert.Equal(rsp.Problems, problems);
+            Assert.Equal(results, rsp.Results);
+            Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
+            Assert.Equal(problems, rsp.Problems);
         }
 
         public override async Task DisposeAsync()

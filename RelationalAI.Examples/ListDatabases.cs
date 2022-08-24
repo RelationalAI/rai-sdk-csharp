@@ -1,10 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
-using RelationalAI;
-
+using RelationalAI.Models.Database;
+using RelationalAI.Services;
+using RelationalAI.Utils;
 
 namespace RelationalAI.Examples
 {
@@ -13,7 +13,7 @@ namespace RelationalAI.Examples
         public static Command GetCommand()
         {
             var cmd = new Command("ListDatabases", "--state <State> --profile <Profile name>"){
-                new Option<string>("--state"){
+                new Option<DatabaseState>("--state"){
                     IsRequired = false,
                     Description = "To list databases in a paricular state. For example, CREATED"
                 },
@@ -24,16 +24,16 @@ namespace RelationalAI.Examples
                 }
             };
             cmd.Description = "List databases";
-            cmd.Handler = CommandHandler.Create<string, string>(Run);
+            cmd.Handler = CommandHandler.Create<DatabaseState?, string>(Run);
             return cmd;
         }
 
-        private static async Task Run(string state = null, string profile = "default")
+        private static async Task Run(DatabaseState? state = null, string profile = "default")
         {
-            Dictionary<string, object> config = Config.Read("", profile);
-            Client.Context context = new Client.Context(config);
-            Client client = new Client(context);
-            List<Database> databases = await client.ListDatabasesAsync(state);
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
+            var databases = await client.ListDatabasesAsync(state);
             foreach (var database in databases)
             {
                 Console.WriteLine(database);

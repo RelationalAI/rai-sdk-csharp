@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using RelationalAI.Models.Transaction;
+using RelationalAI.Services;
+using RelationalAI.Utils;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -13,15 +16,15 @@ namespace RelationalAI.Test
         public Client CreateClient()
         {
             Dictionary<string, object> config;
-            if (File.Exists(Config.GetRAIConfigPath()))
+            if (File.Exists(Config.GetRaiConfigPath()))
             {
                 config = Config.Read(profile: "default");
             }
             else
             {
-                var client_id = Environment.GetEnvironmentVariable("CLIENT_ID");
-                var client_secret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
-                var client_credentials_url = Environment.GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
+                var clientId = Environment.GetEnvironmentVariable("CLIENT_ID");
+                var clientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET");
+                var clientCredentialsUrl = Environment.GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
 
                 var configStr = $@"
                 [default]
@@ -29,14 +32,14 @@ namespace RelationalAI.Test
                 region=us-east
                 port=443
                 scheme=https
-                client_id={client_id}
-                client_secret={client_secret}
-                client_credentials_url={client_credentials_url}
+                client_id={clientId}
+                client_secret={clientSecret}
+                client_credentials_url={clientCredentialsUrl}
                 ";
                 config = Config.Read(new MemoryStream(Encoding.UTF8.GetBytes(configStr)));
             }
 
-            Client.Context ctx = new Client.Context(config);
+            var ctx = new Client.Context(config);
             return new Client(ctx);
         }
 
@@ -44,18 +47,10 @@ namespace RelationalAI.Test
 
         public virtual Task DisposeAsync() => Task.CompletedTask;
 
-        public Relation findRelation(Relation[] relations, string colName)
+        public Relation FindRelation(Relation[] relations, string colName)
         {
-            foreach (var relation in relations)
-            {
-                var keys = relation.RelKey.Keys;
-                if (keys.Length == 0)
-                    continue;
-                var name = keys[0];
-                if (name.Equals(colName))
-                    return relation;
-            }
-            return null;
+            return relations
+                .FirstOrDefault(relation => relation.RelKey.Keys.Length != 0 && relation.RelKey.Keys[0].Equals(colName));
         }
     }
 }

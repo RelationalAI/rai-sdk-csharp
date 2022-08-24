@@ -1,7 +1,3 @@
-// <copyright file="ICredentials.cs" company="PlaceholderCompany">
-// Copyright (c) PlaceholderCompany. All rights reserved.
-// </copyright>
-
 /*
  * Copyright 2022 RelationalAI, Inc.
  *
@@ -17,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 namespace RelationalAI.Credentials
 {
     public interface ICredentials

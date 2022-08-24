@@ -1,44 +1,44 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using RelationalAI.Models.Transaction;
 using Xunit;
 
 namespace RelationalAI.Test
 {
     public class LoadCsvTests : UnitTest
     {
-        public static string UUID = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{UUID}";
-        public static string EngineName = $"csharp-sdk-{UUID}";
-        readonly string sample = "" +
-            "cocktail,quantity,price,date\n" +
-            "\"martini\",2,12.50,\"2020-01-01\"\n" +
-            "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
-            "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
-            "\"bellini\",3,12.25,\"2020-04-04\"\n";
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string Dbname = $"csharp-sdk-{Uuid}";
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+
+        private const string Sample = "" +
+                                      "cocktail,quantity,price,date\n" +
+                                      "\"martini\",2,12.50,\"2020-01-01\"\n" +
+                                      "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
+                                      "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
+                                      "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         [Fact]
         public async Task LoadCsvtTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
-            Relation rel;
-
-            rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -46,11 +46,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -58,22 +58,23 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][] {
+                new[]
+                {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
                 },
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -82,35 +83,33 @@ namespace RelationalAI.Test
             );
         }
 
-        readonly string sampleNoHeader = "" +
-            "\"martini\",2,12.50,\"2020-01-01\"\n" +
-            "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
-            "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
-            "\"bellini\",3,12.25,\"2020-04-04\"\n";
+        private const string SampleNoHeader = "" +
+                                              "\"martini\",2,12.50,\"2020-01-01\"\n" +
+                                              "\"sazerac\",4,14.25,\"2020-02-02\"\n" +
+                                              "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
+                                              "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         [Fact]
         public async Task LoadCsvNoHeaderTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithHeaderRow(0);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", sampleNoHeader, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", SampleNoHeader, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_no_header");
 
-            Relation rel;
-
-            rel = findRelation(rsp.Output, ":COL1");
+            var rel = FindRelation(rsp.Output, ":COL1");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -119,11 +118,11 @@ namespace RelationalAI.Test
             );
 
 
-            rel = findRelation(rsp.Output, ":COL2");
+            rel = FindRelation(rsp.Output, ":COL2");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2", "4", "4", "3"}
@@ -131,11 +130,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":COL3");
+            rel = FindRelation(rsp.Output, ":COL3");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -143,11 +142,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":COL4");
+            rel = FindRelation(rsp.Output, ":COL4");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {1L, 2L, 3L, 4L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -156,36 +155,34 @@ namespace RelationalAI.Test
             );
         }
 
-        readonly string sampleAltSyntax = "" +
-            "cocktail|quantity|price|date\n" +
-            "'martini'|2|12.50|'2020-01-01'\n" +
-            "'sazerac'|4|14.25|'2020-02-02'\n" +
-            "'cosmopolitan'|4|11.00|'2020-03-03'\n" +
-            "'bellini'|3|12.25|'2020-04-04'\n";
+        private const string SampleAltSyntax = "" +
+                                               "cocktail|quantity|price|date\n" +
+                                               "'martini'|2|12.50|'2020-01-01'\n" +
+                                               "'sazerac'|4|14.25|'2020-02-02'\n" +
+                                               "'cosmopolitan'|4|11.00|'2020-03-03'\n" +
+                                               "'bellini'|3|12.25|'2020-04-04'\n";
 
         [Fact]
         public async Task LoadCsvAltSyntaxTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", sampleAltSyntax, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", SampleAltSyntax, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_alt_syntax");
 
-            Relation rel;
-
-            rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -193,11 +190,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"12.50", "14.25", "11.00", "12.25"}
@@ -205,11 +202,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2", "4", "4", "3"}
@@ -217,11 +214,11 @@ namespace RelationalAI.Test
                 rel.Columns
             );
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
@@ -233,7 +230,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvWithSchemaTest()
         {
-            Client client = CreateClient();
+            var client = CreateClient();
 
             await client.CreateEngineWaitAsync(EngineName);
             await client.CreateDatabaseAsync(Dbname, EngineName);
@@ -247,20 +244,18 @@ namespace RelationalAI.Test
             };
 
             var opts = new CsvOptions().WithSchema(schema);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", sample, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
             var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
 
-            Relation rel;
-
-            rel = findRelation(rsp.Output, ":date");
+            var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
@@ -270,11 +265,11 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("Dates.Date", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":price");
+            rel = FindRelation(rsp.Output, ":price");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {12.5, 14.25, 11.00, 12.25}
@@ -284,11 +279,11 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("FixedPointDecimals.FixedDecimal{Int64, 2}", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":quantity");
+            rel = FindRelation(rsp.Output, ":quantity");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {2L, 4L, 4L, 3L}
@@ -298,11 +293,11 @@ namespace RelationalAI.Test
             Assert.Single(rel.RelKey.Values);
             Assert.Equal("Int64", rel.RelKey.Values[0]);
 
-            rel = findRelation(rsp.Output, ":cocktail");
+            rel = FindRelation(rsp.Output, ":cocktail");
             Assert.NotNull(rel);
             Assert.Equal(2, rel.Columns.Length);
             Assert.Equal(
-                new object[][]
+                new[]
                 {
                     new object[] {2L, 3L, 4L, 5L},
                     new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}

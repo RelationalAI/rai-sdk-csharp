@@ -1,8 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
+using RelationalAI.Services;
+using RelationalAI.Utils;
 
 namespace RelationalAI.Examples
 {
@@ -38,9 +39,9 @@ namespace RelationalAI.Examples
 
         private static async Task Run(string database, string engine, string command, string profile = "default")
         {
-            Dictionary<string, object> config = Config.Read("", profile);
-            Client.Context context = new Client.Context(config);
-            Client client = new Client(context);
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
             Console.WriteLine(await client.ExecuteAsync(database, engine, command));
         }
 
