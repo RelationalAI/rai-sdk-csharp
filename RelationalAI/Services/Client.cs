@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
 using RelationalAI.Credentials;
+using RelationalAI.Errors;
 using RelationalAI.Models.Database;
 using RelationalAI.Models.Edb;
 using RelationalAI.Models.Engine;
@@ -86,7 +87,7 @@ namespace RelationalAI.Services
 
             var resp = await GetResourceAsync(PathDatabase, null, parameters);
             var dbs = Json<GetDatabaseResponse>.Deserialize(resp).Databases;
-            return dbs.Count > 0 ? dbs[0] : throw new SystemException("not found");
+            return dbs.Count > 0 ? dbs[0] : throw new NotFoundException($"Database with name `{database}` not found");
         }
 
         public async Task<List<Database>> ListDatabasesAsync(DatabaseState? state = null)
@@ -133,8 +134,7 @@ namespace RelationalAI.Services
 
             if (resp.State != EngineState.Provisioned)
             {
-                // TODO: replace with a better error during introducing the exceptions hierarchy
-                throw new SystemException("Failed to provision engine");
+                throw new EngineProvisionFailedException(resp);
             }
 
             return resp;
@@ -149,7 +149,7 @@ namespace RelationalAI.Services
             };
             var resp = await GetResourceAsync(PathEngine, null, parameters);
             var engines = Json<GetEngineResponse>.Deserialize(resp).Engines;
-            return engines.Count > 0 ? engines[0] : throw new SystemException("not found");
+            return engines.Count > 0 ? engines[0] : throw new NotFoundException($"Engine with name `{engine}` not found");
         }
 
         public async Task<List<Engine>> ListEnginesAsync(EngineState? state = null)
@@ -203,7 +203,7 @@ namespace RelationalAI.Services
             var clients = await ListOAuthClientsAsync();
 
             return clients.FirstOrDefault(client => client.Name == name) ??
-                   throw new SystemException("not found");
+                   throw new NotFoundException($"OAuth Client with name `{name}` not found");
         }
 
         public async Task<OAuthClientEx> GetOAuthClientAsync(string id)
@@ -261,7 +261,7 @@ namespace RelationalAI.Services
             var users = await ListUsersAsync();
 
             return users.FirstOrDefault(user => user.Email == email) ??
-                   throw new SystemException("not found");
+                   throw new NotFoundException($"User with email `{email}` not found");
         }
 
         public async Task<User> GetUserAsync(string userId)
@@ -395,7 +395,7 @@ namespace RelationalAI.Services
             var models = await ListModelsAsync(database, engine);
 
             return models.FirstOrDefault(model => model.Name.Equals(name)) ??
-                   throw new SystemException($"model {name} not found.");
+                   throw new NotFoundException($"Model with name `{name}` not found on database {database}");
         }
 
         public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)

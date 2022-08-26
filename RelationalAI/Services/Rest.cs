@@ -29,6 +29,7 @@ using HttpMultipartParser;
 using Microsoft.Data.Analysis;
 using Newtonsoft.Json;
 using RelationalAI.Credentials;
+using RelationalAI.Errors;
 using RelationalAI.Models.Transaction;
 using Relationalai.Protocol;
 
@@ -269,7 +270,7 @@ namespace RelationalAI.Services
         {
             if (!(_context.Credentials is ClientCredentials creds))
             {
-                throw new SystemException("credential not supported");
+                throw new CredentialsNotSupportedException();
             }
 
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
@@ -323,16 +324,19 @@ namespace RelationalAI.Services
             var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
 
             // Get the result back or throws an exception.
-            var httpResponse = await client.SendAsync(request);
+            var response = await client.SendAsync(request);
             var content = await httpResponse.Content.ReadAsByteArrayAsync();
             var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+            var content = await response.Content.ReadAsByteArrayAsync();
+            var contentType = response.Content.Headers.ContentType.MediaType;
 
             return contentType.ToLower() switch
             {
                 "application/json" => ReadString(content),
                 "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
-                _ => throw new SystemException($"unsupported content-type: {contentType}")
+                _ => throw new ApiException(
+                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content), response.Headers)
             };
         }
 
