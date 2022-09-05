@@ -556,7 +556,7 @@ namespace RelationalAI.Services
             switch (value)
             {
                 case null:
-                    throw new SystemException("Cannot generate literal from null value");
+                    throw new ArgumentException("Cannot generate literal from null value");
                 case Int16 _:
                 case Int32 _:
                 case Int64 _:
@@ -564,7 +564,7 @@ namespace RelationalAI.Services
                 case char c:
                     return GenLiteral(c);
                 default:
-                    throw new SystemException($"Cannot generate type from {value.GetType()} value");
+                    throw new ArgumentException($"Cannot generate literal from {value.GetType()} value");
             }
         }
 
@@ -671,12 +671,12 @@ namespace RelationalAI.Services
 
             if (transaction == null)
             {
-                throw new SystemException("transaction part not found");
+                throw new InvalidResponseException("Transaction part of async result not found");
             }
 
             if (metadata == null)
             {
-                throw new SystemException("metadata part not found");
+                throw new InvalidResponseException("Metadata part of async result not found");
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
@@ -705,7 +705,7 @@ namespace RelationalAI.Services
                     // making sure there aren't more than one value
                     if (result.First != result.Last)
                     {
-                        throw new SystemException("more than one resources found");
+                        throw new InvalidResponseException("More than one resource found");
                     }
 
                     result = result.First;
