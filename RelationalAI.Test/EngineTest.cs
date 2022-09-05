@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using System.Xml.Linq;
+using RelationalAI.Errors;
 using RelationalAI.Models.Engine;
 using Xunit;
 
@@ -34,9 +36,9 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
                 client.ListEnginesAsync((EngineState)1500));
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteEngineWaitAsync(EngineName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetEngineAsync(EngineName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(EngineName));
 
             engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
@@ -47,7 +49,14 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
+            try
+            {
+                await client.DeleteEngineWaitAsync(EngineName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }

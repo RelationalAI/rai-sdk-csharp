@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using RelationalAI.Errors;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -13,7 +14,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
 
             var rsp = await client.CreateOAuthClientAsync(OAuthClientName);
             Assert.Equal(OAuthClientName, rsp.Name);
@@ -37,7 +38,7 @@ namespace RelationalAI.Test
             var deleteRsp = await client.DeleteOAuthClientAsync(clientId);
             Assert.Equal(clientId, deleteRsp.Id);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
         }
 
         public override async Task DisposeAsync()
@@ -49,7 +50,10 @@ namespace RelationalAI.Test
                 var oauthClient = await client.FindOAuthClientAsync(OAuthClientName);
                 await client.DeleteOAuthClientAsync(oauthClient.Id);
             }
-            catch { }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }

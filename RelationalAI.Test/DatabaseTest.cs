@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using RelationalAI.Errors;
 using RelationalAI.Models.Database;
 using Xunit;
 
@@ -10,6 +11,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
+
         [Fact]
         public async Task DatabaseTest()
         {
@@ -62,7 +64,7 @@ namespace RelationalAI.Test
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
         private const string TestModel = "def R = \"hello\", \"world\"";
@@ -151,8 +153,23 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
+            try
+            {
+                await client.DeleteDatabaseAsync(Dbname);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
+            try
+            {
+                await client.DeleteEngineWaitAsync(EngineName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }

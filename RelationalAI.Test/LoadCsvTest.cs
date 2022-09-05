@@ -312,8 +312,23 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
+            try
+            {
+                await client.DeleteDatabaseAsync(Dbname);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
+            try
+            {
+                await client.DeleteEngineWaitAsync(EngineName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }
