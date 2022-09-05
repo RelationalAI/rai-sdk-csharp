@@ -325,8 +325,13 @@ namespace RelationalAI.Services
 
             // Get the result back or throws an exception.
             var response = await client.SendAsync(request);
-            var content = await httpResponse.Content.ReadAsByteArrayAsync();
-            var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+
+            if ((int)response.StatusCode >= 500)
+            {
+                var contentString = await response.Content.ReadAsStringAsync();
+                throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, contentString, response.Headers);
+            }
+
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType.MediaType;
 
