@@ -18,6 +18,9 @@ using System;
 
 namespace RelationalAI.Errors
 {
+    /// <summary>
+    /// Represents error thrown when invalid / unexpectedly formatted response received from RAI API.
+    /// </summary>
     public class InvalidResponseException : Exception
     {
         public InvalidResponseException(string message, object response = null)
@@ -26,8 +29,15 @@ namespace RelationalAI.Errors
             Response = response;
         }
 
-        public object Response { get; set; }
+        /// <summary>
+        /// Gets the response received from RAI API.
+        /// </summary>
+        public object Response { get; }
 
+        /// <summary>
+        /// Gets string representation of the error details, including the Response.
+        /// </summary>
+        /// <returns>String representation of the exception.</returns>
         public override string ToString()
         {
             return $"Response: {Response}" + Environment.NewLine +

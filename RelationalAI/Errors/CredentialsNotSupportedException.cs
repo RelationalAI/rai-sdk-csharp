@@ -18,6 +18,9 @@ using System;
 
 namespace RelationalAI.Errors
 {
+    /// <summary>
+    /// Represents error thrown when provided credentials are unsupported.
+    /// </summary>
     public class CredentialsNotSupportedException : Exception
     {
         public CredentialsNotSupportedException()

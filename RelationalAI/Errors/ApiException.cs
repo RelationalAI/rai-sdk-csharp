@@ -20,6 +20,9 @@ using System.Net.Http.Headers;
 
 namespace RelationalAI.Errors
 {
+    /// <summary>
+    /// Represents error thrown when RAI API request failed with error status code, etc.
+    /// </summary>
     public class ApiException : Exception
     {
         public ApiException(
@@ -34,12 +37,25 @@ namespace RelationalAI.Errors
             Headers = headers;
         }
 
+        /// <summary>
+        /// Gets the status code of the RAI API response.
+        /// </summary>
         public HttpStatusCode StatusCode { get; }
 
+        /// <summary>
+        /// Gets the raw RAI API response content.
+        /// </summary>
         public string Response { get; }
 
+        /// <summary>
+        /// Gets the headers of the RAI API response.
+        /// </summary>
         public HttpResponseHeaders Headers { get; }
 
+        /// <summary>
+        /// Gets string representation of the error details, including Status Code, Headers and Response content.
+        /// </summary>
+        /// <returns>String representation of the exception.</returns>
         public override string ToString()
         {
             return $"StatusCode: {StatusCode}, Headers: {Headers}," + Environment.NewLine +

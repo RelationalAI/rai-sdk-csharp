@@ -19,6 +19,9 @@ using RelationalAI.Models.Engine;
 
 namespace RelationalAI.Errors
 {
+    /// <summary>
+    /// Represents error thrown when engine requested to provision failed to get provisioned.
+    /// </summary>
     public class EngineProvisionFailedException : Exception
     {
         public EngineProvisionFailedException(Engine engine)
@@ -27,6 +30,9 @@ namespace RelationalAI.Errors
             Engine = engine;
         }
 
+        /// <summary>
+        /// Gets the name of the engine that failed to provision.
+        /// </summary>
         public Engine Engine { get; }
     }
 }
