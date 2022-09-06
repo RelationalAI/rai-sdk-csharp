@@ -35,7 +35,6 @@ namespace RelationalAI.Utils
             }
             catch
             {
-                // TODO: add a proper handling of 4xx status responses at Rest service level, currently they end up here
                 throw new InvalidResponseException($"Failed to deserialize response into type {typeof(T).Name}", data);
             }
         }

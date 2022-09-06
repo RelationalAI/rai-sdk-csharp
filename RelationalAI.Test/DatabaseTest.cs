@@ -18,7 +18,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
             await client.CreateEngineWaitAsync(EngineName);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, false);
             Assert.Equal(Dbname, createRsp.Name);
@@ -81,7 +81,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
             await client.CreateEngineWaitAsync(EngineName);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             // create a fresh database
             var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName);

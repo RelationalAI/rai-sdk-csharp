@@ -266,6 +266,23 @@ namespace RelationalAI.Services
             return output;
         }
 
+        private static async Task EnsureSuccessResponseAsync(HttpResponseMessage response)
+        {
+            var status = (int)response.StatusCode;
+            if (status != 404 && status < 500)
+            {
+                return;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            if (status == 404)
+            {
+                throw new NotFoundException(content);
+            }
+
+            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, response.Headers);
+        }
+
         private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(_context.Credentials is ClientCredentials creds))
@@ -325,13 +342,7 @@ namespace RelationalAI.Services
 
             // Get the result back or throws an exception.
             var response = await client.SendAsync(request);
-
-            if ((int)response.StatusCode >= 500)
-            {
-                var contentString = await response.Content.ReadAsStringAsync();
-                throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, contentString, response.Headers);
-            }
-
+            await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType.MediaType;
 
