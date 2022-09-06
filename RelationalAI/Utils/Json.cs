@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-using System;
 using Newtonsoft.Json;
+using RelationalAI.Errors;
 
 namespace RelationalAI.Utils
 {
     public class Json<T>
+        where T : class
     {
         public static T Deserialize(string data, string key = null)
         {
-            if (string.IsNullOrEmpty(data) || data == "[]")
+            if (string.IsNullOrEmpty(data))
             {
-                throw new SystemException("404 not found");
+                return null;
             }
 
             try
@@ -34,7 +35,8 @@ namespace RelationalAI.Utils
             }
             catch
             {
-                throw new SystemException(data);
+                // TODO: add a proper handling of 4xx status responses at Rest service level, currently they end up here
+                throw new InvalidResponseException($"Failed to deserialize response into type {typeof(T).Name}", data);
             }
         }
     }
