@@ -15,27 +15,33 @@
  */
 
 using System.Collections.Generic;
-using System.Linq;
+using Apache.Arrow;
+using Relationalai.Protocol;
 
 namespace RelationalAI.Models.Transaction
 {
     public class ArrowRelation : Entity
     {
-        public ArrowRelation(string relationId, List<object> table)
+        public ArrowRelation(string relationId, List<RecordBatch> records, RelationId metadata)
         {
             RelationId = relationId;
-            Table = table;
+            Records = records;
+            Metadata = metadata;
         }
 
         public string RelationId { get; }
 
-        public List<object> Table { get; }
+        public List<RecordBatch> Records { get; }
+
+        public RelationId Metadata { get; }
 
         public override bool Equals(object obj)
         {
             if (obj is ArrowRelation arrowRelation)
             {
-                return RelationId == arrowRelation.RelationId && Table.SequenceEqual(arrowRelation.Table);
+                return RelationId == arrowRelation.RelationId &&
+                    Records == arrowRelation.Records &&
+                    Metadata == arrowRelation.Metadata;
             }
 
             return false;
@@ -44,7 +50,7 @@ namespace RelationalAI.Models.Transaction
         public override int GetHashCode()
         {
             var hashcode = RelationId.GetHashCode();
-            hashcode ^= Table.GetHashCode();
+            hashcode ^= Records.GetHashCode();
             return hashcode;
         }
     }

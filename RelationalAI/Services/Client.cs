@@ -304,7 +304,7 @@ namespace RelationalAI.Services
             return Json<TransactionAsyncSingleResponse>.Deserialize(rsp);
         }
 
-        public async Task<List<ArrowRelation>> GetTransactionResultsAsync(string id)
+        public async Task<List<ArrowResult>> GetTransactionResultsAsync(string id)
         {
             var files = await _rest.GetAsync(MakeUrl($"{PathTransactions}/{id}/results")) as List<TransactionAsyncFile>;
             return _rest.ReadArrowFiles(files);
@@ -445,9 +445,10 @@ namespace RelationalAI.Services
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
-            var results = await GetTransactionResultsAsync(id);
+            var arrowResults = await GetTransactionResultsAsync(id);
             var metadata = await GetTransactionMetadataAsync(id);
             var problems = await GetTransactionProblemsAsync(id);
+            var results = MakeArrowRelations(arrowResults, metadata);
 
             return new TransactionAsyncResult(
                 transaction,
@@ -688,9 +689,28 @@ namespace RelationalAI.Services
                 problemsResult = ParseProblemsResult(_rest.ReadString(problems.Data));
             }
 
-            var results = _rest.ReadArrowFiles(files);
+            var arrowResults = _rest.ReadArrowFiles(files);
+            var results = MakeArrowRelations(arrowResults, metadataProto);
 
             return new TransactionAsyncResult(transactionResult, results, metadataProto, problemsResult, true);
+        }
+
+        private List<ArrowRelation> MakeArrowRelations(List<ArrowResult> results, MetadataInfo metadata)
+        {
+            var output = new List<ArrowRelation>();
+            var metadataDict = new Dictionary<string, RelationId>();
+
+            foreach (var relation in metadata.Relations)
+            {
+                metadataDict.Add(relation.FileName, relation.RelationId);
+            }
+
+            foreach (ArrowResult result in results)
+            {
+                output.Add(new ArrowRelation(result.RelationID, result.Records, metadataDict[result.Filename]));
+            }
+
+            return output;
         }
 
         private async Task<string> GetResourceAsync(string path, string key = null, Dictionary<string, string> parameters = null)
