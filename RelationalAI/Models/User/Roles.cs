@@ -32,7 +32,7 @@ namespace RelationalAI.Models.User
             {
                 Role.User => "user",
                 Role.Admin => "admin",
-                _ => throw new SystemException($"role '{role}' not supported")
+                _ => throw new ArgumentOutOfRangeException(nameof(role), role, $"Role '{role}' not supported")
             };
         }
     }

@@ -644,7 +644,7 @@ namespace RelationalAI.Services
             var problems = JsonConvert.DeserializeObject(rsp);
             if (!(problems is JArray problemsArray))
             {
-                throw new SystemException("Unexpected format of problems");
+                throw new InvalidResponseException("Unexpected format of transaction problems");
             }
 
             foreach (var problem in problemsArray)
@@ -742,7 +742,7 @@ namespace RelationalAI.Services
             var response = await _rest.GetAsync(url, null, null, parameters);
             if (!(response is string stringResponse))
             {
-                throw new SystemException("Unexpected response type");
+                throw new InvalidResponseException($"Unexpected response type, expected a string, response: {response}");
             }
 
             return stringResponse;
