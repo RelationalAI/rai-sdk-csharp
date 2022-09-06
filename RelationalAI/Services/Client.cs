@@ -644,7 +644,7 @@ namespace RelationalAI.Services
             var problems = JsonConvert.DeserializeObject(rsp);
             if (!(problems is JArray problemsArray))
             {
-                throw new InvalidResponseException("Unexpected format of transaction problems");
+                throw new InvalidResponseException("Unexpected format of transaction problems", rsp);
             }
 
             foreach (var problem in problemsArray)
@@ -705,7 +705,7 @@ namespace RelationalAI.Services
                     // making sure there aren't more than one value
                     if (result.First != result.Last)
                     {
-                        throw new InvalidResponseException("More than one resource found");
+                        throw new InvalidResponseException("More than one resource found", response);
                     }
 
                     result = result.First;
@@ -742,7 +742,7 @@ namespace RelationalAI.Services
             var response = await _rest.GetAsync(url, null, null, parameters);
             if (!(response is string stringResponse))
             {
-                throw new InvalidResponseException($"Unexpected response type, expected a string, response: {response}");
+                throw new InvalidResponseException("Unexpected response type, expected a string", response);
             }
 
             return stringResponse;

@@ -20,9 +20,18 @@ namespace RelationalAI.Errors
 {
     public class InvalidResponseException : Exception
     {
-        public InvalidResponseException(string message)
+        public InvalidResponseException(string message, object response = null)
             : base(message)
         {
+            Response = response;
+        }
+
+        public object Response { get; set; }
+
+        public override string ToString()
+        {
+            return $"Response: {Response}" + Environment.NewLine +
+                   base.ToString();
         }
     }
 }

@@ -294,14 +294,14 @@ namespace RelationalAI.Services
             var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
             if (!(resp is string stringResponse))
             {
-                throw new InvalidResponseException($"Unexpected response type, expected a string, response: {resp}");
+                throw new InvalidResponseException("Unexpected response type, expected a string", resp);
             }
 
             var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
 
             if (result == null)
             {
-                throw new InvalidResponseException($"Unexpected access token response format: {resp}");
+                throw new InvalidResponseException("Unexpected access token response format", resp);
             }
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
