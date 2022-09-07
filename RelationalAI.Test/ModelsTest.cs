@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using RelationalAI.Errors;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -39,7 +40,7 @@ namespace RelationalAI.Test
             Assert.Empty(deleteRsp.Output);
             Assert.Empty(deleteRsp.Problems);
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
 
             modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
             modelName = modelNames.Find(item => item.Equals("test_model"));
@@ -54,8 +55,23 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            try { await client.DeleteDatabaseAsync(Dbname); } catch { }
-            try { await client.DeleteEngineWaitAsync(EngineName); } catch { }
+            try
+            {
+                await client.DeleteDatabaseAsync(Dbname);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
+            try
+            {
+                await client.DeleteEngineWaitAsync(EngineName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }

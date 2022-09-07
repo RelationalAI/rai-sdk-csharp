@@ -29,6 +29,7 @@ using HttpMultipartParser;
 using Microsoft.Data.Analysis;
 using Newtonsoft.Json;
 using RelationalAI.Credentials;
+using RelationalAI.Errors;
 using RelationalAI.Models.Transaction;
 using Relationalai.Protocol;
 
@@ -36,6 +37,8 @@ namespace RelationalAI.Services
 {
     public class Rest
     {
+        private const string RequestIdHeaderName = "X-Request-ID";
+
         private readonly Context _context;
 
         public Rest(Context context)
@@ -265,11 +268,29 @@ namespace RelationalAI.Services
             return output;
         }
 
+        private static async Task EnsureSuccessResponseAsync(HttpResponseMessage response)
+        {
+            var status = (int)response.StatusCode;
+            if (status != 404 && status < 500)
+            {
+                return;
+            }
+
+            var content = await response.Content.ReadAsStringAsync();
+            if (status == 404)
+            {
+                throw new NotFoundException(content);
+            }
+
+            var requestId = response.Headers.TryGetValues(RequestIdHeaderName, out var values) ? values.FirstOrDefault() : null;
+            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, requestId);
+        }
+
         private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(_context.Credentials is ClientCredentials creds))
             {
-                throw new SystemException("credential not supported");
+                throw new CredentialsNotSupportedException();
             }
 
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
@@ -293,14 +314,16 @@ namespace RelationalAI.Services
             var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
             if (!(resp is string stringResponse))
             {
-                throw new SystemException("Unexpected response type");
+                throw new InvalidResponseException(
+                    $"Unexpected response type, expected a string but received {resp.GetType().Name}",
+                    resp);
             }
 
             var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
 
             if (result == null)
             {
-                throw new SystemException("Unexpected access token response format");
+                throw new InvalidResponseException("Unexpected access token response format", resp);
             }
 
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
@@ -323,16 +346,18 @@ namespace RelationalAI.Services
             var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
 
             // Get the result back or throws an exception.
-            var httpResponse = await client.SendAsync(request);
-            var content = await httpResponse.Content.ReadAsByteArrayAsync();
-            var contentType = httpResponse.Content.Headers.ContentType.MediaType;
+            var response = await client.SendAsync(request);
+            await EnsureSuccessResponseAsync(response);
+            var content = await response.Content.ReadAsByteArrayAsync();
+            var contentType = response.Content.Headers.ContentType.MediaType;
 
             return contentType.ToLower() switch
             {
                 "application/json" => ReadString(content),
                 "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
-                _ => throw new SystemException($"unsupported content-type: {contentType}")
+                _ => throw new ApiException(
+                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content))
             };
         }
 

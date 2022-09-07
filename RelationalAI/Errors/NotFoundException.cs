@@ -16,24 +16,16 @@
 
 using System;
 
-namespace RelationalAI.Models.User
+namespace RelationalAI.Errors
 {
-    public enum Role
+    /// <summary>
+    /// Represents error thrown when requested resource was not found in the system of record.
+    /// </summary>
+    public class NotFoundException : Exception
     {
-        User,
-        Admin
-    }
-
-    public static class Roles
-    {
-        public static string Value(this Role role)
+        public NotFoundException(string message)
+            : base(message)
         {
-            return role switch
-            {
-                Role.User => "user",
-                Role.Admin => "admin",
-                _ => throw new ArgumentOutOfRangeException(nameof(role), role, $"Role '{role}' not supported")
-            };
         }
     }
 }
