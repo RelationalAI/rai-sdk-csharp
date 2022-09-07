@@ -16,7 +16,6 @@
 
 using System;
 using System.Net;
-using System.Net.Http.Headers;
 
 namespace RelationalAI.Errors
 {
@@ -29,12 +28,12 @@ namespace RelationalAI.Errors
             string message,
             HttpStatusCode statusCode,
             string response,
-            HttpResponseHeaders headers)
+            string requestId = null)
             : base($"Request failed with error: {message}")
         {
             StatusCode = statusCode;
             Response = response;
-            Headers = headers;
+            RequestId = requestId;
         }
 
         /// <summary>
@@ -48,9 +47,9 @@ namespace RelationalAI.Errors
         public string Response { get; }
 
         /// <summary>
-        /// Gets the headers of the RAI API response.
+        /// Gets id of the failed request from the RAI API response.
         /// </summary>
-        public HttpResponseHeaders Headers { get; }
+        public string RequestId { get; }
 
         /// <summary>
         /// Gets string representation of the error details, including Status Code, Headers and Response content.
@@ -58,7 +57,7 @@ namespace RelationalAI.Errors
         /// <returns>String representation of the exception.</returns>
         public override string ToString()
         {
-            return $"StatusCode: {StatusCode}, Headers: {Headers}," + Environment.NewLine +
+            return $"StatusCode: {StatusCode}, RequestId: {RequestId ?? "Unknown"}," + Environment.NewLine +
                    $"Response: {Response}" + Environment.NewLine
                    + base.ToString();
         }

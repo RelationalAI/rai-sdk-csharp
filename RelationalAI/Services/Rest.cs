@@ -37,6 +37,8 @@ namespace RelationalAI.Services
 {
     public class Rest
     {
+        private const string RequestIdHeaderName = "X-Request-ID";
+
         private readonly Context _context;
 
         public Rest(Context context)
@@ -280,7 +282,8 @@ namespace RelationalAI.Services
                 throw new NotFoundException(content);
             }
 
-            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, response.Headers);
+            var requestId = response.Headers.TryGetValues(RequestIdHeaderName, out var values) ? values.FirstOrDefault() : null;
+            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, requestId);
         }
 
         private async Task<string> GetAccessTokenAsync(string host)
@@ -352,7 +355,7 @@ namespace RelationalAI.Services
                 "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
                 _ => throw new ApiException(
-                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content), response.Headers)
+                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content))
             };
         }
 
