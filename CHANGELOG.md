@@ -6,7 +6,7 @@
   - `ApiException` thrown when RAI API responds with 5xx status codes or contains unsupported content type.
   - `EngineProvisionFailedException` thrown from `CreateEngineWaitAsync` when requested engine failed to provision.
   - `CredentialsNotSupportedException` thrown from every method when credentials to access RAI API are not provided or provided credentials are unsupported (i.e. not for OAuth Client credentials method).
-  - `InvalidResponseExcetion` thrown when RAI API response has unexpected format or content type.
+  - `InvalidResponseException` thrown when RAI API response has unexpected format or content type.
 
 ## v0.7.0-alpha
 * Replaced String properties with Enums in the following models returned by corresponding API methods:
