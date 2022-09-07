@@ -111,7 +111,10 @@ namespace RelationalAI.Services
             return Json<DeleteDatabaseResponse>.Deserialize(resp);
         }
 
-        public async Task<Engine> CreateEngineAsync(string engine, EngineSize size = EngineSize.XS)
+        public async Task<Engine> CreateEngineAsync(
+            string engine,
+            EngineSize size = EngineSize.XS,
+            Dictionary<string, string> customHeaders = null)
         {
             var data = new Dictionary<string, string>
             {
@@ -119,13 +122,16 @@ namespace RelationalAI.Services
                 { "name", engine },
                 { "size", size.ToString() }
             };
-            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data) as string;
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: customHeaders) as string;
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
-        public async Task<Engine> CreateEngineWaitAsync(string engine, EngineSize size = EngineSize.XS)
+        public async Task<Engine> CreateEngineWaitAsync(
+            string engine,
+            EngineSize size = EngineSize.XS,
+            Dictionary<string, string> customHeaders = null)
         {
-            await CreateEngineAsync(engine, size);
+            await CreateEngineAsync(engine, size, customHeaders);
             var resp = await Policy
                     .HandleResult<Engine>(e => !e.State.IsTerminalState(EngineState.Provisioned))
                     .Retry30Min()
