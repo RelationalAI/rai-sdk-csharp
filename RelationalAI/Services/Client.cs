@@ -742,7 +742,9 @@ namespace RelationalAI.Services
             var response = await _rest.GetAsync(url, null, null, parameters);
             if (!(response is string stringResponse))
             {
-                throw new InvalidResponseException("Unexpected response type, expected a string", response);
+                throw new InvalidResponseException(
+                    $"Unexpected response type, expected a string but received {response.GetType().Name}",
+                    response);
             }
 
             return stringResponse;

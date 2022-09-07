@@ -314,7 +314,9 @@ namespace RelationalAI.Services
             var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
             if (!(resp is string stringResponse))
             {
-                throw new InvalidResponseException("Unexpected response type, expected a string", resp);
+                throw new InvalidResponseException(
+                    $"Unexpected response type, expected a string but received {resp.GetType().Name}",
+                    resp);
             }
 
             var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
