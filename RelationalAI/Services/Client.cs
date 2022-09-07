@@ -52,6 +52,31 @@ namespace RelationalAI.Services
             _rest = new Rest(context);
         }
 
+        /// <summary>
+        /// Gets or sets the custom headers.
+        /// This property can be used to pass any custom headers to RAI requests.
+        /// Once set, the same headers will passed to all the calls made by the same client object.
+        /// To pass different headers, change the property value before making the call.
+        /// Make the property empty if you don't want to pass the custom headers.
+        /// <example>
+        /// For example:
+        /// <code>
+        /// Client c = new Client(context);
+        /// var headers = new Dictionary<string, string>();
+        /// headers.Add("user-agent", "my-application");
+        /// c.CustomHeaders = headers;
+        /// </code>
+        /// </example>
+        /// </summary>
+        public Dictionary<string, string> CustomHeaders
+        {
+            // Getter
+            get => _rest.CustomHeaders;
+
+            // Setter
+            set => _rest.CustomHeaders = value;
+        }
+
         public Task<Database> CreateDatabaseAsync(string database, string engine)
         {
             return CreateDatabaseAsync(database, engine, false);

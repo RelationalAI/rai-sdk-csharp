@@ -37,10 +37,36 @@ namespace RelationalAI.Services
     public class Rest
     {
         private readonly Context _context;
+        private Dictionary<string, string> _customHeaders = null;
 
         public Rest(Context context)
         {
             _context = context;
+        }
+
+        /// <summary>
+        /// Gets or sets the custom headers.
+        /// This property can be used to pass any custom headers to RAI requests.
+        /// Once set, the same headers will passed to all the calls made by the same rest object.
+        /// To pass different headers, change the property value before making the call.
+        /// Make the property empty if you don't want to pass the custom headers.
+        /// <example>
+        /// For example:
+        /// <code>
+        /// Rest r = new Rest(context);
+        /// var headers = new Dictionary<string, string>();
+        /// headers.Add("user-agent", "my-application");
+        /// r.CustomHeaders = headers;
+        /// </code>
+        /// </example>
+        /// </summary>
+        public Dictionary<string, string> CustomHeaders
+        {
+            // Getter
+            get => _customHeaders;
+
+            // Setter
+            set => _customHeaders = value;
         }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
@@ -110,6 +136,14 @@ namespace RelationalAI.Services
             if (headers != null)
             {
                 foreach (var (key, value) in headers)
+                {
+                    caseInsensitiveHeaders.Add(key, value);
+                }
+            }
+
+            if (CustomHeaders != null)
+            {
+                foreach (var (key, value) in CustomHeaders)
                 {
                     caseInsensitiveHeaders.Add(key, value);
                 }
