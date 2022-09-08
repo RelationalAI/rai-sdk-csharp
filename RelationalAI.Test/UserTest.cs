@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using RelationalAI.Errors;
 using RelationalAI.Models.User;
 using Xunit;
 
@@ -17,7 +18,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await Assert.ThrowsAsync<SystemException>(async () => await client.FindUserAsync(UserEmail));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindUserAsync(UserEmail));
 
             var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);
@@ -72,7 +73,10 @@ namespace RelationalAI.Test
                 var oauthClient = await client.FindUserAsync(UserEmail);
                 await client.DeleteUserAsync(oauthClient.Id);
             }
-            catch { }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
         }
     }
 }
