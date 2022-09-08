@@ -111,10 +111,7 @@ namespace RelationalAI.Services
             return Json<DeleteDatabaseResponse>.Deserialize(resp);
         }
 
-        public async Task<Engine> CreateEngineAsync(
-            string engine,
-            EngineSize size = EngineSize.XS,
-            Dictionary<string, string> customHeaders = null)
+        public async Task<Engine> CreateEngineAsync(string engine, EngineSize size = EngineSize.XS)
         {
             var data = new Dictionary<string, string>
             {
@@ -122,16 +119,30 @@ namespace RelationalAI.Services
                 { "name", engine },
                 { "size", size.ToString() }
             };
-            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: customHeaders) as string;
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data) as string;
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
-        public async Task<Engine> CreateEngineWaitAsync(
-            string engine,
-            EngineSize size = EngineSize.XS,
-            Dictionary<string, string> customHeaders = null)
+        public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, EngineSize size = EngineSize.XS)
         {
-            await CreateEngineAsync(engine, size, customHeaders);
+            var data = new Dictionary<string, string>
+            {
+                { "region", _context.Region },
+                { "name", engine },
+                { "size", size.ToString() }
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "x-rai-parameter-compute-version", version },
+            };
+
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: headers) as string;
+            return Json<CreateEngineResponse>.Deserialize(resp).Engine;
+        }
+
+        public async Task<Engine> CreateEngineWaitAsync(string engine, EngineSize size = EngineSize.XS)
+        {
+            await CreateEngineAsync(engine, size);
             var resp = await Policy
                     .HandleResult<Engine>(e => !e.State.IsTerminalState(EngineState.Provisioned))
                     .Retry30Min()
