@@ -124,6 +124,23 @@ namespace RelationalAI.Services
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
+        public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, EngineSize size = EngineSize.XS)
+        {
+            var data = new Dictionary<string, string>
+            {
+                { "region", _context.Region },
+                { "name", engine },
+                { "size", size.ToString() }
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "x-rai-parameter-compute-version", version },
+            };
+
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: headers) as string;
+            return Json<CreateEngineResponse>.Deserialize(resp).Engine;
+        }
+
         public async Task<Engine> CreateEngineWaitAsync(string engine, EngineSize size = EngineSize.XS)
         {
             await CreateEngineAsync(engine, size);
