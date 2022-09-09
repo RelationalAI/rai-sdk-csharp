@@ -44,9 +44,9 @@
     <PackageReference Include="Google.Protobuf.Tools" Version="3.19.0" />
   </ItemGroup>
 
-    <Target Name="protogen" BeforeTargets="BeforeBuild">
-      <Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\linux_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
-      <Exec Condition="$([MSBuild]::IsOSPlatform('OSX'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\macosx_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
-    </Target>
+  <Target Name="protogen" BeforeTargets="BeforeBuild">
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\linux_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
+    <Exec Condition="$([MSBuild]::IsOSPlatform('OSX'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\macosx_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
+  </Target>
 
 </Project>
