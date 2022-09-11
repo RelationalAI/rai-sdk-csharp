@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.9.1-alpha
+* Fix for missing Protos package.
+* Fix for `ListEngines`.
+
 ## v0.8.0-alpha
 * Added the following exceptions:
   - `NotFoundException` thrown from `GetEngineAsync(string engine)`, `GetDatabaseAsync(string database)`, etc. when requested resource (Engine/Database/Model/User/Client) doesn't exist or got deleted.
