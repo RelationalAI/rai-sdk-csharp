@@ -93,43 +93,26 @@ namespace RelationalAI.Results
 
             if (relType.Tag == Kind.PrimitiveType)
             {
-                switch (relType.PrimitiveType)
+                return relType.PrimitiveType switch
                 {
-                    case PrimitiveType.String:
-                        return new TypeDef("String");
-                    case PrimitiveType.Char:
-                        return new TypeDef("Char");
-                    case PrimitiveType.Bool:
-                        return new TypeDef("Bool");
-                    case PrimitiveType.Int8:
-                        return new TypeDef("Int8");
-                    case PrimitiveType.Int16:
-                        return new TypeDef("Int16");
-                    case PrimitiveType.Int32:
-                        return new TypeDef("Int32");
-                    case PrimitiveType.Int64:
-                        return new TypeDef("Int64");
-                    case PrimitiveType.Int128:
-                        return new TypeDef("Int128");
-                    case PrimitiveType.Uint8:
-                        return new TypeDef("UInt8");
-                    case PrimitiveType.Uint16:
-                        return new TypeDef("UInt16");
-                    case PrimitiveType.Uint32:
-                        return new TypeDef("UInt32");
-                    case PrimitiveType.Uint64:
-                        return new TypeDef("UInt64");
-                    case PrimitiveType.Uint128:
-                        return new TypeDef("UInt128");
-                    case PrimitiveType.Float16:
-                        return new TypeDef("Float16");
-                    case PrimitiveType.Float32:
-                        return new TypeDef("Float32");
-                    case PrimitiveType.Float64:
-                        return new TypeDef("Float64");
-                    default:
-                        throw new Exception($"Unhandled rel primitive type: {relType.PrimitiveType}");
-                }
+                    PrimitiveType.String => new TypeDef("String"),
+                    PrimitiveType.Char => new TypeDef("Char"),
+                    PrimitiveType.Bool => new TypeDef("Bool"),
+                    PrimitiveType.Int8 => new TypeDef("Int8"),
+                    PrimitiveType.Int16 => new TypeDef("Int16"),
+                    PrimitiveType.Int32 => new TypeDef("Int32"),
+                    PrimitiveType.Int64 => new TypeDef("Int64"),
+                    PrimitiveType.Int128 => new TypeDef("Int128"),
+                    PrimitiveType.Uint8 => new TypeDef("UInt8"),
+                    PrimitiveType.Uint16 => new TypeDef("UInt16"),
+                    PrimitiveType.Uint32 => new TypeDef("UInt32"),
+                    PrimitiveType.Uint64 => new TypeDef("UInt64"),
+                    PrimitiveType.Uint128 => new TypeDef("UInt128"),
+                    PrimitiveType.Float16 => new TypeDef("Float16"),
+                    PrimitiveType.Float32 => new TypeDef("Float32"),
+                    PrimitiveType.Float64 => new TypeDef("Float64"),
+                    _ => throw new Exception($"Unhandled rel primitive type: {relType.PrimitiveType}"),
+                };
             }
 
             if (relType.Tag == Kind.ValueType)
@@ -225,50 +208,31 @@ namespace RelationalAI.Results
                     throw new Exception($"unknow rational type definition");
                 default:
                     throw new Exception($"unhandled standard value type: {standardValueType}");
-
-            };
-
+            }
         }
 
         public static object MapPrimitiveValue(PrimitiveValue argument)
         {
-            switch (argument.ValueCase)
+            return argument.ValueCase switch
             {
-                case PrimitiveValue.ValueOneofCase.StringVal:
-                    return Encoding.Default.GetString(argument.StringVal.ToByteArray());
-                case PrimitiveValue.ValueOneofCase.CharVal:
-                    return argument.CharVal;
-                case PrimitiveValue.ValueOneofCase.BoolVal:
-                    return argument.BoolVal;
-                case PrimitiveValue.ValueOneofCase.Int8Val:
-                    return argument.Int8Val;
-                case PrimitiveValue.ValueOneofCase.Int16Val:
-                    return argument.Int16Val;
-                case PrimitiveValue.ValueOneofCase.Int32Val:
-                    return argument.Int32Val;
-                case PrimitiveValue.ValueOneofCase.Int64Val:
-                    return argument.Int64Val;
-                case PrimitiveValue.ValueOneofCase.Int128Val:
-                    return new[] { argument.Int128Val.Lowbits, argument.Int128Val.Highbits };
-                case PrimitiveValue.ValueOneofCase.Uint8Val:
-                    return argument.Uint8Val;
-                case PrimitiveValue.ValueOneofCase.Uint16Val:
-                    return argument.Uint16Val;
-                case PrimitiveValue.ValueOneofCase.Uint32Val:
-                    return argument.Uint32Val;
-                case PrimitiveValue.ValueOneofCase.Uint64Val:
-                    return argument.Uint64Val;
-                case PrimitiveValue.ValueOneofCase.Uint128Val:
-                    return new[] { argument.Uint128Val.Lowbits, argument.Uint128Val.Highbits };
-                case PrimitiveValue.ValueOneofCase.Float16Val:
-                    return argument.Float16Val;
-                case PrimitiveValue.ValueOneofCase.Float32Val:
-                    return argument.Float32Val;
-                case PrimitiveValue.ValueOneofCase.Float64Val:
-                    return argument.Float64Val;
-                default:
-                    throw new Exception($"unhandled protobuf primitive value map value: {argument.ValueCase}");
-            }
+                PrimitiveValue.ValueOneofCase.StringVal => Encoding.Default.GetString(argument.StringVal.ToByteArray()),
+                PrimitiveValue.ValueOneofCase.CharVal => argument.CharVal,
+                PrimitiveValue.ValueOneofCase.BoolVal => argument.BoolVal,
+                PrimitiveValue.ValueOneofCase.Int8Val => argument.Int8Val,
+                PrimitiveValue.ValueOneofCase.Int16Val => argument.Int16Val,
+                PrimitiveValue.ValueOneofCase.Int32Val => argument.Int32Val,
+                PrimitiveValue.ValueOneofCase.Int64Val => argument.Int64Val,
+                PrimitiveValue.ValueOneofCase.Int128Val => new[] { argument.Int128Val.Lowbits, argument.Int128Val.Highbits },
+                PrimitiveValue.ValueOneofCase.Uint8Val => argument.Uint8Val,
+                PrimitiveValue.ValueOneofCase.Uint16Val => argument.Uint16Val,
+                PrimitiveValue.ValueOneofCase.Uint32Val => argument.Uint32Val,
+                PrimitiveValue.ValueOneofCase.Uint64Val => argument.Uint64Val,
+                PrimitiveValue.ValueOneofCase.Uint128Val => new[] { argument.Uint128Val.Lowbits, argument.Uint128Val.Highbits },
+                PrimitiveValue.ValueOneofCase.Float16Val => argument.Float16Val,
+                PrimitiveValue.ValueOneofCase.Float32Val => argument.Float32Val,
+                PrimitiveValue.ValueOneofCase.Float64Val => argument.Float64Val,
+                _ => throw new Exception($"unhandled protobuf primitive value map value: {argument.ValueCase}"),
+            };
         }
 
         public static object ConvertValue(TypeDef typeDef, object value)

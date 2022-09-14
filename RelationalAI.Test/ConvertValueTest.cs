@@ -70,7 +70,7 @@ namespace RelationalAI.Test
             }
         }
 
-        TestInput[] testInputs =
+        readonly TestInput[] testInputs =
         {
             new TestInput
             (

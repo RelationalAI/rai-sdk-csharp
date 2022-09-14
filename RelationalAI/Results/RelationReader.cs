@@ -19,8 +19,8 @@ using System.Collections.Generic;
 using Apache.Arrow;
 using ConsoleTables;
 using RelationalAI.Models.Transaction;
-using RelationalAI.Results.Models;
 using Relationalai.Protocol;
+using RelationalAI.Results.Models;
 
 namespace RelationalAI.Results
 {
@@ -210,31 +210,6 @@ namespace RelationalAI.Results
                 {
                     output.Add(v);
                 }
-            }
-
-            return output;
-        }
-
-        private List<IList> RawColumns()
-        {
-            var output = new List<IList>();
-
-            foreach (var entry in ColumnsToDict())
-            {
-                output.Add(entry.Value);
-            }
-
-            return output;
-        }
-
-        private IList RowRawValues(int index)
-        {
-            var output = new List<object>();
-
-            var dict = ColumnsToDict();
-            foreach (var key in dict.Keys)
-            {
-                output.Add(dict[key][index]);
             }
 
             return output;
