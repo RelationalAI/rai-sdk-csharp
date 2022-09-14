@@ -39,7 +39,7 @@ namespace RelationalAI.Test
         public void TypesDefinitionTests()
         {
             var expected = new List<ColumnDef>
-            { 
+            {
                 new ColumnDef
                 (
                     new TypeDef("Constant", new TypeDef("String", "output")),

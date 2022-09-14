@@ -58,7 +58,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(Engine);
             await client.CreateDatabaseAsync(DBname, Engine);
 
-            foreach(var test in standardTypeTests)
+            foreach (var test in standardTypeTests)
             {
                 if (!test.Skip)
                 {
@@ -114,7 +114,7 @@ namespace RelationalAI.Test
             await client.CreateEngineWaitAsync(Engine);
             await client.CreateDatabaseAsync(DBname, Engine);
 
-            foreach(var test in miscValueTypeTests)
+            foreach (var test in miscValueTypeTests)
             {
                 if (!test.Skip)
                 {
