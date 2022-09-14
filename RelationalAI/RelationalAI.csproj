@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.7.0-alpha</Version>
+    <Version>0.9.1-alpha</Version>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <PackageId>RAI</PackageId>
     <Authors>RelationalAI</Authors>
@@ -41,7 +41,13 @@
     </PackageReference>
     <PackageReference Include="HttpMultipartParser" Version="5.1.0" />
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.0" />
-    <ProjectReference Include="..\RelationalAI.Protos\RelationalAI.Protos.csproj" />
+    <PackageReference Include="Google.Protobuf" Version="3.19.0" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.19.0" />
   </ItemGroup>
+
+  <Target Name="protogen" BeforeTargets="BeforeBuild">
+    <Exec Condition="$([MSBuild]::IsOSPlatform('Linux'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\linux_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
+    <Exec Condition="$([MSBuild]::IsOSPlatform('OSX'))" Command="$(NugetPackageRoot)google.protobuf.tools\3.19.0\tools\macosx_x64\protoc --proto_path=$(ProjectDir)/Protos --csharp_out=Protos/Generated $(ProjectDir)/Protos/*.proto" />
+  </Target>
 
 </Project>

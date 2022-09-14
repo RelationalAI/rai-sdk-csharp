@@ -16,24 +16,16 @@
 
 using System;
 
-namespace RelationalAI.Models.User
+namespace RelationalAI.Errors
 {
-    public enum Role
+    /// <summary>
+    /// Represents error thrown when provided credentials are unsupported.
+    /// </summary>
+    public class CredentialsNotSupportedException : Exception
     {
-        User,
-        Admin
-    }
-
-    public static class Roles
-    {
-        public static string Value(this Role role)
+        public CredentialsNotSupportedException()
+            : base("Provided credentials for unsupported auth method.")
         {
-            return role switch
-            {
-                Role.User => "user",
-                Role.Admin => "admin",
-                _ => throw new ArgumentOutOfRangeException(nameof(role), role, $"Role '{role}' not supported")
-            };
         }
     }
 }

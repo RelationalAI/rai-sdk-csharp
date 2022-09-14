@@ -17,6 +17,7 @@
 using System;
 using System.Net.Http;
 using Polly;
+using RelationalAI.Errors;
 
 namespace RelationalAI.Utils
 {
@@ -105,9 +106,8 @@ namespace RelationalAI.Utils
                 // failure, server certificate validation or timeout.
                 .Handle<HttpRequestException>()
 
-                // Response deserialization failed due to unsuccessful response received (5xx status code, etc.)
-                // TODO: update after introducing exceptions hierarchy
-                .Or<SystemException>()
+                // Server error response received (5xx status code, etc.)
+                .Or<ApiException>()
 
                 // Retry 5 times. In this case will wait for: 2 + 4 + 8 + 16 + 30 seconds
                 // And rethrow the exception.

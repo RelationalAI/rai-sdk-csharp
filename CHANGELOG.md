@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.9.1-alpha
+* Fix for missing Protos package.
+* Fix for `ListEngines`.
+
+## v0.8.0-alpha
+* Added the following exceptions:
+  - `NotFoundException` thrown from `GetEngineAsync(string engine)`, `GetDatabaseAsync(string database)`, etc. when requested resource (Engine/Database/Model/User/Client) doesn't exist or got deleted.
+  - `ApiException` thrown when RAI API responds with 5xx status codes or contains unsupported content type.
+  - `EngineProvisionFailedException` thrown from `CreateEngineWaitAsync` when requested engine failed to provision.
+  - `CredentialsNotSupportedException` thrown from every method when credentials to access RAI API are not provided or provided credentials are unsupported (i.e. not for OAuth Client credentials method).
+  - `InvalidResponseException` thrown when RAI API response has unexpected format or content type.
+
 ## v0.7.0-alpha
 * Replaced String properties with Enums in the following models returned by corresponding API methods:
   - `Database`.`State` property is of `DatabaseState` type.

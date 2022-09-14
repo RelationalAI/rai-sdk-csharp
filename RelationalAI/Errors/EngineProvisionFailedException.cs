@@ -15,25 +15,24 @@
  */
 
 using System;
+using RelationalAI.Models.Engine;
 
-namespace RelationalAI.Models.User
+namespace RelationalAI.Errors
 {
-    public enum Role
+    /// <summary>
+    /// Represents error thrown when engine requested to provision failed to get provisioned.
+    /// </summary>
+    public class EngineProvisionFailedException : Exception
     {
-        User,
-        Admin
-    }
-
-    public static class Roles
-    {
-        public static string Value(this Role role)
+        public EngineProvisionFailedException(Engine engine)
+            : base($"Engine with name `{engine.Name}` failed to provision")
         {
-            return role switch
-            {
-                Role.User => "user",
-                Role.Admin => "admin",
-                _ => throw new ArgumentOutOfRangeException(nameof(role), role, $"Role '{role}' not supported")
-            };
+            Engine = engine;
         }
+
+        /// <summary>
+        /// Gets the name of the engine that failed to provision.
+        /// </summary>
+        public Engine Engine { get; }
     }
 }

@@ -23,6 +23,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
 using RelationalAI.Credentials;
+using RelationalAI.Errors;
 using RelationalAI.Models.Database;
 using RelationalAI.Models.Edb;
 using RelationalAI.Models.Engine;
@@ -86,7 +87,7 @@ namespace RelationalAI.Services
 
             var resp = await GetResourceAsync(PathDatabase, null, parameters);
             var dbs = Json<GetDatabaseResponse>.Deserialize(resp).Databases;
-            return dbs.Count > 0 ? dbs[0] : throw new SystemException("not found");
+            return dbs.Count > 0 ? dbs[0] : throw new NotFoundException($"Database with name `{database}` not found");
         }
 
         public async Task<List<Database>> ListDatabasesAsync(DatabaseState? state = null)
@@ -123,6 +124,23 @@ namespace RelationalAI.Services
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
+        public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, EngineSize size = EngineSize.XS)
+        {
+            var data = new Dictionary<string, string>
+            {
+                { "region", _context.Region },
+                { "name", engine },
+                { "size", size.ToString() }
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "x-rai-parameter-compute-version", version },
+            };
+
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: headers) as string;
+            return Json<CreateEngineResponse>.Deserialize(resp).Engine;
+        }
+
         public async Task<Engine> CreateEngineWaitAsync(string engine, EngineSize size = EngineSize.XS)
         {
             await CreateEngineAsync(engine, size);
@@ -133,8 +151,7 @@ namespace RelationalAI.Services
 
             if (resp.State != EngineState.Provisioned)
             {
-                // TODO: replace with a better error during introducing the exceptions hierarchy
-                throw new SystemException("Failed to provision engine");
+                throw new EngineProvisionFailedException(resp);
             }
 
             return resp;
@@ -149,7 +166,7 @@ namespace RelationalAI.Services
             };
             var resp = await GetResourceAsync(PathEngine, null, parameters);
             var engines = Json<GetEngineResponse>.Deserialize(resp).Engines;
-            return engines.Count > 0 ? engines[0] : throw new SystemException("not found");
+            return engines.Count > 0 ? engines[0] : throw new NotFoundException($"Engine with name `{engine}` not found");
         }
 
         public async Task<List<Engine>> ListEnginesAsync(EngineState? state = null)
@@ -203,7 +220,7 @@ namespace RelationalAI.Services
             var clients = await ListOAuthClientsAsync();
 
             return clients.FirstOrDefault(client => client.Name == name) ??
-                   throw new SystemException("not found");
+                   throw new NotFoundException($"OAuth Client with name `{name}` not found");
         }
 
         public async Task<OAuthClientEx> GetOAuthClientAsync(string id)
@@ -261,7 +278,7 @@ namespace RelationalAI.Services
             var users = await ListUsersAsync();
 
             return users.FirstOrDefault(user => user.Email == email) ??
-                   throw new SystemException("not found");
+                   throw new NotFoundException($"User with email `{email}` not found");
         }
 
         public async Task<User> GetUserAsync(string userId)
@@ -395,7 +412,7 @@ namespace RelationalAI.Services
             var models = await ListModelsAsync(database, engine);
 
             return models.FirstOrDefault(model => model.Name.Equals(name)) ??
-                   throw new SystemException($"model {name} not found.");
+                   throw new NotFoundException($"Model with name `{name}` not found on database {database}");
         }
 
         public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)
@@ -557,7 +574,7 @@ namespace RelationalAI.Services
             switch (value)
             {
                 case null:
-                    throw new SystemException("Cannot generate literal from null value");
+                    throw new ArgumentException("Cannot generate literal from null value");
                 case Int16 _:
                 case Int32 _:
                 case Int64 _:
@@ -565,7 +582,7 @@ namespace RelationalAI.Services
                 case char c:
                     return GenLiteral(c);
                 default:
-                    throw new SystemException($"Cannot generate type from {value.GetType()} value");
+                    throw new ArgumentException($"Cannot generate literal from {value.GetType()} value");
             }
         }
 
@@ -645,7 +662,7 @@ namespace RelationalAI.Services
             var problems = JsonConvert.DeserializeObject(rsp);
             if (!(problems is JArray problemsArray))
             {
-                throw new SystemException("Unexpected format of problems");
+                throw new InvalidResponseException("Unexpected format of transaction problems", rsp);
             }
 
             foreach (var problem in problemsArray)
@@ -655,7 +672,7 @@ namespace RelationalAI.Services
                 {
                     output.Add(Json<IntegrityConstraintViolation>.Deserialize(data));
                 }
-                catch (SystemException)
+                catch (InvalidResponseException)
                 {
                     output.Add(Json<ClientProblem>.Deserialize(data));
                 }
@@ -672,12 +689,12 @@ namespace RelationalAI.Services
 
             if (transaction == null)
             {
-                throw new SystemException("transaction part not found");
+                throw new InvalidResponseException("Transaction part of async result not found");
             }
 
             if (metadata == null)
             {
-                throw new SystemException("metadata part not found");
+                throw new InvalidResponseException("Metadata part of async result not found");
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
@@ -725,7 +742,7 @@ namespace RelationalAI.Services
                     // making sure there aren't more than one value
                     if (result.First != result.Last)
                     {
-                        throw new SystemException("more than one resources found");
+                        throw new InvalidResponseException("More than one resource found", response);
                     }
 
                     result = result.First;
@@ -762,7 +779,9 @@ namespace RelationalAI.Services
             var response = await _rest.GetAsync(url, null, null, parameters);
             if (!(response is string stringResponse))
             {
-                throw new SystemException("Unexpected response type");
+                throw new InvalidResponseException(
+                    $"Unexpected response type, expected a string but received {response.GetType().Name}",
+                    response);
             }
 
             return stringResponse;
