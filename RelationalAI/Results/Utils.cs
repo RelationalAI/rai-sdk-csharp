@@ -40,11 +40,11 @@ namespace RelationalAI.Results
             {
                 if (colDef.TypeDef.Type == "Constant")
                 {
-                    output.Add(Utils.ConvertValue(colDef.TypeDef, null));
+                    output.Add(ConvertValue(colDef.TypeDef, null));
                 }
                 else
                 {
-                    var value = Utils.ConvertValue(colDef.TypeDef, row[colDef.ArrowIndex]);
+                    var value = ConvertValue(colDef.TypeDef, row[colDef.ArrowIndex]);
                     output.Add(value);
                 }
             }
@@ -74,11 +74,11 @@ namespace RelationalAI.Results
                     object convertedValue;
                     if (values.Count == 1)
                     {
-                        convertedValue = Utils.ConvertValue(typeDef, values[0]);
+                        convertedValue = ConvertValue(typeDef, values[0]);
                     }
                     else
                     {
-                        convertedValue = Utils.ConvertValue(typeDef, values);
+                        convertedValue = ConvertValue(typeDef, values);
                     }
 
                     typeDef.Value = convertedValue;
@@ -276,15 +276,15 @@ namespace RelationalAI.Results
                 case "Float64":
                     return value;
                 case "Int128":
-                    return Utils.Int128ToBigInteger(value as ulong[]);
+                    return Int128ToBigInteger(value as ulong[]);
                 case "UInt128":
-                    return Utils.Uint128ToBigInteger(value as ulong[]);
+                    return Uint128ToBigInteger(value as ulong[]);
                 case "Decimal16":
                 case "Decimal32":
                 case "Decimal64":
                     return Convert.ToDecimal(value) / Convert.ToDecimal(Math.Pow(10, (double)typeDef.Places));
                 case "Hash":
-                    return Utils.Uint128ToBigInteger(value as ulong[]);
+                    return Uint128ToBigInteger(value as ulong[]);
                 case "Missing":
                     return null;
                 case "Rational8":
@@ -297,7 +297,7 @@ namespace RelationalAI.Results
                 case "Rational128":
                     var numValues = (value as List<object>)[0] as ulong[];
                     var denomValues = (value as List<object>)[1] as ulong[];
-                    return $"{Utils.Int128ToBigInteger(numValues)} / {Utils.Int128ToBigInteger(denomValues)}";
+                    return $"{Int128ToBigInteger(numValues)} / {Int128ToBigInteger(denomValues)}";
                 case "ValueType":
                     var physicalIndex = -1;
                     var values = new List<object>();
