@@ -5,6 +5,8 @@ using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
 using RelationalAI.Models.Transaction;
+using Apache.Arrow;
+using Apache.Arrow.Types;
 
 namespace RelationalAI.Test
 {
@@ -22,23 +24,31 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            _ = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
 
-            /*var results = new List<ArrowRelation>
-            {
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 2L, 3L, 4L, 5L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 4L, 9L, 16L, 25L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 8L, 27L, 64L, 125L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 16L, 81L, 256L, 625L} )
-            };
+            // mock arrow table
+            Schema.Builder builder = new Schema.Builder();
+            builder.Field(new Field("v1", Int64Type.Default, false));
+            builder.Field(new Field("v2", Int64Type.Default, false));
+            builder.Field(new Field("v3", Int64Type.Default, false));
+            builder.Field(new Field("v4", Int64Type.Default, false));
 
-            var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("../../../metadata.pb"));
+            var recordBatch = new RecordBatch
+            (
+                builder.Build(),
+                new List<IArrowArray>
+                {
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 2, 3, 4, 5 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 4, 9, 16, 25 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 8, 27, 64, 125 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 16, 81, 256, 625 }).Build()
+                },
+                4
+            );
 
-            var problems = new List<object>();
+            var table = Table.TableFromRecordBatches(recordBatch.Schema, new List<RecordBatch> { recordBatch });
 
-            Assert.Equal(results, rsp.Results);
-            Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
-            Assert.Equal(problems, rsp.Problems);*/
+            Assert.Equal(table, rsp.Results[0].Table);
         }
 
         public override async Task DisposeAsync()
