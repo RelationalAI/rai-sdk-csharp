@@ -165,12 +165,15 @@ namespace RelationalAI.Services
                     var reader = new ArrowStreamReader(memoryStream);
                     RecordBatch record;
                     List<RecordBatch> records = new List<RecordBatch>();
+
                     while ((record = reader.ReadNextRecordBatch()) != null)
                     {
                         records.Add(record);
                     }
 
-                    output.Add(new ArrowResult(file.Name, file.Filename, records));
+                    var table = Table.TableFromRecordBatches(records.First().Schema, records);
+
+                    output.Add(new ArrowResult(file.Name, file.Filename, table));
                 }
             }
 

@@ -19,9 +19,9 @@ using Relationalai.Protocol;
 
 namespace RelationalAI.Models.Transaction
 {
-    public class TransactionAsyncResult : Entity
+    public class TransactionResponse : Entity
     {
-        public TransactionAsyncResult(
+        public TransactionResponse(
             TransactionAsyncCompactResponse transaction,
             List<ArrowRelation> results,
             MetadataInfo metadata,

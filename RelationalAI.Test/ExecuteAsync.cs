@@ -24,7 +24,7 @@ namespace RelationalAI.Test
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
 
-            var results = new List<ArrowRelation>
+            /*var results = new List<ArrowRelation>
             {
                 new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 2L, 3L, 4L, 5L} ),
                 new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 4L, 9L, 16L, 25L} ),
@@ -38,7 +38,7 @@ namespace RelationalAI.Test
 
             Assert.Equal(results, rsp.Results);
             Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
-            Assert.Equal(problems, rsp.Problems);
+            Assert.Equal(problems, rsp.Problems);*/
         }
 
         public override async Task DisposeAsync()

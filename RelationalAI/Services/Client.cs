@@ -422,7 +422,7 @@ namespace RelationalAI.Services
             return Json<TransactionResult>.Deserialize(resp);
         }
 
-        public async Task<TransactionAsyncResult> ExecuteWaitAsync(
+        public async Task<TransactionResponse> ExecuteWaitAsync(
             string database,
             string engine,
             string source,
@@ -450,7 +450,7 @@ namespace RelationalAI.Services
             var problems = await GetTransactionProblemsAsync(id);
             var results = MakeArrowRelations(arrowResults, metadata);
 
-            return new TransactionAsyncResult(
+            return new TransactionResponse(
                 transaction,
                 results,
                 metadata,
@@ -458,7 +458,7 @@ namespace RelationalAI.Services
                 true);
         }
 
-        public async Task<TransactionAsyncResult> ExecuteAsync(
+        public async Task<TransactionResponse> ExecuteAsync(
             string database,
             string engine,
             string source,
@@ -472,10 +472,10 @@ namespace RelationalAI.Services
             if (rsp is string s)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(s);
-                return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
+                return new TransactionResponse(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
-            return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
+            return ReadTransactionResponses(rsp as List<TransactionAsyncFile>);
         }
 
         public Task<TransactionResult> LoadJsonAsync(
@@ -664,7 +664,7 @@ namespace RelationalAI.Services
             return output;
         }
 
-        private TransactionAsyncResult ReadTransactionAsyncResults(List<TransactionAsyncFile> files)
+        private TransactionResponse ReadTransactionResponses(List<TransactionAsyncFile> files)
         {
             var transaction = files.Find(f => f.Name == "transaction");
             var metadata = files.Find(f => f.Name == "metadata.proto");
@@ -692,7 +692,7 @@ namespace RelationalAI.Services
             var arrowResults = _rest.ReadArrowFiles(files);
             var results = MakeArrowRelations(arrowResults, metadataProto);
 
-            return new TransactionAsyncResult(transactionResult, results, metadataProto, problemsResult, true);
+            return new TransactionResponse(transactionResult, results, metadataProto, problemsResult, true);
         }
 
         private List<ArrowRelation> MakeArrowRelations(List<ArrowResult> results, MetadataInfo metadata)
@@ -707,7 +707,7 @@ namespace RelationalAI.Services
 
             foreach (ArrowResult result in results)
             {
-                output.Add(new ArrowRelation(result.RelationID, result.Records, metadataDict[result.Filename]));
+                output.Add(new ArrowRelation(result.RelationID, result.Table, metadataDict[result.Filename]));
             }
 
             return output;

@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-using System.Collections.Generic;
 using Apache.Arrow;
 using Relationalai.Protocol;
 
@@ -22,16 +21,16 @@ namespace RelationalAI.Models.Transaction
 {
     public class ArrowRelation : Entity
     {
-        public ArrowRelation(string relationId, List<RecordBatch> records, RelationId metadata)
+        public ArrowRelation(string relationId, Table table, RelationId metadata)
         {
             RelationId = relationId;
-            Records = records;
+            Table = table;
             Metadata = metadata;
         }
 
         public string RelationId { get; }
 
-        public List<RecordBatch> Records { get; }
+        public Table Table { get; }
 
         public RelationId Metadata { get; }
 
@@ -40,7 +39,7 @@ namespace RelationalAI.Models.Transaction
             if (obj is ArrowRelation arrowRelation)
             {
                 return RelationId == arrowRelation.RelationId &&
-                    Records == arrowRelation.Records &&
+                    Table == arrowRelation.Table &&
                     Metadata == arrowRelation.Metadata;
             }
 
@@ -50,7 +49,7 @@ namespace RelationalAI.Models.Transaction
         public override int GetHashCode()
         {
             var hashcode = RelationId.GetHashCode();
-            hashcode ^= Records.GetHashCode();
+            hashcode ^= Table.GetHashCode();
             return hashcode;
         }
     }

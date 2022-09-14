@@ -14,23 +14,24 @@
  * limitations under the License.
  */
 
-using Apache.Arrow;
+using RelationalAI.Models;
+using Relationalai.Protocol;
 
-namespace RelationalAI.Models.Transaction
+namespace RelationalAI.Results.Models
 {
-    public class ArrowResult
+    public class ColumnDef : Entity
     {
-        public ArrowResult(string relationID, string filename, Table table)
+        public ColumnDef(TypeDef typeDef, RelType relType, int arrowIndex)
         {
-            RelationID = relationID;
-            Filename = filename;
-            Table = table;
+            TypeDef = typeDef;
+            RelType = relType;
+            ArrowIndex = arrowIndex;
         }
 
-        public string RelationID { get; set; }
+        public TypeDef TypeDef { get; set; }
 
-        public string Filename { get; set; }
+        public RelType RelType { get; set; }
 
-        public Table Table { get; set; }
+        public int ArrowIndex { get; set; }
     }
 }
