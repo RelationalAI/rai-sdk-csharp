@@ -95,7 +95,7 @@ namespace RelationalAI.Results
             return Table.ColumnCount;
         }
 
-        public long TuplesCount()
+        public long TupleCount()
         {
             return Table.RowCount;
         }
