@@ -128,9 +128,9 @@ namespace RelationalAI.Services
             return Encoding.UTF8.GetString(data, 0, data.Length);
         }
 
-        public List<ArrowRelation> ReadArrowFiles(List<TransactionAsyncFile> files)
+        public List<ArrowResult> ReadArrowFiles(List<TransactionAsyncFile> files)
         {
-            var output = new List<ArrowRelation>();
+            var output = new List<ArrowResult>();
             foreach (var file in files)
             {
                 if ("application/vnd.apache.arrow.stream".Equals(file.ContentType.ToLower()))
@@ -141,13 +141,17 @@ namespace RelationalAI.Services
                     };
 
                     var reader = new ArrowStreamReader(memoryStream);
-                    RecordBatch recordBatch;
-                    while ((recordBatch = reader.ReadNextRecordBatch()) != null)
+                    RecordBatch record;
+                    List<RecordBatch> records = new List<RecordBatch>();
+
+                    while ((record = reader.ReadNextRecordBatch()) != null)
                     {
-                        var df = DataFrame.FromArrowRecordBatch(recordBatch);
-                        output.AddRange(df.Columns.Select(col => col.Cast<object>().ToList())
-                            .Select(values => new ArrowRelation(file.Name, values)));
+                        records.Add(record);
                     }
+
+                    var table = Table.TableFromRecordBatches(records.First().Schema, records);
+
+                    output.Add(new ArrowResult(file.Name, file.Filename, table));
                 }
             }
 

@@ -14,28 +14,33 @@
  * limitations under the License.
  */
 
-using System.Collections.Generic;
-using System.Linq;
+using Apache.Arrow;
+using Relationalai.Protocol;
 
 namespace RelationalAI.Models.Transaction
 {
     public class ArrowRelation : Entity
     {
-        public ArrowRelation(string relationId, List<object> table)
+        public ArrowRelation(string relationId, Table table, RelationId metadata)
         {
             RelationId = relationId;
             Table = table;
+            Metadata = metadata;
         }
 
         public string RelationId { get; }
 
-        public List<object> Table { get; }
+        public Table Table { get; }
+
+        public RelationId Metadata { get; }
 
         public override bool Equals(object obj)
         {
             if (obj is ArrowRelation arrowRelation)
             {
-                return RelationId == arrowRelation.RelationId && Table.SequenceEqual(arrowRelation.Table);
+                return RelationId == arrowRelation.RelationId &&
+                    Table == arrowRelation.Table &&
+                    Metadata == arrowRelation.Metadata;
             }
 
             return false;

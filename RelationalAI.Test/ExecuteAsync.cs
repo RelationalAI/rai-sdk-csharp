@@ -5,6 +5,8 @@ using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
 using RelationalAI.Models.Transaction;
+using Apache.Arrow;
+using Apache.Arrow.Types;
 
 namespace RelationalAI.Test
 {
@@ -13,6 +15,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
         public static string EngineName = $"csharp-sdk-{Uuid}";
+
         [Fact]
         public async Task ExecuteAsyncTest()
         {
@@ -24,21 +27,47 @@ namespace RelationalAI.Test
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
 
-            var results = new List<ArrowRelation>
+            // mock arrow table
+            Schema.Builder builder = new Schema.Builder();
+            builder.Field(new Field("v1", Int64Type.Default, false));
+            builder.Field(new Field("v2", Int64Type.Default, false));
+            builder.Field(new Field("v3", Int64Type.Default, false));
+            builder.Field(new Field("v4", Int64Type.Default, false));
+
+            var recordBatch = new RecordBatch
+            (
+                builder.Build(),
+                new List<Int64Array>
+                {
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 2, 3, 4, 5 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 4, 9, 16, 25 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 8, 27, 64, 125 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 16, 81, 256, 625 }).Build()
+                },
+                5
+            );
+
+            var table = Table.TableFromRecordBatches(recordBatch.Schema, new List<RecordBatch> { recordBatch });
+
+            for (int i = 0; i < table.ColumnCount; i++)
             {
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 2L, 3L, 4L, 5L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 4L, 9L, 16L, 25L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 8L, 27L, 64L, 125L} ),
-                new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 16L, 81L, 256L, 625L} )
-            };
+                for (int j = 0; j < table.Column(i).Data.ArrayCount; j++)
+                {
+                    for (int k = 0; k < (table.Column(i).Data.Array(j) as Int64Array).Length; k++)
+                    {
+                        var expected = (table.Column(i).Data.Array(j) as Int64Array).GetValue(k).Value;
+                        var actual = (rsp.Results[0].Table.Column(i).Data.Array(j) as Int64Array).GetValue(k).Value;
+                        Assert.Equal(expected, actual);
+                    }
+                }
+            }
 
+            // mock proto metadata
             var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("../../../metadata.pb"));
+            Assert.Equal(metadata.Relations[0].RelationId.Arguments, rsp.Results[0].Metadata.Arguments);
 
-            var problems = new List<object>();
-
-            Assert.Equal(results, rsp.Results);
-            Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
-            Assert.Equal(problems, rsp.Problems);
+            // mock problems
+            Assert.Equal(new List<object>(), rsp.Problems);
         }
 
         public override async Task DisposeAsync()
