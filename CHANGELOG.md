@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.9.2-alpha
+* Removed `EngineSize` enumeration:
+  - `CreateEngineAsync(engineName, size = "XS")`
 ## v0.9.1-alpha
 * Fix for missing Protos package.
 * Fix for `ListEngines`.

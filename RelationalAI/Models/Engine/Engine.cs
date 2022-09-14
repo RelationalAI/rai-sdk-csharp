@@ -41,8 +41,7 @@ namespace RelationalAI.Models.Engine
         public string DeletedOn { get; set; }
 
         [JsonProperty("size")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public EngineSize Size { get; set; }
+        public string Size { get; set; }
 
         [JsonProperty("state")]
         [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
