@@ -108,24 +108,22 @@ namespace RelationalAI.Test
 
         Table MockArrowTable()
         {
-            var stringBuilder = new StringArray.Builder();
-            var uintBuilder = new UInt32Array.Builder();
-            var intBuilder = new Int64Array.Builder();
-
-            stringBuilder.AppendRange(new List<string> { "w", "x", "y", "z" });
-            uintBuilder.AppendRange(new List<uint> { 97, 98, 99, 100 });
-            intBuilder.AppendRange(new List<long> { 1, 2, 3, 4 });
-
-            var stringArray = stringBuilder.Build();
-            var uint32Array = uintBuilder.Build();
-            var int64Array = intBuilder.Build();
-
             Schema.Builder builder = new Schema.Builder();
             builder.Field(new Field("v1", StringType.Default, false));
             builder.Field(new Field("v2", UInt32Type.Default, false));
             builder.Field(new Field("v3", Int64Type.Default, false));
 
-            var recordBatch = new RecordBatch(builder.Build(), new List<IArrowArray> { stringArray, uint32Array, int64Array }, 4);
+            var recordBatch = new RecordBatch
+            (
+                builder.Build(),
+                new List<IArrowArray>
+                {
+                    new StringArray.Builder().AppendRange(new List<string> { "w", "x", "y", "z" }).Build(),
+                    new UInt32Array.Builder().AppendRange(new List<uint> { 97, 98, 99, 100 }).Build(),
+                    new Int64Array.Builder().AppendRange(new List<long> { 1, 2, 3, 4 }).Build(),
+                },
+                4
+             );
 
             return Table.TableFromRecordBatches(recordBatch.Schema, new List<RecordBatch> { recordBatch });
         }
