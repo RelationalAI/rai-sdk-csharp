@@ -20,6 +20,12 @@ namespace RelationalAI.Models.RelModel
 {
     public class Model : Entity
     {
+        public Model(string name, string value)
+        {
+            Name = name;
+            Value = value;
+        }
+
         [JsonProperty("name", Required = Required.Always)]
         public string Name { get; set; }
 

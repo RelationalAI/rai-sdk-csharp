@@ -30,6 +30,9 @@ namespace RelationalAI.Examples
             root.AddCommand(ListEngines.GetCommand());
             root.AddCommand(ListOAuthClients.GetCommand());
             root.AddCommand(ListUsers.GetCommand());
+            root.AddCommand(ListModels.GetCommand());
+            root.AddCommand(LoadModel.GetCommand());
+            root.AddCommand(DeleteModel.GetCommand());
             root.AddCommand(ExecuteV1.GetCommand());
             root.AddCommand(Execute.GetCommand());
             root.AddCommand(ExecuteAsync.GetCommand());

@@ -378,26 +378,31 @@ namespace RelationalAI.Services
             return Json<TransactionResult>.Deserialize(resp);
         }
 
-        public async Task<TransactionResult> LoadModelsAsync(
-            string database,
-            string engine,
-            Dictionary<string, string> models)
+        public async Task<TransactionAsyncResult> LoadModelsAsync(
+        string database,
+        string engine,
+        List<Model> models)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeInstallAction(models) };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            return Json<TransactionResult>.Deserialize(resp);
+            var queries = new List<string>();
+            foreach (var model in models)
+            {
+                queries.Add($"def insert:rel:catalog:model[\"{model.Name}\"] = \"\"\"{model.Value}\"\"\"");
+            }
+
+            return await ExecuteAsync(database, engine, string.Join('\n', queries), false);
         }
 
         public async Task<List<Model>> ListModelsAsync(string database, string engine)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeListModelsAction() };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).Actions;
-            return actionsResp.Count == 0 ? new List<Model>() : actionsResp[0].Result.Models;
+            var models = new List<Model>();
+            var resp = await ExecuteAsync(database, engine, "def output:__models__ = rel:catalog:model");
+
+            for (int i = 0; i < resp.Results[0].Table.Count; i++)
+            {
+                models.Add(new Model(resp.Results[0].Table[i] as string, resp.Results[1].Table[i] as string));
+            }
+
+            return models;
         }
 
         public async Task<List<string>> ListModelNamesAsync(string database, string engine)
@@ -415,13 +420,9 @@ namespace RelationalAI.Services
                    throw new NotFoundException($"Model with name `{name}` not found on database {database}");
         }
 
-        public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)
+        public async Task<TransactionAsyncResult> DeleteModelAsync(string database, string engine, string name)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeDeleteModelAction(name) };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            return Json<TransactionResult>.Deserialize(resp);
+            return await ExecuteAsync(database, engine, $"def delete:rel:catalog:model[\"{name}\"] = rel:catalog:model[\"{name}\"]", false);
         }
 
         // Query
