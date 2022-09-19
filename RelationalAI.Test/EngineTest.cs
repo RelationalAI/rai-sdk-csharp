@@ -18,7 +18,7 @@ namespace RelationalAI.Test
 
             var createRsp = await client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);
-            Assert.Equal("PROVISIONED", createRsp.State);
+            Assert.Equal(EngineStates.Provisioned, createRsp.State);
 
             var engine = await client.GetEngineAsync(EngineName);
             Assert.Equal(engine.Name, EngineName);
