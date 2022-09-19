@@ -145,11 +145,11 @@ namespace RelationalAI.Services
         {
             await CreateEngineAsync(engine, size);
             var resp = await Policy
-                    .HandleResult<Engine>(e => !e.State.IsTerminalState(EngineState.Provisioned))
+                    .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
                     .Retry30Min()
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
-            if (resp.State != EngineState.Provisioned)
+            if (resp.State != EngineStates.Provisioned)
             {
                 throw new EngineProvisionFailedException(resp);
             }
@@ -169,12 +169,12 @@ namespace RelationalAI.Services
             return engines.Count > 0 ? engines[0] : throw new NotFoundException($"Engine with name `{engine}` not found");
         }
 
-        public async Task<List<Engine>> ListEnginesAsync(EngineState? state = null)
+        public async Task<List<Engine>> ListEnginesAsync(string state = null)
         {
             var parameters = new Dictionary<string, string>();
             if (state != null)
             {
-                parameters.Add("state", state.Value.Value());
+                parameters.Add("state", state);
             }
 
             var resp = await ListCollectionsAsync(PathEngine, null, parameters);
@@ -195,7 +195,7 @@ namespace RelationalAI.Services
         {
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
-                .HandleResult<Engine>(e => !e.State.IsFinalState())
+                .HandleResult<Engine>(e => !EngineStates.IsFinalState(e.State))
                 .Retry15Min()
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;

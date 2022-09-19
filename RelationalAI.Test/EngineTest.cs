@@ -18,22 +18,19 @@ namespace RelationalAI.Test
 
             var createRsp = await client.CreateEngineWaitAsync(EngineName);
             Assert.Equal(createRsp.Name, EngineName);
-            Assert.Equal(EngineState.Provisioned, createRsp.State);
+            Assert.Equal("PROVISIONED", createRsp.State);
 
             var engine = await client.GetEngineAsync(EngineName);
             Assert.Equal(engine.Name, EngineName);
-            Assert.Equal(EngineState.Provisioned, engine.State);
+            Assert.Equal(EngineStates.Provisioned, engine.State);
 
             var engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
 
-            engines = await client.ListEnginesAsync(EngineState.Provisioned);
+            engines = await client.ListEnginesAsync(EngineStates.Provisioned);
             engine = engines.Find(item => item.Name.Equals(EngineName));
             Assert.NotNull(engine);
-
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-                client.ListEnginesAsync((EngineState)1500));
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
 
@@ -41,7 +38,7 @@ namespace RelationalAI.Test
 
             engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.Equal(EngineState.Deleted, engine.State);
+            Assert.Equal(EngineStates.Deleted, engine.State);
         }
 
         public override async Task DisposeAsync()
