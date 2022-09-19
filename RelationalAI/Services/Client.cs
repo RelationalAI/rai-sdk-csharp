@@ -397,9 +397,10 @@ namespace RelationalAI.Services
             var models = new List<Model>();
             var resp = await ExecuteAsync(database, engine, "def output:__models__ = rel:catalog:model");
 
-            for (int i = 0; i < resp.Results[0].Table.Count; i++)
+            int index = resp.Results.FindIndex(r => r.RelationId.Contains("/:output/:__models__"));
+            for (int i = 0; i < resp.Results[index].Table.Count; i++)
             {
-                models.Add(new Model(resp.Results[0].Table[i] as string, resp.Results[1].Table[i] as string));
+                models.Add(new Model(resp.Results[index].Table[i] as string, resp.Results[index+1].Table[i] as string));
             }
 
             return models;
