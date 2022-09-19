@@ -44,7 +44,6 @@ namespace RelationalAI.Models.Engine
         public string Size { get; set; }
 
         [JsonProperty("state")]
-        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
-        public EngineState State { get; set; }
+        public string State { get; set; }
     }
 }

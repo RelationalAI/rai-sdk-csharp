@@ -19,50 +19,15 @@ using System;
 namespace RelationalAI.Models.Engine
 {
     /// <summary>
-    /// Represents all engine lifetime states.
-    /// </summary>
-    public enum EngineState
-    {
-        Requested,
-        Provisioning,
-        Registering,
-        Provisioned,
-        ProvisionFailed,
-        DeleteRequested,
-        Stopping,
-        Deleting,
-        Deleted,
-        DeletionFailed
-    }
-
-    /// <summary>
-    /// Extension methods for EngineState enum such as conversion to string, terminal states identification.
+    /// Methods for EngineState determinations such as terminal states identification.
     /// </summary>
     public static class EngineStates
     {
-        /// <summary>
-        /// Converts <paramref name="state"/> to string value RAI REST API returns.
-        /// </summary>
-        /// <param name="state">Engine state.</param>
-        /// <returns>The string value.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Gets thrown when unsupported enum value is passed.</exception>
-        public static string Value(this EngineState state)
-        {
-            return state switch
-            {
-                EngineState.Requested => "REQUESTED",
-                EngineState.Provisioning => "PROVISIONING",
-                EngineState.Registering => "REGISTERING",
-                EngineState.Provisioned => "PROVISIONED",
-                EngineState.ProvisionFailed => "PROVISION_FAILED",
-                EngineState.DeleteRequested => "DELETE_REQUESTED",
-                EngineState.Stopping => "STOPPING",
-                EngineState.Deleting => "DELETING",
-                EngineState.Deleted => "DELETED",
-                EngineState.DeletionFailed => "DELETION_FAILED",
-                _ => throw new ArgumentOutOfRangeException(nameof(state), state, "Engine state is not supported")
-            };
-        }
+        public static readonly string Deleted = "DELETED";
+        public static readonly string DeletionFailed = "DELETION_FAILED";
+        public static readonly string Provisioned = "PROVISIONED";
+        public static readonly string ProvisionFailed = "PROVISION_FAILED";
+        public static readonly string RequestFailed = "REQUEST_FAILED";
 
         /// <summary>
         /// Identifies if <paramref name="state"/> is the final state of engine,
@@ -70,11 +35,12 @@ namespace RelationalAI.Models.Engine
         /// </summary>
         /// <param name="state">The engine state to check.</param>
         /// <returns>If the state if final.</returns>
-        public static bool IsFinalState(this EngineState state)
+        public static bool IsFinalState(string state)
         {
-            return state == EngineState.ProvisionFailed ||
-                   state == EngineState.Deleted ||
-                   state == EngineState.DeletionFailed;
+            return state == ProvisionFailed ||
+                   state == Deleted ||
+                   state == DeletionFailed ||
+                   state == RequestFailed;
         }
 
         /// <summary>
@@ -84,9 +50,9 @@ namespace RelationalAI.Models.Engine
         /// <param name="currentState">The current state.</param>
         /// <param name="targetState">The target state.</param>
         /// <returns>If the current state is terminal.</returns>
-        public static bool IsTerminalState(this EngineState currentState, EngineState targetState)
+        public static bool IsTerminalState(string currentState, string targetState)
         {
-            return currentState == targetState || currentState.IsFinalState();
+            return currentState == targetState || IsFinalState(currentState);
         }
     }
 }

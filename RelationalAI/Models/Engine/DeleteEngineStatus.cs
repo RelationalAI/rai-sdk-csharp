@@ -26,8 +26,7 @@ namespace RelationalAI.Models.Engine
         public string Name { get; set; }
 
         [JsonProperty("state", Required = Required.Always)]
-        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
-        public EngineState State { get; set; }
+        public string State { get; set; }
 
         [JsonProperty("message")]
         public string Message { get; set; }
