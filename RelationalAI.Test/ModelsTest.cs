@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using RelationalAI.Errors;
+using RelationalAI.Models.Transaction;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -36,8 +37,7 @@ namespace RelationalAI.Test
             Assert.NotNull(model);
 
             var deleteRsp = await client.DeleteModelAsync(Dbname, EngineName, "test_model");
-            Assert.False(deleteRsp.Aborted);
-            Assert.Empty(deleteRsp.Output);
+            Assert.Equal(deleteRsp.Transaction.State, TransactionAsyncState.Completed);
             Assert.Empty(deleteRsp.Problems);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
