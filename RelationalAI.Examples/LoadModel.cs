@@ -48,7 +48,7 @@ namespace RelationalAI.Examples
 
             var name = Path.GetFileNameWithoutExtension(file);
             var value = File.ReadAllText(file);
-            var models = new List<Model> { new Model(name, value)};
+            var models = new List<Model> { new Model(name, value) };
             var resp = await client.LoadModelsAsync(database, engine, models);
             Console.WriteLine(resp);
         }
