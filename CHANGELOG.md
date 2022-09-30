@@ -1,5 +1,8 @@
 # Changelog
 
+## v0.9.4-alpha
+* Refactored sdk code back into a single package.
+
 ## v0.9.3-alpha
 * Removed `EngineState` enumeration:
     - `ListEnginesAsync(state = "PROVISIONED")`
