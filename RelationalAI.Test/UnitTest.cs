@@ -4,9 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using RelationalAI.Models.Transaction;
-using RelationalAI.Services;
-using RelationalAI.Utils;
 using Xunit;
 
 namespace RelationalAI.Test

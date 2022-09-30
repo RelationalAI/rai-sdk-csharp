@@ -1,7 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using RelationalAI.Errors;
-using RelationalAI.Models.Engine;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -35,10 +33,6 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(EngineName));
-
-            engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.Equal(EngineStates.Deleted, engine.State);
         }
 
         public override async Task DisposeAsync()

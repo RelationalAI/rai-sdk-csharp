@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using RelationalAI.Errors;
-using RelationalAI.Models.User;
 using Xunit;
 
 namespace RelationalAI.Test
