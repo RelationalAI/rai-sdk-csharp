@@ -4,7 +4,6 @@ using System.IO;
 using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
-using RelationalAI.Models.Transaction;
 
 namespace RelationalAI.Test
 {

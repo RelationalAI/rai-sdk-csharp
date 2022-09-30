@@ -1,7 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using RelationalAI.Errors;
-using RelationalAI.Models.Database;
 using Xunit;
 
 namespace RelationalAI.Test
