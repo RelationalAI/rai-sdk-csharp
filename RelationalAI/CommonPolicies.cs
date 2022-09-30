@@ -17,7 +17,6 @@
 using System;
 using System.Net.Http;
 using Polly;
-using RelationalAI;
 
 namespace RelationalAI
 {
