@@ -1,30 +1,30 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
+using System.IO;
 using System.Threading.Tasks;
-using RelationalAI.Services;
-using RelationalAI.Utils;
 
 namespace RelationalAI.Examples
 {
-    public class DeleteModel
+    public class LoadModels
     {
         public static Command GetCommand()
         {
-            var cmd = new Command("DeleteModel", "--database <Database> --engine <Engine> --model <Model name> --profile <Profile name>"){
+            var cmd = new Command("LoadModels", "--database <Database> --engine <Engine> --file <File> --profile <Profile name>"){
                 new Option<string>("--database"){
                     IsRequired = true,
-                    Description = "Database name."
+                    Description = "To list models in a paricular database."
                 },
 
                 new Option<string>("--engine"){
                     IsRequired = true,
-                    Description = "Engine name."
+                    Description = "Engine to use to list models."
                 },
 
-                new Option<string>("--model"){
+                new Option<string>("--file"){
                     IsRequired = true,
-                    Description = "Model name."
+                    Description = "Model file."
                 },
 
                 new Option<string>("--profile"){
@@ -32,17 +32,22 @@ namespace RelationalAI.Examples
                     Description = "Profile name from .rai/config to connect to RAI Cloud."
                 }
             };
-            cmd.Description = "Deletes a user by ID.";
+            cmd.Description = "List databases";
             cmd.Handler = CommandHandler.Create<string, string, string, string>(Run);
             return cmd;
         }
 
-        private static async Task Run(string database, string engine, string model, string profile = "default")
+        private static async Task Run(string database, string engine, string file, string profile = "default")
         {
             var config = Config.Read("", profile);
             var context = new Client.Context(config);
             var client = new Client(context);
-            Console.WriteLine(await client.DeleteModelAsync(database, engine, model));
+
+            var name = Path.GetFileNameWithoutExtension(file);
+            var value = File.ReadAllText(file);
+            var models = new Dictionary<string, string> { { name, value } };
+            var resp = await client.LoadModelsAsync(database, engine, models);
+            Console.WriteLine(resp);
         }
 
     }

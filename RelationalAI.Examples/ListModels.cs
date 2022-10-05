@@ -2,8 +2,6 @@
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
-using RelationalAI.Services;
-using RelationalAI.Utils;
 
 namespace RelationalAI.Examples
 {

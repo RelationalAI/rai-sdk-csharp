@@ -21,6 +21,7 @@ namespace RelationalAI.Examples
             root.AddCommand(GetDatabase.GetCommand());
             root.AddCommand(GetEngine.GetCommand());
             root.AddCommand(GetOAuthClient.GetCommand());
+            root.AddCommand(GetModel.GetCommand());
             root.AddCommand(GetUser.GetCommand());
             root.AddCommand(FindUser.GetCommand());
             root.AddCommand(EnableUser.GetCommand());
@@ -31,8 +32,8 @@ namespace RelationalAI.Examples
             root.AddCommand(ListOAuthClients.GetCommand());
             root.AddCommand(ListUsers.GetCommand());
             root.AddCommand(ListModels.GetCommand());
-            root.AddCommand(LoadModel.GetCommand());
-            root.AddCommand(DeleteModel.GetCommand());
+            root.AddCommand(LoadModels.GetCommand());
+            root.AddCommand(DeleteModels.GetCommand());
             root.AddCommand(ExecuteV1.GetCommand());
             root.AddCommand(Execute.GetCommand());
             root.AddCommand(ExecuteAsync.GetCommand());
