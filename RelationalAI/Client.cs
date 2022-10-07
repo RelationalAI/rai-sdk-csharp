@@ -386,12 +386,13 @@ namespace RelationalAI
             var models = new List<string>();
             var resp = await ExecuteAsync(database, engine, query);
 
-            int index = resp.Results.FindIndex(r => r.RelationId.Equals($"/:output/:{outName}/String"));
-            if (index >= 0)
+
+            var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
+            if (result != null)
             {
-                for (int i = 0; i < resp.Results[index].Table.Count; i++)
+                for (int i = 0; i < result.Table.Count; i++)
                 {
-                    models.Add(resp.Results[index].Table[i] as string);
+                    models.Add(result.Table[i] as string);
                 }
             }
 
@@ -406,10 +407,10 @@ namespace RelationalAI
             var resp = await ExecuteAsync(database, engine, query);
 
             var model = new Model(name, null);
-            int index = resp.Results.FindIndex(r => r.RelationId.Equals($"/:output/:{outName}/String"));
-            if (index >= 0)
+            var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
+            if (result != null)
             {
-                model.Value = resp.Results[index].Table[0] as string;
+                model.Value = result.Table[0] as string;
                 return model;
             }
 
