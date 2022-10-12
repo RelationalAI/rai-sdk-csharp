@@ -355,63 +355,77 @@ namespace RelationalAI
             return actionsResp.Count == 0 ? new List<Edb>() : actionsResp[0].Result.Rels;
         }
 
-        public async Task<TransactionResult> LoadModelAsync(
-            string database,
-            string engine,
-            string name,
-            string model)
+        public async Task<TransactionAsyncResult> LoadModelsAsync(
+        string database,
+        string engine,
+        Dictionary<string, string> models)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeInstallAction(name, model) };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            return Json<TransactionResult>.Deserialize(resp);
+            var queries = new List<string>();
+            var queriesInputs = new Dictionary<string, string>();
+            var randInt = new Random().Next(int.MaxValue);
+
+            var index = 0;
+            foreach (var model in models)
+            {
+                var inputName = $"input_{randInt}_{index}";
+                queries.Add($"delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] " +
+                $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
+                queriesInputs.Add(inputName, model.Value);
+
+                index++;
+            }
+
+            return await ExecuteAsync(database, engine, string.Join('\n', queries), false, queriesInputs);
         }
 
-        public async Task<TransactionResult> LoadModelsAsync(
-            string database,
-            string engine,
-            Dictionary<string, string> models)
+        public async Task<List<string>> ListModelsAsync(string database, string engine)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeInstallAction(models) };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            return Json<TransactionResult>.Deserialize(resp);
-        }
+            var outName = $"models_{new Random().Next(int.MaxValue)}";
+            var query = $"def output:{outName}[name] = rel:catalog:model(name, _)";
 
-        public async Task<List<Model>> ListModelsAsync(string database, string engine)
-        {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeListModelsAction() };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            var actionsResp = Json<ListModelsResponse>.Deserialize(resp).Actions;
-            return actionsResp.Count == 0 ? new List<Model>() : actionsResp[0].Result.Models;
-        }
+            var models = new List<string>();
+            var resp = await ExecuteAsync(database, engine, query);
 
-        public async Task<List<string>> ListModelNamesAsync(string database, string engine)
-        {
-            var models = await ListModelsAsync(database, engine);
-            var modelNames = models.Select(t => t.Name).ToList();
-            return modelNames;
+
+            var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
+            if (result != null)
+            {
+                for (int i = 0; i < result.Table.Count; i++)
+                {
+                    models.Add(result.Table[i] as string);
+                }
+            }
+
+            return models;
         }
 
         public async Task<Model> GetModelAsync(string database, string engine, string name)
         {
-            var models = await ListModelsAsync(database, engine);
+            var outName = $"model_{new Random().Next(int.MaxValue)}";
+            var query = $"def output:{outName} = rel:catalog:model[\"{name}\"]";
 
-            return models.FirstOrDefault(model => model.Name.Equals(name)) ??
-                   throw new NotFoundException($"Model with name `{name}` not found on database {database}");
+            var resp = await ExecuteAsync(database, engine, query);
+
+            var model = new Model(name, null);
+            var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
+            if (result != null)
+            {
+                model.Value = result.Table[0] as string;
+                return model;
+            }
+
+            throw new NotFoundException($"Model with name `{name}` not found on database {database}");
         }
 
-        public async Task<TransactionResult> DeleteModelAsync(string database, string engine, string name)
+        public async Task<TransactionAsyncResult> DeleteModelsAsync(string database, string engine, List<string> models)
         {
-            var tx = new Transaction(_context.Region, database, engine, TransactionMode.Open);
-            var actions = new List<DbAction> { DbAction.MakeDeleteModelAction(name) };
-            var body = tx.Payload(actions);
-            var resp = await _rest.PostAsync(MakeUrl(PathTransaction), body, null, tx.QueryParams()) as string;
-            return Json<TransactionResult>.Deserialize(resp);
+            var queries = new List<string>();
+            foreach (var model in models)
+            {
+                queries.Add($"def delete:rel:catalog:model[\"{model}\"] = rel:catalog:model[\"{model}\"]");
+            }
+
+            return await ExecuteAsync(database, engine, string.Join('\n', queries), false);
         }
 
         // Query

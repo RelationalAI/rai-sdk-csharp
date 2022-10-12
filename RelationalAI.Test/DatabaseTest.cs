@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -47,17 +48,17 @@ namespace RelationalAI.Test
             var edb = edbs.Find(item => item.Name.Equals("rel"));
             Assert.NotNull(edb);
 
-            var modelNames = await client.ListModelNamesAsync(Dbname, EngineName);
+            var modelNames = await client.ListModelsAsync(Dbname, EngineName);
             var name = modelNames.Find(item => item.Equals("rel/stdlib"));
             Assert.NotNull(name);
 
             var models = await client.ListModelsAsync(Dbname, EngineName);
-            var model = models.Find(m => m.Name.Equals("rel/stdlib"));
-            Assert.NotNull(model);
+            //var model = models.Find(m => m.Name.Equals("rel/stdlib"));
+            //Assert.NotNull(model);
 
-            model = await client.GetModelAsync(Dbname, EngineName, "rel/stdlib");
-            Assert.NotNull(model);
-            Assert.True(model.Value.Length > 0);
+            //model = await client.GetModelAsync(Dbname, EngineName, "rel/stdlib");
+            //Assert.NotNull(model);
+            //Assert.True(model.Value.Length > 0);
 
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
@@ -65,7 +66,7 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
-        private const string TestModel = "def R = \"hello\", \"world\"";
+        private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
 
         private const string TestJson = "{" +
                                         "\"name\":\"Amira\",\n" +
@@ -92,10 +93,9 @@ namespace RelationalAI.Test
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            loadRsp = await client.LoadModelAsync(Dbname, EngineName, "test_model", TestModel);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
-            Assert.Empty(loadRsp.Problems);
+            var resp = await client.LoadModelsAsync(Dbname, EngineName, TestModel);
+            Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
+            Assert.Empty(resp.Problems);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";
@@ -130,17 +130,13 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
 
             // make sure the model was cloned
-            var modelNames = await client.ListModelNamesAsync(databaseCloneName, EngineName);
+            var modelNames = await client.ListModelsAsync(databaseCloneName, EngineName);
             var name = modelNames.Find(item => item.Equals("test_model"));
             Assert.NotNull(name);
 
-            var models = await client.ListModelsAsync(databaseCloneName, EngineName);
-            var model = models.Find(m => m.Name.Equals("test_model"));
-            Assert.NotNull(model);
-
-            model = await client.GetModelAsync(databaseCloneName, EngineName, "test_model");
-            Assert.NotNull(model);
-            Assert.True(model.Value.Length > 0);
+            var model = await client.GetModelAsync(databaseCloneName, EngineName, "test_model");
+            Assert.Equal("test_model", model.Name);
+            Assert.Equal(TestModel["test_model"], model.Value);
 
             // cleanup
             var deleteRsp = await client.DeleteDatabaseAsync(databaseCloneName);
