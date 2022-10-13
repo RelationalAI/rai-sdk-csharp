@@ -498,7 +498,7 @@ namespace RelationalAI
             return ReadTransactionAsyncResults(rsp as List<TransactionAsyncFile>);
         }
 
-        public Task<TransactionResult> LoadJsonAsync(
+        public Task<TransactionAsyncResult> LoadJsonAsync(
             string database,
             string engine,
             string relation,
@@ -509,10 +509,10 @@ namespace RelationalAI
                 { "data", data }
             };
             var source = GenLoadJson(relation);
-            return ExecuteV1Async(database, engine, source, false, inputs);
+            return ExecuteWaitAsync(database, engine, source, false, inputs);
         }
 
-        public Task<TransactionResult> LoadCsvAsync(
+        public Task<TransactionAsyncResult> LoadCsvAsync(
             string database,
             string engine,
             string relation,
@@ -524,7 +524,7 @@ namespace RelationalAI
             {
                 { "data", data }
             };
-            return ExecuteV1Async(database, engine, source, false, inputs);
+            return ExecuteWaitAsync(database, engine, source, false, inputs);
         }
 
         private static TransactionMode CreateMode(string source, bool overwrite)

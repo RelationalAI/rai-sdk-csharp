@@ -89,8 +89,7 @@ namespace RelationalAI.Test
 
             // load some data and model
             var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", TestJson);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
+            Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
             var resp = await client.LoadModelsAsync(Dbname, EngineName, TestModel);
