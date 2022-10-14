@@ -30,7 +30,7 @@ namespace RelationalAI.Test
             Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteAsync(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample");
             Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
             Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
             Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
@@ -60,7 +60,7 @@ namespace RelationalAI.Test
             Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteAsync(Dbname, EngineName, "def output = sample_no_header");
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample_no_header");
             Assert.Equal(rsp.Results[0].Table, new List<object> { 1L, 2L, 3L, 4L });
             Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
             Assert.Equal(rsp.Results[2].Table, new List<object> { 1L, 2L, 3L, 4L });
@@ -91,7 +91,7 @@ namespace RelationalAI.Test
             Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteAsync(Dbname, EngineName, "def output = sample_alt_syntax");
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample_alt_syntax");
             Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
             Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
             Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
@@ -123,7 +123,7 @@ namespace RelationalAI.Test
             Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteAsync(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample");
             Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
             Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
             Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
