@@ -38,13 +38,13 @@ namespace RelationalAI
 
         private readonly Context _context;
 
-        public HttpClient HttpClient { get; set; }
-
         public Rest(Context context)
         {
             _context = context;
             HttpClient = new HttpClient();
         }
+
+        public HttpClient HttpClient { get; set; }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
         {

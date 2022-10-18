@@ -380,7 +380,6 @@ namespace RelationalAI
             var models = new List<string>();
             var resp = await ExecuteAsync(database, engine, query);
 
-
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
             if (result != null)
             {
