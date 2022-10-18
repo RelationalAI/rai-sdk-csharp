@@ -125,14 +125,9 @@ namespace RelationalAI
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
-        // This function is no longer needed and will be deprecated soon
-        // please make sure to use the exposed http client to set custom headers
+        [Obsolete("This method is deprecated, please use the exposed http client instead")]
         public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, string size = "XS")
         {
-            Console.WriteLine(@"
-            This function will be deprecated in the next release
-            Please make sure to use the exposed http client to set custom headers
-            ");
             var data = new Dictionary<string, string>
             {
                 { "region", _context.Region },
