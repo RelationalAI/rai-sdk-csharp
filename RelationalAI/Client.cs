@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -41,6 +42,11 @@ namespace RelationalAI
         {
             _context = context;
             _rest = new Rest(context);
+        }
+
+        public HttpClient GetHttpClient()
+        {
+            return _rest.HttpClient;
         }
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)
