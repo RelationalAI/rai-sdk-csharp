@@ -49,6 +49,11 @@ namespace RelationalAI
             return _rest.HttpClient;
         }
 
+        public void SetHttpClient(HttpClient httpClient)
+        {
+            _rest.HttpClient = httpClient;
+        }
+
         public Task<Database> CreateDatabaseAsync(string database, string engine)
         {
             return CreateDatabaseAsync(database, engine, false);

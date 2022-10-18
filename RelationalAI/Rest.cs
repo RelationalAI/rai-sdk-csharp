@@ -38,7 +38,7 @@ namespace RelationalAI
 
         private readonly Context _context;
 
-        public HttpClient HttpClient { get; }
+        public HttpClient HttpClient { get; set; }
 
         public Rest(Context context)
         {
