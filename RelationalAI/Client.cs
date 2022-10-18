@@ -125,6 +125,29 @@ namespace RelationalAI
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
+        // This function is no longer needed and will be deprecated soon
+        // please make sure to use the exposed http client to set custom headers
+        public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, string size = "XS")
+        {
+            Console.WriteLine(@"
+            This function will be deprecated in the next release
+            Please make sure to use the exposed http client to set custom headers
+            ");
+            var data = new Dictionary<string, string>
+            {
+                { "region", _context.Region },
+                { "name", engine },
+                { "size", size.ToString() }
+            };
+            var headers = new Dictionary<string, string>
+            {
+                { "x-rai-parameter-compute-version", version },
+            };
+
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: headers) as string;
+            return Json<CreateEngineResponse>.Deserialize(resp).Engine;
+        }
+
         public async Task<Engine> CreateEngineWaitAsync(string engine, string size = "XS")
         {
             await CreateEngineAsync(engine, size);
