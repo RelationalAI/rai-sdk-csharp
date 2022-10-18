@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
@@ -41,6 +42,16 @@ namespace RelationalAI
         {
             _context = context;
             _rest = new Rest(context);
+        }
+
+        public HttpClient GetHttpClient()
+        {
+            return _rest.HttpClient;
+        }
+
+        public void SetHttpClient(HttpClient httpClient)
+        {
+            _rest.HttpClient = httpClient;
         }
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)
@@ -114,6 +125,7 @@ namespace RelationalAI
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
+        [Obsolete("This method is deprecated, please use the exposed http client instead")]
         public async Task<Engine> CreateEngineWithVersionAsync(string engine, string version, string size = "XS")
         {
             var data = new Dictionary<string, string>
@@ -385,7 +397,6 @@ namespace RelationalAI
 
             var models = new List<string>();
             var resp = await ExecuteAsync(database, engine, query);
-
 
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
             if (result != null)

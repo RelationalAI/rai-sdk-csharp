@@ -1,5 +1,12 @@
 # Changelog
 
+## main
+* Exposed http client
+```
+var client = new Client(ctx);
+var httpClient = client.GetHttpClient();
+```
+
 ## v0.9.4-alpha
 * Refactored sdk code back into a single package.
 

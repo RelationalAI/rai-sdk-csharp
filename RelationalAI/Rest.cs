@@ -41,7 +41,10 @@ namespace RelationalAI
         public Rest(Context context)
         {
             _context = context;
+            HttpClient = new HttpClient();
         }
+
+        public HttpClient HttpClient { get; set; }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
         {
@@ -333,17 +336,11 @@ namespace RelationalAI
             Dictionary<string, string> headers = null,
             Dictionary<string, string> parameters = null)
         {
-            var uri = new Uri(url);
-            using var client = new HttpClient();
-
-            // Set the API url
-            client.BaseAddress = uri;
-
             // Create the POST request
-            var request = PrepareHttpRequest(method, client.BaseAddress, EncodeContent(data), headers, parameters);
+            var request = PrepareHttpRequest(method, new Uri(url), EncodeContent(data), headers, parameters);
 
             // Get the result back or throws an exception.
-            var response = await client.SendAsync(request);
+            var response = await HttpClient.SendAsync(request);
             await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType.MediaType;
