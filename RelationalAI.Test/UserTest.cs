@@ -11,7 +11,7 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{Uuid}@example.com";
 
-        [Fact (Skip = "User tests are hitting Auth0 API rate limits")]
+        [Fact(Skip="User tests are hitting Auth0 API rate limits")]
         public async Task TestUser()
         {
             var client = CreateClient();
