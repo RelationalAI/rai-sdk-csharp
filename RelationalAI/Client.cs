@@ -44,14 +44,10 @@ namespace RelationalAI
             _rest = new Rest(context);
         }
 
-        public HttpClient GetHttpClient()
+        public HttpClient HttpClient
         {
-            return _rest.HttpClient;
-        }
-
-        public void SetHttpClient(HttpClient httpClient)
-        {
-            _rest.HttpClient = httpClient;
+            get { return _rest.HttpClient; }
+            set { _rest.HttpClient = value; }
         }
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)

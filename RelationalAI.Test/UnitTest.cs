@@ -42,7 +42,7 @@ namespace RelationalAI.Test
 
             var ctx = new Client.Context(config);
             var testClient = new Client(ctx);
-            var httpClient = testClient.GetHttpClient();
+            var httpClient = testClient.HttpClient;
             foreach (var header in customHeaders)
             {
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
