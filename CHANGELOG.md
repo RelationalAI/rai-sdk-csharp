@@ -4,7 +4,7 @@
 * Exposed http client
 ```
 var client = new Client(ctx);
-var httpClient = client.GetHttpClient();
+var httpClient = client.HttpClient;
 ```
 
 ## v0.9.4-alpha
