@@ -15,6 +15,8 @@
  */
 
 using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 
 namespace RelationalAI
 {
@@ -31,7 +33,7 @@ namespace RelationalAI
             bool readOnly,
             string query,
             string lastRequestedInterval,
-            string abortReason)
+            TransactionAsyncAbortReason abortReason)
             : base(id, state)
         {
             AccountName = accountName;
@@ -70,6 +72,7 @@ namespace RelationalAI
         public string LastRequestedInterval { get; set; }
 
         [JsonProperty("abort_reason")]
-        public string AbortReason { get; set; }
+        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        public TransactionAsyncAbortReason AbortReason { get; set; }
     }
 }

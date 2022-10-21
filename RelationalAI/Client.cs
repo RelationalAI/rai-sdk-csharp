@@ -481,17 +481,11 @@ namespace RelationalAI
             MetadataInfo metadata = null;
             List<object> problems = null;
 
-            try
+            if (transaction.State == TransactionAsyncState.Completed || transaction.AbortReason == TransactionAsyncAbortReason.IntegrityConstraintViolation)
             {
                 results = await GetTransactionResultsAsync(id);
                 metadata = await GetTransactionMetadataAsync(id);
                 problems = await GetTransactionProblemsAsync(id);
-            }
-            catch (NotFoundException)
-            {
-                // ignore not found exceptions
-                // for aborted transactions results, metadata or problems
-                // might be missing
             }
 
             return new TransactionAsyncResult(
