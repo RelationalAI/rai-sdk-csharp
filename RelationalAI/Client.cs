@@ -487,7 +487,7 @@ namespace RelationalAI
                 metadata = await GetTransactionMetadataAsync(id);
                 problems = await GetTransactionProblemsAsync(id);
             }
-            catch(NotFoundException)
+            catch (NotFoundException)
             {
                 // ignore not found exceptions
                 // for aborted transactions results, metadata or problems
