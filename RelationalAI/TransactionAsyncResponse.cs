@@ -72,7 +72,7 @@ namespace RelationalAI
         public string LastRequestedInterval { get; set; }
 
         [JsonProperty("abort_reason")]
-        [JsonConverter(typeof(StringEnumConverter), typeof(SnakeCaseNamingStrategy))]
+        [JsonConverter(typeof(StringEnumConverter))]
         public TransactionAsyncAbortReason AbortReason { get; set; }
     }
 }

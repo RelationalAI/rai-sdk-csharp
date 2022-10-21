@@ -15,16 +15,23 @@
  */
 
 using System;
+using System.Runtime.Serialization;
 
 namespace RelationalAI
 {
     public enum TransactionAsyncAbortReason
     {
-        InternalError,
+        [EnumMember(Value = "system internal error")]
+        SystemInternalError,
+        [EnumMember(Value = "cancelled")]
         Cancelled,
-        ShuttingDown,
+        [EnumMember(Value = "engine shutting down")]
+        EngineShuttingDown,
+        [EnumMember(Value = "invalid request")]
         InvalidRequest,
+        [EnumMember(Value = "too many requests")]
         TooManyRequests,
+        [EnumMember(Value = "integrity constraint violation")]
         IntegrityConstraintViolation
     }
 
@@ -34,9 +41,9 @@ namespace RelationalAI
         {
             return reason switch
             {
-                TransactionAsyncAbortReason.InternalError => "system internal error",
+                TransactionAsyncAbortReason.SystemInternalError => "system internal error",
                 TransactionAsyncAbortReason.Cancelled => "cancelled",
-                TransactionAsyncAbortReason.ShuttingDown => "engine shutting down",
+                TransactionAsyncAbortReason.EngineShuttingDown => "engine shutting down",
                 TransactionAsyncAbortReason.InvalidRequest => "invalid request",
                 TransactionAsyncAbortReason.TooManyRequests => "too many requests",
                 TransactionAsyncAbortReason.IntegrityConstraintViolation => "integrity constraint violation",
