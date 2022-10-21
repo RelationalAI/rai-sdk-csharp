@@ -30,7 +30,8 @@ namespace RelationalAI
             string databaseName,
             bool readOnly,
             string query,
-            string lastRequestedInterval)
+            string lastRequestedInterval,
+            string abortReason)
             : base(id, state)
         {
             AccountName = accountName;
@@ -41,6 +42,7 @@ namespace RelationalAI
             ReadOnly = readOnly;
             Query = query;
             LastRequestedInterval = lastRequestedInterval;
+            AbortReason = abortReason;
         }
 
         [JsonProperty("account_name", Required = Required.Always)]
@@ -66,5 +68,8 @@ namespace RelationalAI
 
         [JsonProperty("last_requested_interval", Required = Required.Always)]
         public string LastRequestedInterval { get; set; }
+
+        [JsonProperty("abort_reason")]
+        public string AbortReason { get; set; }
     }
 }

@@ -477,9 +477,22 @@ namespace RelationalAI
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
-            var results = await GetTransactionResultsAsync(id);
-            var metadata = await GetTransactionMetadataAsync(id);
-            var problems = await GetTransactionProblemsAsync(id);
+            List<ArrowRelation> results = null;
+            MetadataInfo metadata = null;
+            List<object> problems = null;
+
+            try
+            {
+                results = await GetTransactionResultsAsync(id);
+                metadata = await GetTransactionMetadataAsync(id);
+                problems = await GetTransactionProblemsAsync(id);
+            }
+            catch(NotFoundException)
+            {
+                // ignore not found exceptions
+                // for aborted transactions results, metadata or problems
+                // might be missing
+            }
 
             return new TransactionAsyncResult(
                 transaction,
