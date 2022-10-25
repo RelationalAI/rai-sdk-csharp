@@ -466,10 +466,14 @@ namespace RelationalAI
                 return rsp;
             }
 
+            // txn start time
+            var txn = await GetTransactionAsync(id);
+            var startTime = DateTimeOffset.FromUnixTimeMilliseconds(txn.Transaction.CreatedOn).UtcDateTime;
+
             // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r => !r.Transaction.State.IsFinalState())
-                .RetryForeverWithBoundedDelay()
+                .RetryForeverWithBoundedDelay(startTime)
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
