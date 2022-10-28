@@ -141,10 +141,11 @@ namespace RelationalAI
 
         public async Task<Engine> CreateEngineWaitAsync(string engine, string size = "XS")
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             await CreateEngineAsync(engine, size);
             var resp = await Policy
                     .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
-                    .Retry30Min()
+                    .Retry30Min(startTime)
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
             if (resp.State != EngineStates.Provisioned)
@@ -191,10 +192,11 @@ namespace RelationalAI
 
         public async Task<DeleteEngineResponse> DeleteEngineWaitAsync(string engine)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
                 .HandleResult<Engine>(e => !EngineStates.IsFinalState(e.State))
-                .Retry15Min()
+                .Retry15Min(startTime)
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
             return resp;
@@ -457,6 +459,7 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var rsp = await ExecuteAsync(database, engine, source, readOnly, inputs);
             var id = rsp.Transaction.Id;
 
@@ -466,14 +469,10 @@ namespace RelationalAI
                 return rsp;
             }
 
-            // txn start time
-            var txn = await GetTransactionAsync(id);
-            var startTime = DateTimeOffset.FromUnixTimeMilliseconds(txn.Transaction.CreatedOn).UtcDateTime;
-
             // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r => !r.Transaction.State.IsFinalState())
-                .RetryForeverWithBoundedDelay(startTime)
+                .RetryForeverWithBoundedDelay(startTime, 0.2)
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;

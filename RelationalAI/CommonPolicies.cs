@@ -41,15 +41,14 @@ namespace RelationalAI
         /// </summary>
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
-        /// <param name="startTime">The transaction start time</param>
+        /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <param name="delayThreshold">Max delay between retry attempts in seconds. Defaults to 30 seconds.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, DateTime? startTime = null, double overheadRate = 0.1, int delayThreshold = 30)
+        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1, int delayThreshold = 120)
         {
-            var time = startTime == null ? DateTime.UtcNow : (DateTime)startTime;
             return policyBuilder
-                .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(time, overheadRate, delayThreshold))
+                .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, delayThreshold))
                 .AddRequestErrorResilience();
         }
 
@@ -61,13 +60,12 @@ namespace RelationalAI
         /// </summary>
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
-        /// <param name="startTime">The transaction start time</param>
+        /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder, DateTime? startTime = null, double overheadRate = 0.1)
+        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1)
         {
-            var time = startTime == null ? DateTime.UtcNow : (DateTime)startTime;
-            return policyBuilder.AddBoundedRetryPolicy(time, overheadRate, 15, 15 * 60);
+            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 15 * 60);
         }
 
         /// <summary>
@@ -78,13 +76,12 @@ namespace RelationalAI
         /// </summary>
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
-        /// <param name="startTime">The transaction start time</param>
+        /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder, DateTime? startTime = null, double overheadRate = 0.1)
+        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1)
         {
-            var time = startTime == null ? DateTime.UtcNow : (DateTime)startTime;
-            return policyBuilder.AddBoundedRetryPolicy(time, overheadRate, 15, 30 * 60);
+            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 30 * 60);
         }
 
         /// <summary>
@@ -99,15 +96,16 @@ namespace RelationalAI
             return policy.WrapAsync(RequestErrorResilience);
         }
 
-        private static AsyncPolicy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, DateTime startTime, double overheadRate, int delayThreshold, int timeoutSeconds)
+        private static AsyncPolicy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate, int delayThreshold, int timeoutSeconds)
         {
             var timeoutPolicy = Policy.TimeoutAsync(TimeSpan.FromSeconds(timeoutSeconds));
             var retryPolicy = policyBuilder.RetryForeverWithBoundedDelay(startTime, overheadRate, delayThreshold);
             return timeoutPolicy.WrapAsync(retryPolicy);
         }
 
-        private static AsyncPolicy GetRequestErrorResiliencePolicy()
+        private static AsyncPolicy GetRequestErrorResiliencePolicy(double overheadRate = 0.1, int maxDelayThreshold = 120)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             return Policy
 
                 // The request failed due to an underlying issue such as network connectivity, DNS
@@ -119,14 +117,19 @@ namespace RelationalAI
 
                 // Retry 5 times with 10% overhead of the time the transaction has been running so far
                 // And rethrow the exception.
-                .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(DateTime.UtcNow, 0.10, 30));
+                .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, maxDelayThreshold));
         }
 
         // Adds a % overhead of the time the transaction has been running so far
-        private static TimeSpan GetBoundedRetryDelay(DateTime startTime, double overheadRate, int maxDelayThreshold)
+        private static TimeSpan GetBoundedRetryDelay(int retryAttempt, long startTime, double overheadRate, int maxDelayThreshold)
         {
-            var currentDelay = DateTime.UtcNow - startTime;
-            var duration = currentDelay.TotalMilliseconds * overheadRate;
+            if (retryAttempt == 1)
+            {
+                return TimeSpan.FromMilliseconds(500);
+            }
+
+            var currentDelay = DateTimeOffset.Now.ToUnixTimeMilliseconds() - startTime; // total run time
+            var duration = currentDelay * overheadRate; // 20% of total run time
             return TimeSpan.FromMilliseconds(Math.Min(duration, maxDelayThreshold * 1000));
         }
     }
