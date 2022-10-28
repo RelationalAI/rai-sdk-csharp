@@ -15,29 +15,38 @@
  */
 
 using System;
+using Newtonsoft.Json;
 
 namespace RelationalAI
 {
-    public class AccessToken
+    public class AccessToken : Entity
     {
-        private readonly DateTime _createdOn;
-        private int _expiresIn;
-
-        public AccessToken(string token, int expiresIn)
+        public AccessToken(string token, int expiresIn, string scope)
         {
             Token = token;
             ExpiresIn = expiresIn;
-            _createdOn = DateTime.Now;
+            Scope = scope;
+            CreatedOn = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
         }
 
-        public bool IsExpired => (DateTime.Now - _createdOn).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
+        public bool IsExpired => (DateTime.Now - DateTimeOffset.FromUnixTimeSeconds(CreatedOn)).TotalSeconds >= ExpiresIn - 5; // Anticipate access token expiration by 5 seconds
 
+        [JsonProperty("access_token", Required = Required.Always)]
         public string Token { get; set; }
 
-        public int ExpiresIn
+        [JsonProperty("scope")]
+        public string Scope { get; set; }
+
+        [JsonProperty("expires_in")]
+        public int ExpiresIn;
+
+        [JsonProperty("created_on")]
+        public long CreatedOn { get; set; }
+
+        public int ExpriesIn
         {
-            get => _expiresIn;
-            set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
+            get => ExpiresIn;
+            set => ExpiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
         }
     }
 }
