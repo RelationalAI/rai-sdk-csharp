@@ -25,6 +25,23 @@ namespace RelationalAI
 {
     public class DefaultAccessTokenHandler : IAccessTokenHandler
     {
+        public async Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds)
+        {
+            var token = ReadAccessToken(creds);
+            if (token != null && !token.IsExpired)
+            {
+                return token;
+            }
+
+            token = await rest.RequestAccessTokenAsync(host, creds);
+            if (token != null)
+            {
+                WriteAccessToken(creds, token);
+            }
+
+            return token;
+        }
+
         private string CacheName()
         {
             var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
@@ -33,24 +50,13 @@ namespace RelationalAI
             return Path.Join(home, ".rai", "tokens.json");
         }
 
-        public async Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds)
-        {
-            var token = ReadAccessToken(creds);
-            if (token != null && !token.IsExpired)
-                return token;
-
-            token = await rest.RequestAccessTokenAsync(host, creds);
-            if (token != null)
-                WriteAccessToken(creds, token);
-
-            return token;
-        }
-
         private AccessToken ReadAccessToken(ClientCredentials creds)
         {
             var cache = ReadTokenCache();
             if (cache == null)
+            {
                 return null;
+            }
 
             if (cache.ContainsKey(creds.ClientId))
             {
@@ -69,7 +75,8 @@ namespace RelationalAI
                 return cache;
             }
             catch (IOException)
-            { }
+            {
+            }
 
             return null;
         }
@@ -90,8 +97,10 @@ namespace RelationalAI
                 }
 
                 File.WriteAllText(CacheName(), JsonConvert.SerializeObject(dict));
-            } catch (IOException)
-            { }
+            }
+            catch (IOException)
+            {
+            }
         }
     }
 }
