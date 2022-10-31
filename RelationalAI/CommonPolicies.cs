@@ -129,7 +129,7 @@ namespace RelationalAI
             }
 
             var currentDelay = DateTimeOffset.Now.ToUnixTimeMilliseconds() - startTime; // total run time
-            var duration = currentDelay * overheadRate; // 20% of total run time
+            var duration = currentDelay * overheadRate; // overhead rate % of total run time
             return TimeSpan.FromMilliseconds(Math.Min(duration, maxDelayThreshold * 1000));
         }
     }
