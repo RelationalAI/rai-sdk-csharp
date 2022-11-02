@@ -145,7 +145,7 @@ namespace RelationalAI
             await CreateEngineAsync(engine, size);
             var resp = await Policy
                     .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
-                    .Retry30Min(startTime)
+                    .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
             if (resp.State != EngineStates.Provisioned)
@@ -196,7 +196,7 @@ namespace RelationalAI
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
                 .HandleResult<Engine>(e => !EngineStates.IsFinalState(e.State))
-                .Retry15Min(startTime)
+                .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
             return resp;

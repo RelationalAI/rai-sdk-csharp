@@ -43,7 +43,7 @@ namespace RelationalAI
         /// <param name="policyBuilder">The policy builder.</param>
         /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
-        /// <param name="delayThreshold">Max delay between retry attempts in seconds. Defaults to 30 seconds.</param>
+        /// <param name="delayThreshold">Max delay between retry attempts in seconds</param>
         /// <returns>Resulting policy instance.</returns>
         public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01, int delayThreshold = 120)
         {
@@ -53,7 +53,7 @@ namespace RelationalAI
         }
 
         /// <summary>
-        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 15 min
+        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than the timeout
         /// to complete, otherwise throws TimeoutRejectedException.
         /// Uses exponential back-off with an overhead % of the time the transaction has been running so far up to 15 seconds and then retrying every 15 seconds.
         /// Retries on HTTP request sending errors.
@@ -62,26 +62,12 @@ namespace RelationalAI
         /// <param name="policyBuilder">The policy builder.</param>
         /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
+        /// <param name="delayThreshold">Max delay between retry attempts in seconds.</param>
+        /// <param name="timeoutSeconds">the retry timeout in seconds</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01)
+        public static AsyncPolicy<T> RetryWithTimeout<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate, int delayThreshold, int timeoutSeconds)
         {
-            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 15 * 60);
-        }
-
-        /// <summary>
-        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 30 min
-        /// to complete, otherwise throws TimeoutRejectedException.
-        /// Uses exponential back-off with an overhead % of the time the transaction has been running so far up to 15 seconds and then retrying every 15 seconds.
-        /// Retries on HTTP request sending errors.
-        /// </summary>
-        /// <typeparam name="T">Result type of an operation.</typeparam>
-        /// <param name="policyBuilder">The policy builder.</param>
-        /// <param name="startTime">transaction startTime epoch milliseconds</param>
-        /// <param name="overheadRate">the overhead % to add through polling</param>
-        /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01)
-        {
-            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 30 * 60);
+            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, delayThreshold, timeoutSeconds);
         }
 
         /// <summary>
