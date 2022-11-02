@@ -57,10 +57,6 @@ namespace RelationalAI
         private AccessToken ReadAccessToken(ClientCredentials creds)
         {
             var cache = ReadTokenCache();
-            if (cache == null)
-            {
-                return null;
-            }
 
             if (cache.ContainsKey(creds.ClientId))
             {
@@ -82,7 +78,7 @@ namespace RelationalAI
             {
             }
 
-            return null;
+            return new Dictionary<string, AccessToken>();
         }
 
         private void WriteAccessToken(ClientCredentials creds, AccessToken token)
