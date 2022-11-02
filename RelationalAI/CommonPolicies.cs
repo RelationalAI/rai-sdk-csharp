@@ -45,7 +45,7 @@ namespace RelationalAI
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <param name="delayThreshold">Max delay between retry attempts in seconds. Defaults to 30 seconds.</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1, int delayThreshold = 120)
+        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01, int delayThreshold = 120)
         {
             return policyBuilder
                 .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, delayThreshold))
@@ -63,7 +63,7 @@ namespace RelationalAI
         /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1)
+        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01)
         {
             return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 15 * 60);
         }
@@ -79,7 +79,7 @@ namespace RelationalAI
         /// <param name="startTime">transaction startTime epoch milliseconds</param>
         /// <param name="overheadRate">the overhead % to add through polling</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.1)
+        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01)
         {
             return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, 15, 30 * 60);
         }
@@ -103,7 +103,7 @@ namespace RelationalAI
             return timeoutPolicy.WrapAsync(retryPolicy);
         }
 
-        private static AsyncPolicy GetRequestErrorResiliencePolicy(double overheadRate = 0.1, int maxDelayThreshold = 120)
+        private static AsyncPolicy GetRequestErrorResiliencePolicy(double overheadRate = 0.01, int maxDelayThreshold = 120)
         {
             var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             return Policy
@@ -115,7 +115,7 @@ namespace RelationalAI
                 // Server error response received (5xx status code, etc.)
                 .Or<ApiException>()
 
-                // Retry 5 times with 10% overhead of the time the transaction has been running so far
+                // Retry 5 times with overheadRate param of the time the transaction has been running so far
                 // And rethrow the exception.
                 .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, maxDelayThreshold));
         }
