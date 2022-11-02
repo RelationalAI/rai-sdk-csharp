@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace RelationalAI
 {
+    // IAccessTokenHandler is a contract interface
+    // for custom access token handlers implementation.
+    // Check DefaultAccessToken for an example
     public interface IAccessTokenHandler
     {
         Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds);

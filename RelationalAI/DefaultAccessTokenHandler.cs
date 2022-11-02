@@ -23,6 +23,10 @@ using Newtonsoft.Json;
 
 namespace RelationalAI
 {
+    // This handler caches tokens in ~/.rai/tokens.json. It will attempt to load
+    // a token from the cache file and if it is not found or has expired, it will
+    // delegate to rest.RequestAccessTokenAsync to retrieve a new token and will save it
+    // in the cache file.
     public class DefaultAccessTokenHandler : IAccessTokenHandler
     {
         public async Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds)
