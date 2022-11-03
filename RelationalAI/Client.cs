@@ -366,9 +366,9 @@ namespace RelationalAI
         }
 
         public async Task<TransactionAsyncResult> LoadModelsAsync(
-        string database,
-        string engine,
-        Dictionary<string, string> models)
+            string database,
+            string engine,
+            Dictionary<string, string> models)
         {
             var queries = new List<string>();
             var queriesInputs = new Dictionary<string, string>();
@@ -388,13 +388,36 @@ namespace RelationalAI
             return await ExecuteAsync(database, engine, string.Join('\n', queries), false, queriesInputs);
         }
 
+        public async Task<TransactionAsyncResult> LoadModelsWaitAsync(
+            string database,
+            string engine,
+            Dictionary<string, string> models)
+        {
+            var queries = new List<string>();
+            var queriesInputs = new Dictionary<string, string>();
+            var randInt = new Random().Next(int.MaxValue);
+
+            var index = 0;
+            foreach (var model in models)
+            {
+                var inputName = $"input_{randInt}_{index}";
+                queries.Add($"delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] " +
+                $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
+                queriesInputs.Add(inputName, model.Value);
+
+                index++;
+            }
+
+            return await ExecuteWaitAsync(database, engine, string.Join('\n', queries), false, queriesInputs);
+        }
+
         public async Task<List<string>> ListModelsAsync(string database, string engine)
         {
             var outName = $"models_{new Random().Next(int.MaxValue)}";
             var query = $"def output:{outName}[name] = rel:catalog:model(name, _)";
 
             var models = new List<string>();
-            var resp = await ExecuteAsync(database, engine, query);
+            var resp = await ExecuteWaitAsync(database, engine, query);
 
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
             if (result != null)
@@ -413,7 +436,7 @@ namespace RelationalAI
             var outName = $"model_{new Random().Next(int.MaxValue)}";
             var query = $"def output:{outName} = rel:catalog:model[\"{name}\"]";
 
-            var resp = await ExecuteAsync(database, engine, query);
+            var resp = await ExecuteWaitAsync(database, engine, query);
 
             var model = new Model(name, null);
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
@@ -434,7 +457,7 @@ namespace RelationalAI
                 queries.Add($"def delete:rel:catalog:model[\"{model}\"] = rel:catalog:model[\"{model}\"]");
             }
 
-            return await ExecuteAsync(database, engine, string.Join('\n', queries), false);
+            return await ExecuteWaitAsync(database, engine, string.Join('\n', queries), false);
         }
 
         // Query

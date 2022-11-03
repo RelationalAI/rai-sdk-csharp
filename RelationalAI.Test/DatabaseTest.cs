@@ -93,7 +93,7 @@ namespace RelationalAI.Test
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var resp = await client.LoadModelsAsync(Dbname, EngineName, TestModel);
+            var resp = await client.LoadModelsWaitAsync(Dbname, EngineName, TestModel);
             Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
             Assert.Empty(resp.Problems);
 
