@@ -1,5 +1,8 @@
 # Changelog
 
+## main
+* Fixed transaction async backoff issue.
+
 ## v0.9.5-alpha
 * Exposed http client
 ```
