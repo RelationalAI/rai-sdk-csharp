@@ -41,41 +41,33 @@ namespace RelationalAI
         /// </summary>
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
-        /// <param name="delayThreshold">Max delay between retry attempts in seconds. Defaults to 30 seconds.</param>
+        /// <param name="startTime">transaction startTime epoch milliseconds</param>
+        /// <param name="overheadRate">the overhead % to add through polling</param>
+        /// <param name="delayThreshold">Max delay between retry attempts in seconds</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold = 30)
+        public static AsyncPolicy<T> RetryForeverWithBoundedDelay<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate = 0.01, int delayThreshold = 120)
         {
             return policyBuilder
-                .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(retryAttempt, delayThreshold))
+                .WaitAndRetryForeverAsync(retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, delayThreshold))
                 .AddRequestErrorResilience();
         }
 
         /// <summary>
-        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 15 min
+        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than the timeout
         /// to complete, otherwise throws TimeoutRejectedException.
-        /// Uses exponential back-off starting with a 2 seconds delay up to 15 seconds and then retrying every 15 seconds.
+        /// Uses exponential back-off with an overhead % of the time the transaction has been running so far up to 15 seconds and then retrying every 15 seconds.
         /// Retries on HTTP request sending errors.
         /// </summary>
         /// <typeparam name="T">Result type of an operation.</typeparam>
         /// <param name="policyBuilder">The policy builder.</param>
+        /// <param name="startTime">transaction startTime epoch milliseconds</param>
+        /// <param name="overheadRate">the overhead % to add through polling</param>
+        /// <param name="delayThreshold">Max delay between retry attempts in seconds.</param>
+        /// <param name="timeoutSeconds">the retry timeout in seconds</param>
         /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry15Min<T>(this PolicyBuilder<T> policyBuilder)
+        public static AsyncPolicy<T> RetryWithTimeout<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate, int delayThreshold, int timeoutSeconds)
         {
-            return policyBuilder.AddBoundedRetryPolicy(15, 15 * 60);
-        }
-
-        /// <summary>
-        /// Creates a policy that can be used to produce synchronous API for async calls which may be taking less than 30 min
-        /// to complete, otherwise throws TimeoutRejectedException.
-        /// Uses exponential back-off starting with a 2 seconds delay up to 15 seconds and then retrying every 15 seconds.
-        /// Retries on HTTP request sending errors.
-        /// </summary>
-        /// <typeparam name="T">Result type of an operation.</typeparam>
-        /// <param name="policyBuilder">The policy builder.</param>
-        /// <returns>Resulting policy instance.</returns>
-        public static AsyncPolicy<T> Retry30Min<T>(this PolicyBuilder<T> policyBuilder)
-        {
-            return policyBuilder.AddBoundedRetryPolicy(15, 30 * 60);
+            return policyBuilder.AddBoundedRetryPolicy(startTime, overheadRate, delayThreshold, timeoutSeconds);
         }
 
         /// <summary>
@@ -90,15 +82,16 @@ namespace RelationalAI
             return policy.WrapAsync(RequestErrorResilience);
         }
 
-        private static AsyncPolicy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, int delayThreshold, int timeoutSeconds)
+        private static AsyncPolicy<T> AddBoundedRetryPolicy<T>(this PolicyBuilder<T> policyBuilder, long startTime, double overheadRate, int delayThreshold, int timeoutSeconds)
         {
             var timeoutPolicy = Policy.TimeoutAsync(TimeSpan.FromSeconds(timeoutSeconds));
-            var retryPolicy = policyBuilder.RetryForeverWithBoundedDelay(delayThreshold);
+            var retryPolicy = policyBuilder.RetryForeverWithBoundedDelay(startTime, overheadRate, delayThreshold);
             return timeoutPolicy.WrapAsync(retryPolicy);
         }
 
-        private static AsyncPolicy GetRequestErrorResiliencePolicy()
+        private static AsyncPolicy GetRequestErrorResiliencePolicy(double overheadRate = 0.01, int maxDelayThreshold = 120)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             return Policy
 
                 // The request failed due to an underlying issue such as network connectivity, DNS
@@ -108,16 +101,22 @@ namespace RelationalAI
                 // Server error response received (5xx status code, etc.)
                 .Or<ApiException>()
 
-                // Retry 5 times. In this case will wait for: 2 + 4 + 8 + 16 + 30 seconds
+                // Retry 5 times with overheadRate param of the time the transaction has been running so far
                 // And rethrow the exception.
-                .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, 30));
+                .WaitAndRetryAsync(5, retryAttempt => GetBoundedRetryDelay(retryAttempt, startTime, overheadRate, maxDelayThreshold));
         }
 
-        private static TimeSpan GetBoundedRetryDelay(int retryAttempt, int delayThreshold)
+        // Adds a % overhead of the time the transaction has been running so far
+        private static TimeSpan GetBoundedRetryDelay(int retryAttempt, long startTime, double overheadRate, int maxDelayThreshold)
         {
-            var exponentialDelay = Math.Pow(2, retryAttempt); // expected delay for the Nth retry attempt
-            var retryDelay = Math.Min(exponentialDelay, delayThreshold);
-            return TimeSpan.FromSeconds(retryDelay);
+            if (retryAttempt == 1)
+            {
+                return TimeSpan.FromMilliseconds(500);
+            }
+
+            var currentDelay = DateTimeOffset.Now.ToUnixTimeMilliseconds() - startTime; // total run time
+            var duration = currentDelay * overheadRate; // overhead rate % of total run time
+            return TimeSpan.FromMilliseconds(Math.Min(duration, maxDelayThreshold * 1000));
         }
     }
 }

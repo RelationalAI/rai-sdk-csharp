@@ -1,12 +1,15 @@
 # Changelog
 
+## main
+* Fixed transaction async backoff issue.
+
 ## v0.9.5-alpha
 * Exposed http client
 ```
 var client = new Client(ctx);
 var httpClient = client.HttpClient;
 ```
-
+* Poll transaction asynchronous with x% overhead of the time the transaction has been running so far.
 ## v0.9.4-alpha
 * Refactored sdk code back into a single package.
 
