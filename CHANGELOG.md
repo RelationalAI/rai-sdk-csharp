@@ -1,6 +1,6 @@
 # Changelog
 
-## main
+## v0.9.6-alpha
 * Fixed transaction async backoff issue.
 
 ## v0.9.5-alpha
