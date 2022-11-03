@@ -495,7 +495,7 @@ namespace RelationalAI
             // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r => !r.Transaction.State.IsFinalState())
-                .RetryForeverWithBoundedDelay(startTime, 0.05) // wait for 5% of the total runtime
+                .RetryForeverWithBoundedDelay(startTime, 0.2) // wait for 20% of the total runtime
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
