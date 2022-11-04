@@ -19,7 +19,7 @@ namespace RelationalAI.Test
                                       "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         [Fact]
-        public async Task LoadCsvtTest()
+        public async Task LoadCsvTest()
         {
             var client = CreateClient();
 
@@ -27,59 +27,18 @@ namespace RelationalAI.Test
             await client.CreateDatabaseAsync(Dbname, EngineName);
 
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
+            Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
-
-            var rel = FindRelation(rsp.Output, ":date");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":price");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"12.50", "14.25", "11.00", "12.25"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":quantity");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"2", "4", "4", "3"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":cocktail");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
-                },
-                rel.Columns
-            );
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample");
+            Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
+            Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[3].Table, new List<object> { "2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04" });
+            Assert.Equal(rsp.Results[4].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[5].Table, new List<object> { "12.50", "14.25", "11.00", "12.25" });
+            Assert.Equal(rsp.Results[6].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[7].Table, new List<object> { "2", "4", "4", "3" });
         }
 
         private const string SampleNoHeader = "" +
@@ -98,60 +57,18 @@ namespace RelationalAI.Test
 
             var opts = new CsvOptions().WithHeaderRow(0);
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", SampleNoHeader, opts);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
+            Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_no_header");
-
-            var rel = FindRelation(rsp.Output, ":COL1");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {1L, 2L, 3L, 4L},
-                    new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
-                },
-                rel.Columns
-            );
-
-
-            rel = FindRelation(rsp.Output, ":COL2");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {1L, 2L, 3L, 4L},
-                    new object[] {"2", "4", "4", "3"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":COL3");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {1L, 2L, 3L, 4L},
-                    new object[] {"12.50", "14.25", "11.00", "12.25"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":COL4");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {1L, 2L, 3L, 4L},
-                    new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
-                },
-                rel.Columns
-            );
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample_no_header");
+            Assert.Equal(rsp.Results[0].Table, new List<object> { 1L, 2L, 3L, 4L });
+            Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
+            Assert.Equal(rsp.Results[2].Table, new List<object> { 1L, 2L, 3L, 4L });
+            Assert.Equal(rsp.Results[3].Table, new List<object> { "2", "4", "4", "3" });
+            Assert.Equal(rsp.Results[4].Table, new List<object> { 1L, 2L, 3L, 4L });
+            Assert.Equal(rsp.Results[5].Table, new List<object> { "12.50", "14.25", "11.00", "12.25" });
+            Assert.Equal(rsp.Results[6].Table, new List<object> { 1L, 2L, 3L, 4L });
+            Assert.Equal(rsp.Results[7].Table, new List<object> { "2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04" });
         }
 
         private const string SampleAltSyntax = "" +
@@ -171,59 +88,18 @@ namespace RelationalAI.Test
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", SampleAltSyntax, opts);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
+            Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_alt_syntax");
-
-            var rel = FindRelation(rsp.Output, ":date");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":price");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"12.50", "14.25", "11.00", "12.25"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":quantity");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"2", "4", "4", "3"}
-                },
-                rel.Columns
-            );
-
-            rel = FindRelation(rsp.Output, ":cocktail");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
-                },
-                rel.Columns
-            );
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample_alt_syntax");
+            Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
+            Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[3].Table, new List<object> { "2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04" });
+            Assert.Equal(rsp.Results[4].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[5].Table, new List<object> { "12.50", "14.25", "11.00", "12.25" });
+            Assert.Equal(rsp.Results[6].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[7].Table, new List<object> { "2", "4", "4", "3" });
         }
 
         [Fact]
@@ -244,67 +120,18 @@ namespace RelationalAI.Test
 
             var opts = new CsvOptions().WithSchema(schema);
             var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample, opts);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
+            Assert.Equal(TransactionAsyncState.Completed, loadRsp.Transaction.State);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
-
-            var rel = FindRelation(rsp.Output, ":date");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"2020-01-01", "2020-02-02", "2020-03-03", "2020-04-04"}
-                },
-                rel.Columns
-            );
-            Assert.Single(rel.RelKey.Values);
-            Assert.Equal("Dates.Date", rel.RelKey.Values[0]);
-
-            rel = FindRelation(rsp.Output, ":price");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {12.5, 14.25, 11.00, 12.25}
-                },
-                rel.Columns
-            );
-            Assert.Single(rel.RelKey.Values);
-            Assert.Equal("FixedPointDecimals.FixedDecimal{Int64, 2}", rel.RelKey.Values[0]);
-
-            rel = FindRelation(rsp.Output, ":quantity");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {2L, 4L, 4L, 3L}
-                },
-                rel.Columns
-            );
-            Assert.Single(rel.RelKey.Values);
-            Assert.Equal("Int64", rel.RelKey.Values[0]);
-
-            rel = FindRelation(rsp.Output, ":cocktail");
-            Assert.NotNull(rel);
-            Assert.Equal(2, rel.Columns.Length);
-            Assert.Equal(
-                new[]
-                {
-                    new object[] {2L, 3L, 4L, 5L},
-                    new object[] {"martini", "sazerac", "cosmopolitan", "bellini"}
-                },
-                rel.Columns
-            );
-            Assert.Single(rel.RelKey.Values);
-            Assert.Equal("String", rel.RelKey.Values[0]);
+            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, "def output = sample");
+            Assert.Equal(rsp.Results[0].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[1].Table, new List<object> { "martini", "sazerac", "cosmopolitan", "bellini" });
+            Assert.Equal(rsp.Results[2].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[3].Table, new List<object> { 737425L, 737457L, 737487L, 737519L });
+            Assert.Equal(rsp.Results[4].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[5].Table, new List<object> { 1250L, 1425L, 1100L, 1225L });
+            Assert.Equal(rsp.Results[6].Table, new List<object> { 2L, 3L, 4L, 5L });
+            Assert.Equal(rsp.Results[7].Table, new List<object> { 2L, 4L, 4L, 3L });
         }
 
         public override async Task DisposeAsync()
