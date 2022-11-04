@@ -1,5 +1,8 @@
 # Changelog
 
+# main
+* Fixed load models async issue.
+
 ## v0.9.6-alpha
 * Fixed transaction async backoff issue.
 
