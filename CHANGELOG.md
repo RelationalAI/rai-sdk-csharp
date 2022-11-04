@@ -1,6 +1,6 @@
 # Changelog
 
-# main
+# v0.9.7-alpha
 * Fixed load models async issue.
 
 ## v0.9.6-alpha
