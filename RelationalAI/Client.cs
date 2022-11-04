@@ -378,7 +378,7 @@ namespace RelationalAI
             foreach (var model in models)
             {
                 var inputName = $"input_{randInt}_{index}";
-                queries.Add($"delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] " +
+                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
                 $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
                 queriesInputs.Add(inputName, model.Value);
 
@@ -401,7 +401,7 @@ namespace RelationalAI
             foreach (var model in models)
             {
                 var inputName = $"input_{randInt}_{index}";
-                queries.Add($"delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] " +
+                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
                 $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
                 queriesInputs.Add(inputName, model.Value);
 
