@@ -8,7 +8,6 @@ namespace RelationalAI.Test
 {
     public class UserTest : UnitTest
     {
-        public static string Uuid = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{Uuid}@example.com";
 
         // TODO: Keep it disabled until we fix the Auth0 API rate limiting issue

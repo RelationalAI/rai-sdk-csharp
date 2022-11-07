@@ -6,9 +6,7 @@ namespace RelationalAI.Test
 {
     public class LoadJsonTests : UnitTest
     {
-        public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
 
         private const string Sample = "{" +
                                       "\"name\":\"Amira\",\n" +
@@ -21,15 +19,15 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var createRsp = await CreateEngineWaitAsync(client);
+            await client.CreateDatabaseAsync(Dbname, createRsp.Name);
 
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", Sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, createRsp.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, createRsp.Name, "def output = sample");
 
             var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
@@ -67,7 +65,7 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                await client.DeleteEngineWaitAsync(GetEngineName());
             }
             catch (Exception e)
             {

@@ -9,8 +9,12 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    
     public class UnitTest : IAsyncLifetime
     {
+        public static string Uuid = Guid.NewGuid().ToString();
+        public static string EngineName = $"csharp-sdk-{Uuid}";
+
         public Client CreateClient()
         {
             Dictionary<string, object> config;
@@ -62,5 +66,26 @@ namespace RelationalAI.Test
 
         public string GetEnvironmentVariable(string name, string defaultValue = "{}")
             => Environment.GetEnvironmentVariable(name) ?? defaultValue;
+        
+        public string GetEngineName() 
+        {
+            var engineName = GetEnvironmentVariable("ENGINE_NAME", "");
+            return engineName != "" ? engineName : EngineName;
+        }
+
+        public async Task<Engine> CreateEngineWaitAsync(Client client, string size = "XS")
+        {
+            try
+            { 
+                return await client.GetEngineAsync(GetEngineName());    
+            }
+            catch (NotFoundException)
+            {
+                return await client.CreateEngineWaitAsync(GetEngineName(), size);
+            }
+
+        }
     }
+
+   
 }

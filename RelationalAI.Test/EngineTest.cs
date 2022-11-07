@@ -6,33 +6,31 @@ namespace RelationalAI.Test
 {
     public class EngineTests : UnitTest
     {
-        public static string Uuid = Guid.NewGuid().ToString();
-        public static string EngineName = $"csharp-sdk-{Uuid}";
 
         [Fact]
         public async Task EngineTest()
         {
             var client = CreateClient();
 
-            var createRsp = await client.CreateEngineWaitAsync(EngineName);
-            Assert.Equal(createRsp.Name, EngineName);
+            var createRsp = await CreateEngineWaitAsync(client);
+            Assert.Equal(createRsp.Name, GetEngineName());
             Assert.Equal(EngineStates.Provisioned, createRsp.State);
 
-            var engine = await client.GetEngineAsync(EngineName);
-            Assert.Equal(engine.Name, EngineName);
+            var engine = await client.GetEngineAsync(createRsp.Name);
+            Assert.Equal(engine.Name, createRsp.Name);
             Assert.Equal(EngineStates.Provisioned, engine.State);
 
             var engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+            engine = engines.Find(item => item.Name.Equals(createRsp.Name));
             Assert.NotNull(engine);
 
             engines = await client.ListEnginesAsync(EngineStates.Provisioned);
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+            engine = engines.Find(item => item.Name.Equals(createRsp.Name));
             Assert.NotNull(engine);
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(createRsp.Name));
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(EngineName));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(createRsp.Name));
         }
 
         public override async Task DisposeAsync()
@@ -41,7 +39,7 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                await client.DeleteEngineWaitAsync(GetEngineName());
             }
             catch (Exception e)
             {
