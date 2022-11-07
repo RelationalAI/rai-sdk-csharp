@@ -65,8 +65,8 @@ namespace RelationalAI.Test
 
         public string GetEnvironmentVariable(string name, string defaultValue = "{}")
             => Environment.GetEnvironmentVariable(name) ?? defaultValue;
- 
-        public string GetEngineName() 
+
+        public string GetEngineName()
         {
             var engineName = GetEnvironmentVariable("ENGINE_NAME", "");
             return engineName != "" ? engineName : EngineName;
