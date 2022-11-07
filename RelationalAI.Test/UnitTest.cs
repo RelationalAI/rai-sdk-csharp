@@ -65,7 +65,7 @@ namespace RelationalAI.Test
 
         public string GetEnvironmentVariable(string name, string defaultValue = "{}")
             => Environment.GetEnvironmentVariable(name) ?? defaultValue;
-       
+ 
         public string GetEngineName() 
         {
             var engineName = GetEnvironmentVariable("ENGINE_NAME", "");
@@ -75,14 +75,13 @@ namespace RelationalAI.Test
         public async Task<Engine> CreateEngineWaitAsync(Client client, string size = "XS")
         {
             try
-            { 
-                return await client.GetEngineAsync(GetEngineName());    
+            {
+                return await client.GetEngineAsync(GetEngineName());
             }
             catch (NotFoundException)
             {
                 return await client.CreateEngineWaitAsync(GetEngineName(), size);
             }
-
         }
     }
 }
