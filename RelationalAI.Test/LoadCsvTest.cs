@@ -229,7 +229,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-           var createRsp = await CreateEngineWaitAsync(client);
+            var createRsp = await CreateEngineWaitAsync(client);
             await client.CreateDatabaseAsync(Dbname, createRsp.Name);
 
             var schema = new Dictionary<string, string>
