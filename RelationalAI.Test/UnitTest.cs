@@ -9,7 +9,6 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
-    
     public class UnitTest : IAsyncLifetime
     {
         public static string Uuid = Guid.NewGuid().ToString();
@@ -66,7 +65,7 @@ namespace RelationalAI.Test
 
         public string GetEnvironmentVariable(string name, string defaultValue = "{}")
             => Environment.GetEnvironmentVariable(name) ?? defaultValue;
-        
+       
         public string GetEngineName() 
         {
             var engineName = GetEnvironmentVariable("ENGINE_NAME", "");
@@ -86,6 +85,4 @@ namespace RelationalAI.Test
 
         }
     }
-
-   
 }
