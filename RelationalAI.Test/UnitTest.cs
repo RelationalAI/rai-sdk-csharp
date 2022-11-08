@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using Serilog.Events;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -47,6 +48,9 @@ namespace RelationalAI.Test
             {
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
+
+            // set minimum log level to debug
+            LoggerFactory.LoggingLevelSwitch.MinimumLevel = LogEventLevel.Debug;
             return testClient;
         }
 
