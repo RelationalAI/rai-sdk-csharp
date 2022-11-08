@@ -24,6 +24,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
 using Relationalai.Protocol;
+using Serilog.Core;
 
 namespace RelationalAI
 {
@@ -37,11 +38,13 @@ namespace RelationalAI
         private const string PathOAuthClients = "/oauth-clients";
         private readonly Rest _rest;
         private readonly Context _context;
+        private readonly Logger _logger;
 
         public Client(Context context)
         {
             _context = context;
             _rest = new Rest(context);
+            _logger = LoggerFactory.Logger;
         }
 
         public HttpClient HttpClient
@@ -525,6 +528,7 @@ namespace RelationalAI
             if (rsp is string s)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(s);
+                _logger.Debug($"Transaction-ID: {txn.Id}");
                 return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
@@ -734,6 +738,7 @@ namespace RelationalAI
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
+            _logger.Debug($"Transaction-ID: {transactionResult.Id}");
             var metadataProto = _rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;

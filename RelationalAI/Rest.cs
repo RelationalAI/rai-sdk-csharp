@@ -29,6 +29,7 @@ using HttpMultipartParser;
 using Microsoft.Data.Analysis;
 using Newtonsoft.Json;
 using Relationalai.Protocol;
+using Serilog.Core;
 
 namespace RelationalAI
 {
@@ -37,10 +38,12 @@ namespace RelationalAI
         private const string RequestIdHeaderName = "X-Request-ID";
 
         private readonly Context _context;
+        private readonly Logger _logger;
 
         public Rest(Context context)
         {
             _context = context;
+            _logger = LoggerFactory.Logger;
             HttpClient = new HttpClient();
         }
 
@@ -286,6 +289,23 @@ namespace RelationalAI
             throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, requestId);
         }
 
+        // logs useful reponse information if debug enabled
+        private void LogDebugResponse(HttpResponseMessage response)
+        {
+            // log status code
+            _logger.Debug($"StatusCode: {response.StatusCode}, Version: {response.Version}");
+
+            // headers to log
+            var headers = new List<string> { "Date", "Connection", "X-Request-ID", "Content-Type", "Content-Length" };
+            foreach (var header in headers)
+            {
+                if (response.Headers.TryGetValues(header, out IEnumerable<string> values))
+                {
+                    _logger.Debug($"{header}: {values.First()}");
+                }
+            }
+        }
+
         private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(_context.Credentials is ClientCredentials creds))
@@ -341,6 +361,9 @@ namespace RelationalAI
 
             // Get the result back or throws an exception.
             var response = await HttpClient.SendAsync(request);
+
+            // Log useful response information
+            LogDebugResponse(response);
             await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType.MediaType;

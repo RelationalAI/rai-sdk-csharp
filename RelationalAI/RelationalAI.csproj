@@ -40,6 +40,9 @@
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.0" />
     <PackageReference Include="Google.Protobuf" Version="3.19.0" />
     <PackageReference Include="Google.Protobuf.Tools" Version="3.19.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+    <PackageReference Include="Serilog.Sinks.Debug" Version="2.0.0" />
   </ItemGroup>
 
   <Target Name="protogen" BeforeTargets="BeforeBuild">
