@@ -22,11 +22,11 @@ namespace RelationalAI.Test
             Assert.Equal(engine.Name, engineName);
             Assert.Equal(EngineStates.Provisioned, engine.State);
 
-            var engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(engineName));
-            Assert.NotNull(engine);
+            //var engines = await client.ListEnginesAsync();
+            //engine = engines.Find(item => item.Name.Equals(engineName));
+            //Assert.NotNull(engine);
 
-            engines = await client.ListEnginesAsync(EngineStates.Provisioned);
+            var engines = await client.ListEnginesAsync(EngineStates.Provisioned);
             engine = engines.Find(item => item.Name.Equals(engineName));
             Assert.NotNull(engine);
         }
