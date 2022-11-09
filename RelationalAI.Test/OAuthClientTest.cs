@@ -8,7 +8,8 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string OAuthClientName = $"csharp-sdk-{Uuid}";
-        [Fact]
+        
+         // [Fact]
         public async Task OAuthClientTest()
         {
             var client = CreateClient();
@@ -40,6 +41,7 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
         }
 
+        /*
         public override async Task DisposeAsync()
         {
             var client = CreateClient();
@@ -54,5 +56,6 @@ namespace RelationalAI.Test
                 await Console.Error.WriteLineAsync(e.ToString());
             }
         }
+        */
     }
 }

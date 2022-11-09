@@ -63,6 +63,8 @@ namespace RelationalAI.Test
             Assert.Equal(userId, rsp.Id);
         }
 
+       
+        /*
         public override async Task DisposeAsync()
         {
             var client = CreateClient();
@@ -77,5 +79,6 @@ namespace RelationalAI.Test
                 await Console.Error.WriteLineAsync(e.ToString());
             }
         }
+        */
     }
 }

@@ -9,8 +9,6 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
-
         private const string Sample = "" +
                                       "cocktail,quantity,price,date\n" +
                                       "\"martini\",2,12.50,\"2020-01-01\"\n" +
@@ -23,15 +21,15 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engineName = EngineHelper.Instance.EngineName; 
+            await client.CreateDatabaseAsync(Dbname, engineName);
 
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample);
+            var loadRsp = await client.LoadCsvAsync(Dbname, engineName, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engineName, "def output = sample");
 
             var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
@@ -93,16 +91,16 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engineName = EngineHelper.Instance.EngineName; 
+            await client.CreateDatabaseAsync(Dbname, engineName);
 
             var opts = new CsvOptions().WithHeaderRow(0);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_no_header", SampleNoHeader, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, engineName, "sample_no_header", SampleNoHeader, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_no_header");
+            var rsp = await client.ExecuteV1Async(Dbname, engineName, "def output = sample_no_header");
 
             var rel = FindRelation(rsp.Output, ":COL1");
             Assert.NotNull(rel);
@@ -166,16 +164,16 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engineName = EngineHelper.Instance.EngineName; 
+            await client.CreateDatabaseAsync(Dbname, engineName);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample_alt_syntax", SampleAltSyntax, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, engineName, "sample_alt_syntax", SampleAltSyntax, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample_alt_syntax");
+            var rsp = await client.ExecuteV1Async(Dbname, engineName, "def output = sample_alt_syntax");
 
             var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
@@ -231,8 +229,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engineName = EngineHelper.Instance.EngineName;  
+            await client.CreateDatabaseAsync(Dbname, engineName);
 
             var schema = new Dictionary<string, string>
             {
@@ -243,12 +241,12 @@ namespace RelationalAI.Test
             };
 
             var opts = new CsvOptions().WithSchema(schema);
-            var loadRsp = await client.LoadCsvAsync(Dbname, EngineName, "sample", Sample, opts);
+            var loadRsp = await client.LoadCsvAsync(Dbname, engineName, "sample", Sample, opts);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engineName, "def output = sample");
 
             var rel = FindRelation(rsp.Output, ":date");
             Assert.NotNull(rel);
@@ -322,12 +320,17 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                EngineHelper.Instance.DeleteEngineAsync();
             }
             catch (Exception e)
             {
                 await Console.Error.WriteLineAsync(e.ToString());
             }
+        }
+
+        public override async Task InitializeAsync()
+        {
+             await EngineHelper.Instance.CreateOrGetEngineAsync();
         }
     }
 }

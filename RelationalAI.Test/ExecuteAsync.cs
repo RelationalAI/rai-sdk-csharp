@@ -11,17 +11,17 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
+        
         [Fact]
         public async Task ExecuteAsyncTest()
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engineName = EngineHelper.Instance.EngineName; 
+            await client.CreateDatabaseAsync(Dbname, engineName);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteWaitAsync(Dbname, engineName, query, true);
 
             var results = new List<ArrowRelation>
             {
@@ -55,12 +55,17 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                EngineHelper.Instance.DeleteEngineAsync();
             }
             catch (Exception e)
             {
                 await Console.Error.WriteLineAsync(e.ToString());
             }
+        }
+
+        public override async Task InitializeAsync()
+        {
+             await EngineHelper.Instance.CreateOrGetEngineAsync();
         }
     }
 }
