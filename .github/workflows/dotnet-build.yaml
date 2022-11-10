@@ -38,4 +38,7 @@ jobs:
       - name: Test
         env:
           ENGINE_NAME: "csharp-sdk-${{ github.run_id }}"
-        run: dotnet test --logger "console;verbosity=detailed"
+        run: |
+          dotnet run RelationalAI.Examples/CreateEngine --engine "csharp-sdk-${{ github.run_id }}" 
+          dotnet test --logger "console;verbosity=detailed"
+          dotnet run RelationalAI.Examples/DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"
