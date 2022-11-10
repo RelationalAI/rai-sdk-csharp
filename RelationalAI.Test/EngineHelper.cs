@@ -68,10 +68,13 @@ namespace RelationalAI.Test
                 {
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
-                    var delEngine = await client.DeleteEngineWaitAsync(EngineName);
-                    Assert.Equal(EngineStates.Deleted, delEngine.Status.State);
+                    await client.DeleteEngineWaitAsync(EngineName);
                     _engine = null;
                 }
+            }
+            catch(NotFoundException)
+            {
+               // No-op    
             }
             finally
             {
