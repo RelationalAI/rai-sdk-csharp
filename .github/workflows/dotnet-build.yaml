@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2
@@ -28,10 +28,15 @@ jobs:
           dotnet tool install -g dotnet-format
           #dotnet format . --check
 
+      - name: Setup RAICloud Config
+        uses: ./.github/actions/setup-raicloud
+        with:
+          client_id: ${{ secrets.CLIENT_ID }}
+          client_secret: ${{ secrets.CLIENT_SECRET }}
+          client_credentials_url: ${{ secrets.CLIENT_CREDENTIALS_URL }}
+          rai_host: 'azure.relationalai.com'
+
       - name: Test
         env:
-            CLIENT_ID: ${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-            CLIENT_CREDENTIALS_URL: ${{ secrets.CLIENT_CREDENTIALS_URL }}
-            ENGINE_NAME: "csharp-sdk-98daf872-dff1-4624-960f-f69123cb0715"
+            ENGINE_NAME: "csharp-sdk-${{ github.run_id }}"
         run: dotnet test --logger "console;verbosity=detailed"

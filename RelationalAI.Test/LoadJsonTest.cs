@@ -21,15 +21,15 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engine = await CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, engine.Name);
 
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", Sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engine.Name, "def output = sample");
 
             var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
@@ -67,7 +67,7 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {

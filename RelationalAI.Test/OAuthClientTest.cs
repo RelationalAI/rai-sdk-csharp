@@ -8,6 +8,7 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string OAuthClientName = $"csharp-sdk-{Uuid}";
+        
         [Fact]
         public async Task OAuthClientTest()
         {

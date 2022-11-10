@@ -15,11 +15,11 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            var engine = await CreateEngineWaitAsync(EngineName);
+            await client.CreateDatabaseAsync(Dbname, engine.Name);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteV1Async(Dbname, engine.Name, query, true);
 
             Assert.False(rsp.Aborted);
             var output = rsp.Output;
@@ -56,7 +56,7 @@ namespace RelationalAI.Test
 
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {

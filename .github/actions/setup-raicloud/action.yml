@@ -1,0 +1,41 @@
+name: 'Setup RAICloud'
+description: 'Set up RAICloud credentials for Julia SDK'
+
+inputs:
+  client_id:
+    required: true
+    description: 'Client ID'
+
+  client_secret:
+    required: true
+    description: 'Client secret'
+  
+  client_credentials_url:
+    required: true
+    description: 'OAuth token generation API URL'
+  
+  rai_host:
+    required: false
+    description: 'RAI host in the .rai/config'
+    default: 'azure.relationalai.com'
+  
+  profile:
+    required: false
+    description: 'RAICloud profile name'
+
+runs:
+  using: "composite"
+  steps:
+    - run: mkdir -p $HOME/.rai
+      shell: bash
+
+    - run: |
+        echo -e "[${{ inputs.profile}}]\n" >> $HOME/.rai/config
+        echo -e "region=us-east\n" >> $HOME/.rai/config
+        echo -e "infra=azure\n" >> $HOME/.rai/config
+        echo -e "port=443\n" >> $HOME/.rai/config
+        echo -e "host=${{ inputs.rai_host }}\n" >> $HOME/.rai/config
+        echo -e "client_credentials_url=${{ inputs.client_credentials_url }}\n" >> $HOME/.rai/config
+        echo -e "client_id=${{ inputs.client_id }}\n" >> $HOME/.rai/config
+        echo -e "client_secret=${{ inputs.client_secret }}\n" >> $HOME/.rai/config
+      shell: bash
