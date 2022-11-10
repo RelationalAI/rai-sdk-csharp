@@ -42,7 +42,7 @@ jobs:
 
       - name: Test
         run: |
-          export ENGINE_NAME="csharp-sdk-${{ github.run_id }}"
+          export ENGINE_NAME="csharp-sdk1-${{ github.run_id }}"
           dotnet test --logger "console;verbosity=detailed"
           
         
