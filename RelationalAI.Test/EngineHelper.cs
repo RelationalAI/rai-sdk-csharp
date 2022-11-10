@@ -11,7 +11,7 @@ namespace RelationalAI.Test
         
         private static Engine _engine;
         private static int _countEngines;
-        private static SemaphoreSlim _semaphoreEngine = new SemaphoreSlim(1);
+        private static readonly SemaphoreSlim _semaphoreEngine = new SemaphoreSlim(1);
         private static readonly EngineHelper _instance = new EngineHelper();
         private string engineName = "sdk-csharp-engine-" + Guid.NewGuid().ToString();
 
