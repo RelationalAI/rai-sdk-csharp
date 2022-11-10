@@ -17,6 +17,7 @@ namespace RelationalAI.Test
         {
             try
             {
+                Console.WriteLine("Deleting Engine >>>>>>>");
                 var ut = new UnitTest();
                 var client = ut.CreateClient();
                 await client.DeleteEngineWaitAsync(engineName);
