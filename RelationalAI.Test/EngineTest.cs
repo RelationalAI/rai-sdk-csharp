@@ -28,11 +28,11 @@ namespace RelationalAI.Test
             Assert.Equal(engine.Name, engineFixture.Engine.Name);
             Assert.Equal(EngineStates.Provisioned, engine.State);
 
-            //var engines = await client.ListEnginesAsync();
-            //engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
-            //Assert.NotNull(engine);
+            var engines = await client.ListEnginesAsync();
+            engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
+            Assert.NotNull(engine);
 
-            var engines = await client.ListEnginesAsync(EngineStates.Provisioned);
+            engines = await client.ListEnginesAsync(EngineStates.Provisioned);
             engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
             Assert.NotNull(engine);
         }

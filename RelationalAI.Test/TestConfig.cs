@@ -10,14 +10,13 @@ namespace RelationalAI.Test
     {
         private Engine _engine;
         private readonly string engineName = "sdk-csharp-" + Guid.NewGuid().ToString();
-
+        // Semaphore is used to lock the CreateEngine function so that only one test creates the engine.
         private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
 
         public async void Dispose()
         {
             try
             {
-                Console.WriteLine("Deleting Engine >>>>>>>");
                 var ut = new UnitTest();
                 var client = ut.CreateClient();
                 await client.DeleteEngineWaitAsync(engineName);
