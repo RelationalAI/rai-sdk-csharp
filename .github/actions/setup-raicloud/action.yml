@@ -22,6 +22,7 @@ inputs:
   profile:
     required: false
     description: 'RAICloud profile name'
+    default: 'default'
 
 runs:
   using: "composite"
@@ -30,7 +31,7 @@ runs:
       shell: bash
 
     - run: |
-        echo -e "[${{ inputs.profile}}]\n" >> $HOME/.rai/config
+        echo -e "[${{ inputs.profile }}]\n" >> $HOME/.rai/config
         echo -e "region=us-east\n" >> $HOME/.rai/config
         echo -e "infra=azure\n" >> $HOME/.rai/config
         echo -e "port=443\n" >> $HOME/.rai/config
