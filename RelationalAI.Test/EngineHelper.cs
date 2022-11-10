@@ -67,13 +67,15 @@ namespace RelationalAI.Test
                 await _semaphoreEngine.WaitAsync();
                 _countDeleteEngines++;
                 Console.WriteLine("Delete Engine Count = " + _countDeleteEngines);
-                if (_countDeleteEngines >= _countEngines)
+                if (_countDeleteEngines > _countEngines)
                 {
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
                     await client.DeleteEngineWaitAsync(EngineName);
                     Console.WriteLine("Engine Deleted");
                     _engine = null;
+                    _countEngines = 0;
+                    _countDeleteEngines = 0;
                 }
             }
             catch(NotFoundException)
