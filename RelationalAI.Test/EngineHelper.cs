@@ -31,9 +31,9 @@ namespace RelationalAI.Test
         {  
             try
             {
+                await _semaphoreEngine.WaitAsync();
                 if (_engine == null)
                 {
-                    await _semaphoreEngine.WaitAsync();
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
                     try
