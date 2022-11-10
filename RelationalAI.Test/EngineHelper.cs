@@ -11,6 +11,7 @@ namespace RelationalAI.Test
         
         private static Engine _engine;
         private static int _countEngines;
+        private static int _countDeleteEngines;
         private static readonly SemaphoreSlim _semaphoreEngine = new SemaphoreSlim(1);
         private static readonly EngineHelper _instance = new EngineHelper();
         private string engineName = "sdk-csharp-engine-" + Guid.NewGuid().ToString();
@@ -47,8 +48,8 @@ namespace RelationalAI.Test
                         Assert.Equal(EngineStates.Provisioned, _engine.State);
                     }
                 }
-                Console.WriteLine("Get Engine Count = " + _countEngines);
                 _countEngines++;
+                Console.WriteLine("Get Engine Count = " + _countEngines);
                 return _engine;
             }
             finally 
@@ -64,9 +65,9 @@ namespace RelationalAI.Test
             try
             {
                 await _semaphoreEngine.WaitAsync();
-                _countEngines--;
-                Console.WriteLine("Delete Engine Count = " + _countEngines);
-                if (_countEngines <= 0)
+                _countDeleteEngines++;
+                Console.WriteLine("Delete Engine Count = " + _countDeleteEngines);
+                if (_countDeleteEngines >= _countEngines)
                 {
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
