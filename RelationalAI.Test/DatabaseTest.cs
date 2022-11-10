@@ -71,7 +71,6 @@ namespace RelationalAI.Test
         [Fact]
         public async Task DatabaseCloneTest()
         {
-            Environment.SetEnvironmentVariable("ENGINE_NAME", "csharp-sdk-98daf872-dff1-4624-960f-f69123cb0715");
             var client = CreateClient();
             var engine = await CreateEngineWaitAsync(EngineName);
 

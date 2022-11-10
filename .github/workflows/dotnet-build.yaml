@@ -45,8 +45,9 @@ jobs:
           export ENGINE_NAME="csharp-sdk-${{ github.run_id }}"
           dotnet test --logger "console;verbosity=detailed"
           
-        if: always()
+        
       - name: Delete Engine
+        if: always()
         run: |
           cd RelationalAI.Examples
           echo `dotnet run DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"`
