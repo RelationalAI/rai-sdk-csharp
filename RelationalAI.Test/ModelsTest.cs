@@ -24,7 +24,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(engineFixture.Engine.Name);
+            await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);

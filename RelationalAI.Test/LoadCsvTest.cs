@@ -30,7 +30,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            
+            await engineFixture.CreateEngineWaitAsync();            
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
@@ -100,6 +100,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
+            await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var opts = new CsvOptions().WithHeaderRow(0);
@@ -172,6 +173,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
+            await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
@@ -236,6 +238,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
+            await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var schema = new Dictionary<string, string>
@@ -314,7 +317,6 @@ namespace RelationalAI.Test
         public override async Task DisposeAsync()
         {
             var client = CreateClient();
-
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);

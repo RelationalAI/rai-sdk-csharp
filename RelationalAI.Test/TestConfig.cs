@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using System.Threading;
 using Xunit;
 using RelationalAI;
 
@@ -8,45 +9,43 @@ namespace RelationalAI.Test
     public class EngineFixture : IDisposable
     {
         private Engine _engine;
-        private string engineName = "sdk-csharp-" + Guid.NewGuid().ToString();
+        private readonly string engineName = "sdk-csharp-" + Guid.NewGuid().ToString();
 
-        public EngineFixture()
-        {
-            Task.Run(() => CreateEngineWaitAsync()).Wait();
-        }
+        private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
 
-        public void Dispose()
+        public async void Dispose()
         {
             try
             {
-                DeleteEngineWaitAsync();
+                var ut = new UnitTest();
+                var client = ut.CreateClient();
+                await client.DeleteEngineWaitAsync(engineName);
             }
             catch (System.Exception e)
             {
-                Console.Error.WriteLineAsync(e.ToString());
+                await Console.Error.WriteLineAsync(e.ToString());
             }
         }
 
-        private async void CreateEngineWaitAsync()
+        public async Task<Engine> CreateEngineWaitAsync()
         {
-            var ut = new UnitTest();
-            var client = ut.CreateClient();
             try
             {
-                _engine = await client.CreateEngineWaitAsync(engineName);    
+                if (_engine == null)
+                {
+                    await semaphoreSlim.WaitAsync();
+                    var ut = new UnitTest();
+                    var client = ut.CreateClient();
+                    _engine = await client.CreateEngineWaitAsync(engineName);
+                }    
             }
-            catch (System.Exception e)
+            finally
             {
-                Console.WriteLine(e);
+                semaphoreSlim.Release();
             }
             
-        }
-
-        private async void DeleteEngineWaitAsync()
-        {
-            var ut = new UnitTest();
-            var client = ut.CreateClient();
-            await client.DeleteEngineWaitAsync(engineName);    
+            return _engine;
+            
         }
 
         public Engine Engine

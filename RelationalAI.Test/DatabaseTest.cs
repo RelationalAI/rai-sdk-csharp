@@ -22,7 +22,7 @@ namespace RelationalAI.Test
         public async Task DatabaseTest()
         {
             var client = CreateClient();
-            //await client.CreateEngineWaitAsync(EngineName);
+            await engineFixture.CreateEngineWaitAsync();
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
@@ -80,6 +80,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
+            await engineFixture.CreateEngineWaitAsync();
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             // create a fresh database
