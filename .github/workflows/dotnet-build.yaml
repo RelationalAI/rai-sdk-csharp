@@ -35,13 +35,20 @@ jobs:
           client_secret: ${{ secrets.CLIENT_SECRET }}
           client_credentials_url: ${{ secrets.CLIENT_CREDENTIALS_URL }}
 
-      - name: Test
-        env:
-          ENGINE_NAME: "csharp-sdk-${{ github.run_id }}"
+      - name: Create Engine
         run: |
           cd RelationalAI.Examples
           dotnet run CreateEngine --engine "csharp-sdk-${{ github.run_id }}"
-          cd .. 
+
+      - name: Test
+        run: |
+          export ENGINE_NAME="csharp-sdk-${{ github.run_id }}"
           dotnet test --logger "console;verbosity=detailed"
+          
+        if: always()
+      - name: Delete Engine
+        run: |
           cd RelationalAI.Examples
-          dotnet run DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"
+          echo `dotnet run DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"`
+       
+      

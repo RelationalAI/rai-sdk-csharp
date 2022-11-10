@@ -67,12 +67,15 @@ namespace RelationalAI.Test
         {
             var engine = GetEngineName(engineName);
             var client = CreateClient();
+            Console.WriteLine("Engine-Name: " + engine);
             if (engine != engineName)
             {
+                Console.WriteLine("Getting Engine");
                 return await client.GetEngineAsync(engine);
             }
             else
             {
+                Console.WriteLine("Creating Engine");
                 return await client.CreateEngineWaitAsync(engine);
             }
         }
@@ -81,6 +84,7 @@ namespace RelationalAI.Test
         {
             if (GetEngineName(engineName) == engineName)
             {
+                Console.WriteLine("Deleting Engine: " + engineName);
                 var client = CreateClient();
                 await client.DeleteEngineWaitAsync(engineName);
             }
