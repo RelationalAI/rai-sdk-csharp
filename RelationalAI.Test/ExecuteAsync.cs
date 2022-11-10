@@ -7,21 +7,28 @@ using System.Threading.Tasks;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class ExecuteAsyncTests : UnitTest
     {
+
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
+        private readonly EngineFixture engineFixture;
+
+        public ExecuteAsyncTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
+
         [Fact]
         public async Task ExecuteAsyncTest()
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = await client.ExecuteWaitAsync(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
 
             var results = new List<ArrowRelation>
             {
@@ -47,15 +54,6 @@ namespace RelationalAI.Test
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {

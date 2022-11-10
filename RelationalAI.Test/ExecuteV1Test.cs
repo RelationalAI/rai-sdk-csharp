@@ -4,22 +4,27 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class ExecuteTests : UnitTest
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
+         private readonly EngineFixture engineFixture;
+
+        public ExecuteTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
 
         [Fact]
         public async Task ExecuteV1Test()
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, query, true);
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, query, true);
 
             Assert.False(rsp.Aborted);
             var output = rsp.Output;
@@ -48,15 +53,6 @@ namespace RelationalAI.Test
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {

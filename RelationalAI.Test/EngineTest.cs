@@ -4,49 +4,35 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class EngineTests : UnitTest
     {
-        public static string Uuid = Guid.NewGuid().ToString();
-        public static string EngineName = $"csharp-sdk-{Uuid}";
+
+        private readonly EngineFixture engineFixture;
+
+        public EngineTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
 
         [Fact]
         public async Task EngineTest()
         {
             var client = CreateClient();
 
-            var createRsp = await client.CreateEngineWaitAsync(EngineName);
-            Assert.Equal(createRsp.Name, EngineName);
-            Assert.Equal(EngineStates.Provisioned, createRsp.State);
+            Assert.Equal(EngineStates.Provisioned, engineFixture.Engine.State);
 
-            var engine = await client.GetEngineAsync(EngineName);
-            Assert.Equal(engine.Name, EngineName);
+            var engine = await client.GetEngineAsync(engineFixture.Engine.Name);
+            Assert.Equal(engine.Name, engineFixture.Engine.Name);
             Assert.Equal(EngineStates.Provisioned, engine.State);
 
             var engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+            engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
             Assert.NotNull(engine);
 
             engines = await client.ListEnginesAsync(EngineStates.Provisioned);
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+            engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
             Assert.NotNull(engine);
-
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
-
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(EngineName));
-        }
-
-        public override async Task DisposeAsync()
-        {
-            var client = CreateClient();
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
         }
     }
 }

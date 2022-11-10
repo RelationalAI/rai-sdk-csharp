@@ -5,25 +5,32 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class DatabaseTests : UnitTest
     {
+        private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
+        //public static string EngineName = $"csharp-sdk-{Uuid}";
+
+        public DatabaseTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
 
         [Fact]
         public async Task DatabaseTest()
         {
             var client = CreateClient();
-            await client.CreateEngineWaitAsync(EngineName);
+            //await client.CreateEngineWaitAsync(EngineName);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
-            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, false);
+            var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, false);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
-            createRsp = await client.CreateDatabaseAsync(Dbname, EngineName, true);
+            createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, true);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
@@ -44,22 +51,16 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
                 client.ListDatabasesAsync((DatabaseState)1000));
 
-            var edbs = await client.ListEdbsAsync(Dbname, EngineName);
+            var edbs = await client.ListEdbsAsync(Dbname, engineFixture.Engine.Name);
             var edb = edbs.Find(item => item.Name.Equals("rel"));
             Assert.NotNull(edb);
 
-            var modelNames = await client.ListModelsAsync(Dbname, EngineName);
+            var modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("rel/stdlib"));
             Assert.NotNull(name);
 
-            var models = await client.ListModelsAsync(Dbname, EngineName);
-            //var model = models.Find(m => m.Name.Equals("rel/stdlib"));
-            //Assert.NotNull(model);
-
-            //model = await client.GetModelAsync(Dbname, EngineName, "rel/stdlib");
-            //Assert.NotNull(model);
-            //Assert.True(model.Value.Length > 0);
-
+            var models = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
+            
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
 
@@ -78,28 +79,27 @@ namespace RelationalAI.Test
         public async Task DatabaseCloneTest()
         {
             var client = CreateClient();
-            await client.CreateEngineWaitAsync(EngineName);
 
             await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             // create a fresh database
-            var createRsp = await client.CreateDatabaseAsync(Dbname, EngineName);
+            var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
             // load some data and model
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "test_data", TestJson);
+            var loadRsp = await client.LoadJsonAsync(Dbname, engineFixture.Engine.Name, "test_data", TestJson);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var resp = await client.LoadModelsWaitAsync(Dbname, EngineName, TestModel);
+            var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
             Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
             Assert.Empty(resp.Problems);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";
-            createRsp = await client.CloneDatabaseAsync(databaseCloneName, EngineName, Dbname, true);
+            createRsp = await client.CloneDatabaseAsync(databaseCloneName, engineFixture.Engine.Name, Dbname, true);
             Assert.Equal(databaseCloneName, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
@@ -115,7 +115,7 @@ namespace RelationalAI.Test
             Assert.Equal(DatabaseState.Created, database.State);
 
             // make sure the data was cloned
-            var rsp = await client.ExecuteV1Async(databaseCloneName, EngineName, "test_data", true);
+            var rsp = await client.ExecuteV1Async(databaseCloneName, engineFixture.Engine.Name, "test_data", true);
 
             var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
@@ -130,11 +130,11 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
 
             // make sure the model was cloned
-            var modelNames = await client.ListModelsAsync(databaseCloneName, EngineName);
+            var modelNames = await client.ListModelsAsync(databaseCloneName, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("test_model"));
             Assert.NotNull(name);
 
-            var model = await client.GetModelAsync(databaseCloneName, EngineName, "test_model");
+            var model = await client.GetModelAsync(databaseCloneName, engineFixture.Engine.Name, "test_model");
             Assert.Equal("test_model", model.Name);
             Assert.Equal(TestModel["test_model"], model.Value);
 
@@ -150,15 +150,6 @@ namespace RelationalAI.Test
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {

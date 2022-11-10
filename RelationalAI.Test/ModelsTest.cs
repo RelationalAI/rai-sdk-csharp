@@ -5,39 +5,46 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class ModelsTests : UnitTest
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
+
+        private readonly EngineFixture engineFixture;
+
+        public ModelsTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
 
         [Fact]
         public async Task ModelsTest()
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            await client.CreateEngineWaitAsync(engineFixture.Engine.Name);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
-            var resp = await client.LoadModelsWaitAsync(Dbname, EngineName, TestModel);
+            var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
             Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
             Assert.Empty(resp.Problems);
 
-            var model = await client.GetModelAsync(Dbname, EngineName, "test_model");
+            var model = await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model");
             Assert.Equal("test_model", model.Name);
             Assert.Equal(TestModel["test_model"], model.Value);
 
-            var modelNames = await client.ListModelsAsync(Dbname, EngineName);
+            var modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             var modelName = modelNames.Find(item => item.Equals("test_model"));
 
-            var deleteRsp = await client.DeleteModelsAsync(Dbname, EngineName, new List<string> { "test_model" });
+            var deleteRsp = await client.DeleteModelsAsync(Dbname, engineFixture.Engine.Name, new List<string> { "test_model" });
             Assert.Equal(TransactionAsyncState.Completed, deleteRsp.Transaction.State);
             Assert.Empty(deleteRsp.Problems);
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetModelAsync(Dbname, EngineName, "test_model"));
+            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model"));
 
-            modelNames = await client.ListModelsAsync(Dbname, EngineName);
+            modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             modelName = modelNames.Find(item => item.Equals("test_model"));
             Assert.Null(modelName);
         }
@@ -49,15 +56,6 @@ namespace RelationalAI.Test
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {
