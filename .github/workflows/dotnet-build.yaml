@@ -33,4 +33,5 @@ jobs:
             CLIENT_ID: ${{ secrets.CLIENT_ID }}
             CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
             CLIENT_CREDENTIALS_URL: ${{ secrets.CLIENT_CREDENTIALS_URL }}
+            ENGINE_NAME: "csharp-sdk-98daf872-dff1-4624-960f-f69123cb0715"
         run: dotnet test --logger "console;verbosity=detailed"

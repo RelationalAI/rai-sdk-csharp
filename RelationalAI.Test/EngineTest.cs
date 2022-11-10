@@ -13,35 +13,28 @@ namespace RelationalAI.Test
         public async Task EngineTest()
         {
             var client = CreateClient();
-
-            var createRsp = await client.CreateEngineWaitAsync(EngineName);
-            Assert.Equal(createRsp.Name, EngineName);
-            Assert.Equal(EngineStates.Provisioned, createRsp.State);
-
-            var engine = await client.GetEngineAsync(EngineName);
-            Assert.Equal(engine.Name, EngineName);
+            var engine = await CreateEngineWaitAsync(EngineName);
+            Assert.Equal(engine.Name, GetEngineName(EngineName));
             Assert.Equal(EngineStates.Provisioned, engine.State);
 
-            var engines = await client.ListEnginesAsync();
-            engine = engines.Find(item => item.Name.Equals(EngineName));
+            engine = await client.GetEngineAsync(engine.Name);
+            Assert.Equal(engine.Name, GetEngineName(EngineName));
+            Assert.Equal(EngineStates.Provisioned, engine.State);
+
+            //var engines = await client.ListEnginesAsync();
+            //engine = engines.Find(item => item.Name.Equals(EngineName));
+            //Assert.NotNull(engine);
+
+            var engines = await client.ListEnginesAsync(EngineStates.Provisioned);
+            engine = engines.Find(item => item.Name.Equals(GetEngineName(EngineName)));
             Assert.NotNull(engine);
-
-            engines = await client.ListEnginesAsync(EngineStates.Provisioned);
-            engine = engines.Find(item => item.Name.Equals(EngineName));
-            Assert.NotNull(engine);
-
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteEngineWaitAsync(EngineName));
-
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetEngineAsync(EngineName));
         }
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
-
             try
             {
-                await client.DeleteEngineWaitAsync(EngineName);
+                DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {
