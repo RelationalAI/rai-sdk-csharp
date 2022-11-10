@@ -39,7 +39,9 @@ jobs:
         env:
           ENGINE_NAME: "csharp-sdk-${{ github.run_id }}"
         run: |
-          ls
-          dotnet run RelationalAI.Examples/CreateEngine --engine "csharp-sdk-${{ github.run_id }}" 
+          cd RelationalAI.Examples
+          dotnet run CreateEngine --engine "csharp-sdk-${{ github.run_id }}"
+          cd .. 
           dotnet test --logger "console;verbosity=detailed"
-          dotnet run RelationalAI.Examples/DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"
+          cd RelationalAI.Examples
+          dotnet run DeleteEngine --engine "csharp-sdk-${{ github.run_id }}"
