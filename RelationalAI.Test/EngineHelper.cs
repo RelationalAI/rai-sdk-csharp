@@ -47,6 +47,7 @@ namespace RelationalAI.Test
                         Assert.Equal(EngineStates.Provisioned, _engine.State);
                     }
                 }
+                Console.WriteLine("Get Engine Count = " + _countEngines);
                 _countEngines++;
                 return _engine;
             }
@@ -64,11 +65,13 @@ namespace RelationalAI.Test
             {
                 await _semaphoreEngine.WaitAsync();
                 _countEngines--;
+                Console.WriteLine("Delete Engine Count = " + _countEngines);
                 if (_countEngines <= 0)
                 {
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
                     await client.DeleteEngineWaitAsync(EngineName);
+                    Console.WriteLine("Engine Deleted");
                     _engine = null;
                 }
             }
