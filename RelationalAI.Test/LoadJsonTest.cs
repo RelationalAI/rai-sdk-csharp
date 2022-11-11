@@ -4,32 +4,38 @@ using Xunit;
 
 namespace RelationalAI.Test
 {
+    [Collection("RelationalAI.Test")]
     public class LoadJsonTests : UnitTest
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        public static string EngineName = $"csharp-sdk-{Uuid}";
-
         private const string Sample = "{" +
                                       "\"name\":\"Amira\",\n" +
                                       "\"age\":32,\n" +
                                       "\"height\":null,\n" +
                                       "\"pets\":[\"dog\",\"rabbit\"]}";
 
+        private readonly EngineFixture engineFixture;
+
+        public LoadJsonTests(EngineFixture fixture)
+        {
+            engineFixture = fixture;
+        }
+
         [Fact]
         public async Task LoadJsontTest()
         {
             var client = CreateClient();
 
-            await client.CreateEngineWaitAsync(EngineName);
-            await client.CreateDatabaseAsync(Dbname, EngineName);
+            await engineFixture.CreateEngineWaitAsync();
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
-            var loadRsp = await client.LoadJsonAsync(Dbname, EngineName, "sample", Sample);
+            var loadRsp = await client.LoadJsonAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
             Assert.Empty(loadRsp.Output);
             Assert.Empty(loadRsp.Problems);
 
-            var rsp = await client.ExecuteV1Async(Dbname, EngineName, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output = sample");
 
             var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
@@ -59,15 +65,6 @@ namespace RelationalAI.Test
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-
-            try
-            {
-                await client.DeleteEngineWaitAsync(EngineName);
             }
             catch (Exception e)
             {
