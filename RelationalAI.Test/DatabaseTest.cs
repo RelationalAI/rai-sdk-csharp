@@ -11,7 +11,6 @@ namespace RelationalAI.Test
         private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        //public static string EngineName = $"csharp-sdk-{Uuid}";
 
         public DatabaseTests(EngineFixture fixture)
         {
