@@ -9,7 +9,7 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-         private readonly EngineFixture engineFixture;
+        private readonly EngineFixture engineFixture;
 
         public ExecuteTests(EngineFixture fixture)
         {

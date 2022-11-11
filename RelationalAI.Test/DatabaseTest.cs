@@ -60,7 +60,7 @@ namespace RelationalAI.Test
             Assert.NotNull(name);
 
             var models = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
-            
+
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
 

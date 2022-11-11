@@ -30,7 +30,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();            
+            await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);

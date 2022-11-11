@@ -37,15 +37,15 @@ namespace RelationalAI.Test
                     var ut = new UnitTest();
                     var client = ut.CreateClient();
                     _engine = await client.CreateEngineWaitAsync(engineName);
-                }    
+                }
             }
             finally
             {
                 semaphoreSlim.Release();
             }
-            
+
             return _engine;
-            
+
         }
 
         public Engine Engine
