@@ -24,6 +24,6 @@ namespace RelationalAI
     // Check DefaultAccessToken for an example
     public interface IAccessTokenHandler
     {
-        Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds);
+        Task<AccessToken> GetAccessTokenAsync(string host, ClientCredentials creds);
     }
 }

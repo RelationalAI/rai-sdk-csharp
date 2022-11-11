@@ -29,7 +29,14 @@ namespace RelationalAI
     // in the cache file.
     public class DefaultAccessTokenHandler : IAccessTokenHandler
     {
-        public async Task<AccessToken> GetAccessTokenAsync(Rest rest, string host, ClientCredentials creds)
+        private readonly Rest _rest;
+
+        public DefaultAccessTokenHandler(Rest rest)
+        {
+            _rest = rest;
+        }
+
+        public async Task<AccessToken> GetAccessTokenAsync(string host, ClientCredentials creds)
         {
             var token = ReadAccessToken(creds);
             if (token != null && !token.IsExpired)
@@ -37,7 +44,7 @@ namespace RelationalAI
                 return token;
             }
 
-            token = await rest.RequestAccessTokenAsync(host, creds);
+            token = await _rest.RequestAccessTokenAsync(host, creds);
             if (token != null)
             {
                 WriteAccessToken(creds, token);
@@ -85,8 +92,8 @@ namespace RelationalAI
         {
             try
             {
-                var cache = ReadTokenCache();
-                var dict = cache ?? new Dictionary<string, AccessToken>();
+                var dict = ReadTokenCache();
+
                 if (dict.ContainsKey(creds.ClientId))
                 {
                     dict[creds.ClientId] = token;

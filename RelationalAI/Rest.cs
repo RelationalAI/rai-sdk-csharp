@@ -43,7 +43,7 @@ namespace RelationalAI
         public Rest(Context context)
         {
             _context = context;
-            _accessTokenHandler = new DefaultAccessTokenHandler();
+            _accessTokenHandler = new DefaultAccessTokenHandler(this);
             HttpClient = new HttpClient();
         }
 
@@ -326,7 +326,7 @@ namespace RelationalAI
 
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
-                creds.AccessToken = await _accessTokenHandler.GetAccessTokenAsync(this, host, creds);
+                creds.AccessToken = await _accessTokenHandler.GetAccessTokenAsync(host, creds);
             }
 
             return creds.AccessToken.Token;
