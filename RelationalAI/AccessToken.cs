@@ -41,7 +41,7 @@ namespace RelationalAI
         [JsonProperty("created_on")]
         public long CreatedOn { get; set; }
 
-        public int ExpriesIn
+        public int ExpiresIn
         {
             get => _expiresIn;
             set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
