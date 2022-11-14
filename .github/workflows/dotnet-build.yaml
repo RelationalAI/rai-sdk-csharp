@@ -10,18 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
       - name: Setup .NET Core
         uses: actions/setup-dotnet@v2
         with:
           dotnet-version: '3.1.x'
-
-      - name: Install dependencies
-        run: dotnet restore
-
-      - name: Build
-        run: dotnet build
 
       - name: Dotnet linter
         run: |
@@ -29,8 +23,8 @@ jobs:
           dotnet format . --check
 
       - name: Test
-        env:
-            CLIENT_ID: ${{ secrets.CLIENT_ID }}
-            CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
-            CLIENT_CREDENTIALS_URL: ${{ secrets.CLIENT_CREDENTIALS_URL }}
-        run: dotnet test --logger "console;verbosity=detailed"
+        uses: ./.github/actions/test
+        with:
+          client_id: ${{ secrets.CLIENT_ID }}
+          client_secret: ${{ secrets.CLIENT_SECRET }}
+          client_credentials_url: ${{ secrets.CLIENT_CREDENTIALS_URL }}
