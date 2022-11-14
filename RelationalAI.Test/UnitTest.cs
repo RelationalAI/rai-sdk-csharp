@@ -27,7 +27,7 @@ namespace RelationalAI.Test
                 var raiHost = GetEnvironmentVariable("HOST", "");
                 if (raiHost == "")
                 {
-                    raiHost = "azure.relationalai.com";    
+                    raiHost = "azure.relationalai.com";
                 }
 
                 var configStr = $@"
