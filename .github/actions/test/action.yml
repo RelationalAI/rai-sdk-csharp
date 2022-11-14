@@ -1,4 +1,5 @@
-name: 'rai-sdk-python test'
+name: 'rai-sdk-csharp test'
+description: 'rai-sdk-csharp test action'
 
 inputs:
   client_id:
