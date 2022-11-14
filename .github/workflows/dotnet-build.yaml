@@ -23,7 +23,7 @@ jobs:
           dotnet format . --check
 
       - name: Test
-        uses: ./.github/action/test
+        uses: ./.github/actions/test
         with:
           client_id: ${{ secrets.CLIENT_ID }}
           client_secret: ${{ secrets.CLIENT_SECRET }}
