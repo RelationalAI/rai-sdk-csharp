@@ -25,7 +25,7 @@ namespace RelationalAI.Test
                 var clientSecret = GetEnvironmentVariable("CLIENT_SECRET");
                 var clientCredentialsUrl = GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
                 var raiHost = GetEnvironmentVariable("HOST", "");
-                if (raiHost == "") 
+                if (raiHost == "")
                 {
                     raiHost = "azure.relationalai.com";    
                 }
