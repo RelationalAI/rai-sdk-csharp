@@ -329,6 +329,22 @@ namespace RelationalAI
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
+        private void LogDebugResponse(HttpResponseMessage response)
+        {
+            // log status code
+            Console.WriteLine($"StatusCode: {response.StatusCode}, Version: {response.Version}");
+
+            // headers to log
+            var headers = new List<string> { "Date", "Connection", "X-Request-ID", "Content-Type", "Content-Length" };
+            foreach (var header in headers)
+            {
+                if (response.Headers.TryGetValues(header, out IEnumerable<string> values))
+                {
+                    Console.WriteLine($"{header}: {values.First()}");
+                }
+            }
+        }
+
         private async Task<object> RequestHelperAsync(
             string method,
             string url,
@@ -341,6 +357,7 @@ namespace RelationalAI
 
             // Get the result back or throws an exception.
             var response = await HttpClient.SendAsync(request);
+            LogDebugResponse(response);
             await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
             var contentType = response.Content.Headers.ContentType.MediaType;
