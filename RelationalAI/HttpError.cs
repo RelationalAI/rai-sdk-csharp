@@ -48,9 +48,9 @@ namespace RelationalAI
         }
 
         public HttpError(int statusCode, String message)
-        : base(message)
         {
             StatusCode = statusCode;
+            Message = message;
         }
 
         public int StatusCode { get; set; }

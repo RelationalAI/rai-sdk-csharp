@@ -333,7 +333,7 @@ namespace RelationalAI
                     requestId = values.First();
                 }
 
-                throw new HttpError((int)response.StatusCode, $"(request id: {requestId}), {ReadString(content)}");
+                throw new HttpError((int)response.StatusCode, $"(request id: {requestId})\n{ReadString(content)}");
             }
 
             var contentType = response.Content.Headers.ContentType.MediaType;
