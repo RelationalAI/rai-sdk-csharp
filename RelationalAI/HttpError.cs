@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
+using System;
+using System.Collections.Generic;
+
 namespace RelationalAI
 {
-    /*
-    class HttpError : SystemException
+    [Serializable]
+    public class HttpError : Exception
     {
-        public int StatusCode { get; set; }
-
-        public string Message { get; set; }
-
-        public static Dictionary<int, string> statusText = new Dictionary<int, string>()
+        private static Dictionary<int, string> statusText = new Dictionary<int, string>()
         {
             { 200, "OK" },
             { 201, "Created" },
@@ -43,23 +42,35 @@ namespace RelationalAI
             { 504, "Gateway Timeout" },
         };
 
-    public HttpError(int statusCode) {
-        this.StatusCode = statusCode;
-    }
+        public HttpError(int statusCode)
+        {
+            StatusCode = statusCode;
+        }
 
-    public HttpError(int statusCode, String message) {
-        this.StatusCode = statusCode;
-        this.Message = message;
-    }
+        public HttpError(int statusCode, String message)
+        : base(message)
+        {
+            StatusCode = statusCode;
+        }
 
-    public String toString() {
-        String result = Integer.toString(statusCode);
-        if (statusText.containsKey(statusCode))
-            result += " " + statusText.get(statusCode);
-        if (message != null)
-            result += "\n" + message;
-        return result;
+        public int StatusCode { get; set; }
+
+        public override string Message { get; }
+
+        public override String ToString()
+        {
+            String result = StatusCode.ToString();
+            if (statusText.ContainsKey(StatusCode))
+            {
+                result += " " + statusText[StatusCode];
+            }
+
+            if (Message != null)
+            {
+                result += "\n" + Message;
+            }
+
+            return result;
+        }
     }
-    }
-    */
 }

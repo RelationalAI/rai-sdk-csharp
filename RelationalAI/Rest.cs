@@ -268,24 +268,6 @@ namespace RelationalAI
             return output;
         }
 
-        private static async Task EnsureSuccessResponseAsync(HttpResponseMessage response)
-        {
-            var status = (int)response.StatusCode;
-            if (status != 404 && status < 500)
-            {
-                return;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            if (status == 404)
-            {
-                throw new NotFoundException(content);
-            }
-
-            var requestId = response.Headers.TryGetValues(RequestIdHeaderName, out var values) ? values.FirstOrDefault() : null;
-            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, requestId);
-        }
-
         private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(_context.Credentials is ClientCredentials creds))
@@ -329,22 +311,6 @@ namespace RelationalAI
             return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
-        private void LogDebugResponse(HttpResponseMessage response)
-        {
-            // log status code
-            Console.WriteLine($"StatusCode: {response.StatusCode}, Version: {response.Version}");
-
-            // headers to log
-            var headers = new List<string> { "Date", "Connection", "X-Request-ID", "Content-Type", "Content-Length" };
-            foreach (var header in headers)
-            {
-                if (response.Headers.TryGetValues(header, out IEnumerable<string> values))
-                {
-                    Console.WriteLine($"{header}: {values.First()}");
-                }
-            }
-        }
-
         private async Task<object> RequestHelperAsync(
             string method,
             string url,
@@ -357,9 +323,19 @@ namespace RelationalAI
 
             // Get the result back or throws an exception.
             var response = await HttpClient.SendAsync(request);
-            LogDebugResponse(response);
-            await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
+
+            if ((int)response.StatusCode >= 400)
+            {
+                string requestId = string.Empty;
+                if (response.Headers.TryGetValues("X-Request-ID", out IEnumerable<string> values))
+                {
+                    requestId = values.First();
+                }
+
+                throw new HttpError((int)response.StatusCode, $"(request id: {requestId}), {ReadString(content)}");
+            }
+
             var contentType = response.Content.Headers.ContentType.MediaType;
 
             return contentType.ToLower() switch
