@@ -80,7 +80,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             // create a fresh database
             var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);

@@ -343,8 +343,8 @@ namespace RelationalAI
                 "application/json" => ReadString(content),
                 "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
-                _ => throw new ApiException(
-                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content))
+                _ => throw new HttpError(
+                    (int)response.StatusCode, $"Unsupported response content-type: {contentType}\n{ReadString(content)}")
             };
         }
 
