@@ -14,31 +14,21 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.FindOAuthClientAsync(OAuthClientName));
 
             var rsp = await client.CreateOAuthClientAsync(OAuthClientName);
             Assert.Equal(OAuthClientName, rsp.Name);
 
             var clientId = rsp.Id;
 
-            rsp = await client.FindOAuthClientAsync(OAuthClientName);
-            Assert.Equal(clientId, rsp.Id);
-            Assert.Equal(OAuthClientName, rsp.Name);
-
             rsp = await client.GetOAuthClientAsync(clientId);
             Assert.Equal(clientId, rsp.Id);
             Assert.Equal(OAuthClientName, rsp.Name);
 
-            var clients = await client.ListOAuthClientsAsync();
-            var found = clients.Find(item => item.Id == clientId);
-            Assert.NotNull(found);
-            Assert.Equal(clientId, found.Id);
-            Assert.Equal(OAuthClientName, found.Name);
-
             var deleteRsp = await client.DeleteOAuthClientAsync(clientId);
             Assert.Equal(clientId, deleteRsp.Id);
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindOAuthClientAsync(OAuthClientName));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.GetOAuthClientAsync(clientId));
         }
 
         public override async Task DisposeAsync()

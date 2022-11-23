@@ -16,7 +16,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindUserAsync(UserEmail));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.FindUserAsync(UserEmail));
 
             var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);

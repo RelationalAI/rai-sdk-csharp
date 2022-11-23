@@ -23,7 +23,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
             await engineFixture.CreateEngineWaitAsync();
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, false);
             Assert.Equal(Dbname, createRsp.Name);
@@ -63,7 +63,7 @@ namespace RelationalAI.Test
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
             Assert.Equal(Dbname, deleteRsp.Name);
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetDatabaseAsync(Dbname));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.GetDatabaseAsync(Dbname));
         }
 
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
