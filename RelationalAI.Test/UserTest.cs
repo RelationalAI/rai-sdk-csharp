@@ -23,19 +23,14 @@ namespace RelationalAI.Test
             Assert.Equal(UserStatus.Active, rsp.Status);
             Assert.True(new List<Role> { Role.User }.SequenceEqual(rsp.Roles));
 
-            rsp = await client.FindUserAsync(UserEmail);
-            var userId = rsp.Id;
-            Assert.Equal(userId, rsp.Id);
-            Assert.Equal(UserEmail, rsp.Email);
+            var user = await client.GetUserAsync(rsp.Id);
+            var userId = user.Id;
+            Assert.Equal(user.Id, rsp.Id);
+            Assert.Equal(UserEmail, user.Email);
 
             rsp = await client.GetUserAsync(userId);
             Assert.Equal(userId, rsp.Id);
             Assert.Equal(UserEmail, rsp.Email);
-
-            var users = await client.ListUsersAsync();
-            var user = users.Find(user => user.Id == userId);
-            Assert.Equal(userId, user.Id);
-            Assert.Equal(UserEmail, user.Email);
 
             rsp = await client.DisableUserAsync(userId);
             Assert.Equal(userId, rsp.Id);
