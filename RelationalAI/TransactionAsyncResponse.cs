@@ -33,7 +33,7 @@ namespace RelationalAI
             bool readOnly,
             string query,
             string lastRequestedInterval,
-            TransactionAsyncAbortReason abortReason)
+            string abortReason)
             : base(id, state)
         {
             AccountName = accountName;
@@ -72,7 +72,6 @@ namespace RelationalAI
         public string LastRequestedInterval { get; set; }
 
         [JsonProperty("abort_reason")]
-        [JsonConverter(typeof(StringEnumConverter))]
-        public TransactionAsyncAbortReason AbortReason { get; set; }
+        public string AbortReason { get; set; }
     }
 }

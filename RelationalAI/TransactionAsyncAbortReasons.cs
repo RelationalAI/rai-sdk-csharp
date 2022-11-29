@@ -19,36 +19,13 @@ using System.Runtime.Serialization;
 
 namespace RelationalAI
 {
-    public enum TransactionAsyncAbortReason
+    public static class TransactionAsyncAbortReason
     {
-        [EnumMember(Value = "system internal error")]
-        SystemInternalError,
-        [EnumMember(Value = "cancelled")]
-        Cancelled,
-        [EnumMember(Value = "engine shutting down")]
-        EngineShuttingDown,
-        [EnumMember(Value = "invalid request")]
-        InvalidRequest,
-        [EnumMember(Value = "too many requests")]
-        TooManyRequests,
-        [EnumMember(Value = "integrity constraint violation")]
-        IntegrityConstraintViolation
-    }
-
-    public static class TransactionAsyncAbortReasons
-    {
-        public static string Value(this TransactionAsyncAbortReason reason)
-        {
-            return reason switch
-            {
-                TransactionAsyncAbortReason.SystemInternalError => "system internal error",
-                TransactionAsyncAbortReason.Cancelled => "cancelled",
-                TransactionAsyncAbortReason.EngineShuttingDown => "engine shutting down",
-                TransactionAsyncAbortReason.InvalidRequest => "invalid request",
-                TransactionAsyncAbortReason.TooManyRequests => "too many requests",
-                TransactionAsyncAbortReason.IntegrityConstraintViolation => "integrity constraint violation",
-                _ => throw new ArgumentOutOfRangeException(nameof(reason), reason, "unknow async transaction abort reason")
-            };
-        }
+        public const string SYSTEM_INTERNAL_ERROR = "system internal error";
+        public const string CANCELLED = "cancelled";
+        public const string ENGINE_SHUTTING_DOWN = "engine shutting down";
+        public const string INVALID_REQUEST = "invalid request";
+        public const string TOO_MANY_REQUESTS = "too many requests";
+        public const string INTEGRITY_CONSTRAINT_VIOLATION = "integrity constraint violation";
     }
 }

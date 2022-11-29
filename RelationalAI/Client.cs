@@ -481,7 +481,7 @@ namespace RelationalAI
             MetadataInfo metadata = null;
             List<object> problems = null;
 
-            if (transaction.State == TransactionAsyncState.Completed || transaction.AbortReason == TransactionAsyncAbortReason.IntegrityConstraintViolation)
+            if (transaction.State == TransactionAsyncState.Completed || TransactionAsyncAbortReason.INTEGRITY_CONSTRAINT_VIOLATION.Equals(transaction.AbortReason))
             {
                 results = await GetTransactionResultsAsync(id);
                 metadata = await GetTransactionMetadataAsync(id);
