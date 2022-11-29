@@ -44,14 +44,10 @@ namespace RelationalAI
             _rest = new Rest(context);
         }
 
-        public HttpClient GetHttpClient()
+        public HttpClient HttpClient
         {
-            return _rest.HttpClient;
-        }
-
-        public void SetHttpClient(HttpClient httpClient)
-        {
-            _rest.HttpClient = httpClient;
+            get { return _rest.HttpClient; }
+            set { _rest.HttpClient = value; }
         }
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)
@@ -145,10 +141,11 @@ namespace RelationalAI
 
         public async Task<Engine> CreateEngineWaitAsync(string engine, string size = "XS")
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             await CreateEngineAsync(engine, size);
             var resp = await Policy
                     .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
-                    .Retry30Min()
+                    .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
             if (resp.State != EngineStates.Provisioned)
@@ -195,10 +192,11 @@ namespace RelationalAI
 
         public async Task<DeleteEngineResponse> DeleteEngineWaitAsync(string engine)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var resp = await DeleteEngineAsync(engine);
             var engineResponse = await Policy
                 .HandleResult<Engine>(e => !EngineStates.IsFinalState(e.State))
-                .Retry15Min()
+                .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
                 .ExecuteAsync(() => GetEngineAsync(engine));
             resp.Status.State = engineResponse.State;
             return resp;
@@ -368,9 +366,9 @@ namespace RelationalAI
         }
 
         public async Task<TransactionAsyncResult> LoadModelsAsync(
-        string database,
-        string engine,
-        Dictionary<string, string> models)
+            string database,
+            string engine,
+            Dictionary<string, string> models)
         {
             var queries = new List<string>();
             var queriesInputs = new Dictionary<string, string>();
@@ -380,7 +378,7 @@ namespace RelationalAI
             foreach (var model in models)
             {
                 var inputName = $"input_{randInt}_{index}";
-                queries.Add($"delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] " +
+                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
                 $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
                 queriesInputs.Add(inputName, model.Value);
 
@@ -390,13 +388,36 @@ namespace RelationalAI
             return await ExecuteAsync(database, engine, string.Join('\n', queries), false, queriesInputs);
         }
 
+        public async Task<TransactionAsyncResult> LoadModelsWaitAsync(
+            string database,
+            string engine,
+            Dictionary<string, string> models)
+        {
+            var queries = new List<string>();
+            var queriesInputs = new Dictionary<string, string>();
+            var randInt = new Random().Next(int.MaxValue);
+
+            var index = 0;
+            foreach (var model in models)
+            {
+                var inputName = $"input_{randInt}_{index}";
+                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
+                $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
+                queriesInputs.Add(inputName, model.Value);
+
+                index++;
+            }
+
+            return await ExecuteWaitAsync(database, engine, string.Join('\n', queries), false, queriesInputs);
+        }
+
         public async Task<List<string>> ListModelsAsync(string database, string engine)
         {
             var outName = $"models_{new Random().Next(int.MaxValue)}";
             var query = $"def output:{outName}[name] = rel:catalog:model(name, _)";
 
             var models = new List<string>();
-            var resp = await ExecuteAsync(database, engine, query);
+            var resp = await ExecuteWaitAsync(database, engine, query);
 
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
             if (result != null)
@@ -415,7 +436,7 @@ namespace RelationalAI
             var outName = $"model_{new Random().Next(int.MaxValue)}";
             var query = $"def output:{outName} = rel:catalog:model[\"{name}\"]";
 
-            var resp = await ExecuteAsync(database, engine, query);
+            var resp = await ExecuteWaitAsync(database, engine, query);
 
             var model = new Model(name, null);
             var result = resp.Results.Find(r => r.RelationId.Equals($"/:output/:{outName}/String"));
@@ -436,7 +457,7 @@ namespace RelationalAI
                 queries.Add($"def delete:rel:catalog:model[\"{model}\"] = rel:catalog:model[\"{model}\"]");
             }
 
-            return await ExecuteAsync(database, engine, string.Join('\n', queries), false);
+            return await ExecuteWaitAsync(database, engine, string.Join('\n', queries), false);
         }
 
         // Query
@@ -461,6 +482,7 @@ namespace RelationalAI
             bool readOnly = false,
             Dictionary<string, string> inputs = null)
         {
+            var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             var rsp = await ExecuteAsync(database, engine, source, readOnly, inputs);
             var id = rsp.Transaction.Id;
 
@@ -473,7 +495,7 @@ namespace RelationalAI
             // slow-path
             var transactionResponse = await Policy
                 .HandleResult<TransactionAsyncSingleResponse>(r => !r.Transaction.State.IsFinalState())
-                .RetryForeverWithBoundedDelay()
+                .RetryForeverWithBoundedDelay(startTime, 0.2) // wait for 20% of the total runtime
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
