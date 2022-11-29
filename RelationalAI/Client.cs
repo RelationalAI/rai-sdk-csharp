@@ -499,9 +499,16 @@ namespace RelationalAI
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
-            var results = await GetTransactionResultsAsync(id);
-            var metadata = await GetTransactionMetadataAsync(id);
-            var problems = await GetTransactionProblemsAsync(id);
+            List<ArrowRelation> results = null;
+            MetadataInfo metadata = null;
+            List<object> problems = null;
+
+            if (transaction.State == TransactionAsyncState.Completed || TransactionAsyncAbortReason.IntegrityConstraintViolation.Equals(transaction.AbortReason))
+            {
+                results = await GetTransactionResultsAsync(id);
+                metadata = await GetTransactionMetadataAsync(id);
+                problems = await GetTransactionProblemsAsync(id);
+            }
 
             return new TransactionAsyncResult(
                 transaction,
