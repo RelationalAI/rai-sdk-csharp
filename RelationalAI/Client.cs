@@ -503,7 +503,7 @@ namespace RelationalAI
             MetadataInfo metadata = null;
             List<object> problems = null;
 
-            if (transaction.State == TransactionAsyncState.Completed || TransactionAsyncAbortReason.INTEGRITY_CONSTRAINT_VIOLATION.Equals(transaction.AbortReason))
+            if (transaction.State == TransactionAsyncState.Completed || TransactionAsyncAbortReason.IntegrityConstraintViolation.Equals(transaction.AbortReason))
             {
                 results = await GetTransactionResultsAsync(id);
                 metadata = await GetTransactionMetadataAsync(id);

@@ -21,11 +21,11 @@ namespace RelationalAI
 {
     public static class TransactionAsyncAbortReason
     {
-        public const string SYSTEM_INTERNAL_ERROR = "system internal error";
-        public const string CANCELLED = "cancelled";
-        public const string ENGINE_SHUTTING_DOWN = "engine shutting down";
-        public const string INVALID_REQUEST = "invalid request";
-        public const string TOO_MANY_REQUESTS = "too many requests";
-        public const string INTEGRITY_CONSTRAINT_VIOLATION = "integrity constraint violation";
+        public const string SystemInternalError = "system internal error";
+        public const string Cancelled = "cancelled";
+        public const string EngineShuttingDown = "engine shutting down";
+        public const string InvalidRequest = "invalid request";
+        public const string TooManyReqeuests = "too many requests";
+        public const string IntegrityConstraintViolation = "integrity constraint violation";
     }
 }
