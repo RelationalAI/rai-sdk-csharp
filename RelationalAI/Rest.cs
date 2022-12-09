@@ -268,24 +268,6 @@ namespace RelationalAI
             return output;
         }
 
-        private static async Task EnsureSuccessResponseAsync(HttpResponseMessage response)
-        {
-            var status = (int)response.StatusCode;
-            if (status != 404 && status < 500)
-            {
-                return;
-            }
-
-            var content = await response.Content.ReadAsStringAsync();
-            if (status == 404)
-            {
-                throw new NotFoundException(content);
-            }
-
-            var requestId = response.Headers.TryGetValues(RequestIdHeaderName, out var values) ? values.FirstOrDefault() : null;
-            throw new ApiException($"Server error {response.ReasonPhrase}", response.StatusCode, content, requestId);
-        }
-
         private async Task<string> GetAccessTokenAsync(string host)
         {
             if (!(_context.Credentials is ClientCredentials creds))
@@ -341,8 +323,19 @@ namespace RelationalAI
 
             // Get the result back or throws an exception.
             var response = await HttpClient.SendAsync(request);
-            await EnsureSuccessResponseAsync(response);
             var content = await response.Content.ReadAsByteArrayAsync();
+
+            if ((int)response.StatusCode >= 400)
+            {
+                string requestId = string.Empty;
+                if (response.Headers.TryGetValues("X-Request-ID", out IEnumerable<string> values))
+                {
+                    requestId = values.First();
+                }
+
+                throw new HttpError((int)response.StatusCode, $"(request id: {requestId})\n{ReadString(content)}");
+            }
+
             var contentType = response.Content.Headers.ContentType.MediaType;
 
             return contentType.ToLower() switch
@@ -350,8 +343,7 @@ namespace RelationalAI
                 "application/json" => ReadString(content),
                 "application/x-protobuf" => ReadMetadataProtobuf(content),
                 "multipart/form-data" => ParseMultipartResponse(content),
-                _ => throw new ApiException(
-                    $"Unsupported response content-type: {contentType}", response.StatusCode, ReadString(content))
+                _ => throw new Exception($"Unsupported response content-type: {contentType}\n{ReadString(content)}")
             };
         }
 
