@@ -24,7 +24,7 @@ namespace RelationalAI
         [JsonProperty("permissions")]
         public List<string> Permissions { get; set; }
 
-        [JsonProperty("secret", Required = Required.Always)]
+        [JsonProperty("secret")]
         public string Secret { get; set; }
     }
 }
