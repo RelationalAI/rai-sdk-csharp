@@ -21,7 +21,7 @@ namespace RelationalAI
 {
     public class OAuthClientEx : OAuthClient
     {
-        [JsonProperty("permissions", Required = Required.Always)]
+        [JsonProperty("permissions")]
         public List<string> Permissions { get; set; }
 
         [JsonProperty("secret", Required = Required.Always)]
