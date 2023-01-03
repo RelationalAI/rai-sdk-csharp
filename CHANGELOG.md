@@ -1,5 +1,9 @@
 # Changelog
 
+# v0.9.9-alpha
+* Fix `GetOAuthClientResponse` deserialization issue
+# v0.9.8-alpha
+* Added `TransactionAsyncAbortReason`
 # v0.9.7-alpha
 * Fixed load models async issue.
 

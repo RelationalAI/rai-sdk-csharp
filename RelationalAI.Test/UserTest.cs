@@ -11,32 +11,26 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{Uuid}@example.com";
 
-        // TODO: Keep it disabled until we fix the Auth0 API rate limiting issue
-        //[Fact] 
+        [Fact]
         public async Task TestUser()
         {
             var client = CreateClient();
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.FindUserAsync(UserEmail));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.FindUserAsync(UserEmail));
 
             var rsp = await client.CreateUserAsync(UserEmail);
             Assert.Equal(UserEmail, rsp.Email);
             Assert.Equal(UserStatus.Active, rsp.Status);
             Assert.True(new List<Role> { Role.User }.SequenceEqual(rsp.Roles));
 
-            rsp = await client.FindUserAsync(UserEmail);
-            var userId = rsp.Id;
-            Assert.Equal(userId, rsp.Id);
-            Assert.Equal(UserEmail, rsp.Email);
+            var user = await client.GetUserAsync(rsp.Id);
+            var userId = user.Id;
+            Assert.Equal(user.Id, rsp.Id);
+            Assert.Equal(UserEmail, user.Email);
 
             rsp = await client.GetUserAsync(userId);
             Assert.Equal(userId, rsp.Id);
             Assert.Equal(UserEmail, rsp.Email);
-
-            var users = await client.ListUsersAsync();
-            var user = users.Find(user => user.Id == userId);
-            Assert.Equal(userId, user.Id);
-            Assert.Equal(UserEmail, user.Email);
 
             rsp = await client.DisableUserAsync(userId);
             Assert.Equal(userId, rsp.Id);

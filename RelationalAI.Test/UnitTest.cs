@@ -24,10 +24,15 @@ namespace RelationalAI.Test
                 var clientId = GetEnvironmentVariable("CLIENT_ID");
                 var clientSecret = GetEnvironmentVariable("CLIENT_SECRET");
                 var clientCredentialsUrl = GetEnvironmentVariable("CLIENT_CREDENTIALS_URL");
+                var raiHost = GetEnvironmentVariable("HOST", "");
+                if (raiHost == "")
+                {
+                    raiHost = "azure.relationalai.com";
+                }
 
                 var configStr = $@"
                 [default]
-                host=azure.relationalai.com
+                host={raiHost}
                 region=us-east
                 port=443
                 scheme=https

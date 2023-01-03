@@ -42,7 +42,7 @@ namespace RelationalAI.Test
             Assert.Equal(TransactionAsyncState.Completed, deleteRsp.Transaction.State);
             Assert.Empty(deleteRsp.Problems);
 
-            await Assert.ThrowsAsync<NotFoundException>(async () => await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model"));
+            await Assert.ThrowsAsync<HttpError>(async () => await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model"));
 
             modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             modelName = modelNames.Find(item => item.Equals("test_model"));

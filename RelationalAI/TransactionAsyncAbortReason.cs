@@ -15,17 +15,17 @@
  */
 
 using System;
+using System.Runtime.Serialization;
 
 namespace RelationalAI
 {
-    /// <summary>
-    /// Represents error thrown when requested resource was not found in the system of record.
-    /// </summary>
-    public class NotFoundException : Exception
+    public static class TransactionAsyncAbortReason
     {
-        public NotFoundException(string message)
-            : base(message)
-        {
-        }
+        public const string SystemInternalError = "system internal error";
+        public const string Cancelled = "cancelled";
+        public const string EngineShuttingDown = "engine shutting down";
+        public const string InvalidRequest = "invalid request";
+        public const string TooManyReqeuests = "too many requests";
+        public const string IntegrityConstraintViolation = "integrity constraint violation";
     }
 }

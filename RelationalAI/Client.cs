@@ -84,7 +84,7 @@ namespace RelationalAI
 
             var resp = await GetResourceAsync(PathDatabase, null, parameters);
             var dbs = Json<GetDatabaseResponse>.Deserialize(resp).Databases;
-            return dbs.Count > 0 ? dbs[0] : throw new NotFoundException($"Database with name `{database}` not found");
+            return dbs.Count > 0 ? dbs[0] : throw new HttpError(404, $"Database with name `{database}` not found");
         }
 
         public async Task<List<Database>> ListDatabasesAsync(DatabaseState? state = null)
@@ -165,7 +165,7 @@ namespace RelationalAI
             };
             var resp = await GetResourceAsync(PathEngine, null, parameters);
             var engines = Json<GetEngineResponse>.Deserialize(resp).Engines;
-            return engines.Count > 0 ? engines[0] : throw new NotFoundException($"Engine with name `{engine}` not found");
+            return engines.Count > 0 ? engines[0] : throw new HttpError(404, $"Engine with name `{engine}` not found");
         }
 
         public async Task<List<Engine>> ListEnginesAsync(string state = null)
@@ -220,7 +220,7 @@ namespace RelationalAI
             var clients = await ListOAuthClientsAsync();
 
             return clients.FirstOrDefault(client => client.Name == name) ??
-                   throw new NotFoundException($"OAuth Client with name `{name}` not found");
+                   throw new HttpError(404, $"OAuth Client with name `{name}` not found");
         }
 
         public async Task<OAuthClientEx> GetOAuthClientAsync(string id)
@@ -278,7 +278,7 @@ namespace RelationalAI
             var users = await ListUsersAsync();
 
             return users.FirstOrDefault(user => user.Email == email) ??
-                   throw new NotFoundException($"User with email `{email}` not found");
+                   throw new HttpError(404, $"User with email `{email}` not found");
         }
 
         public async Task<User> GetUserAsync(string userId)
@@ -446,7 +446,7 @@ namespace RelationalAI
                 return model;
             }
 
-            throw new NotFoundException($"Model with name `{name}` not found on database {database}");
+            throw new HttpError(404, $"Model with name `{name}` not found on database {database}");
         }
 
         public async Task<TransactionAsyncResult> DeleteModelsAsync(string database, string engine, List<string> models)
@@ -499,9 +499,16 @@ namespace RelationalAI
                 .ExecuteAsync(() => GetTransactionAsync(id));
 
             var transaction = transactionResponse.Transaction;
-            var results = await GetTransactionResultsAsync(id);
-            var metadata = await GetTransactionMetadataAsync(id);
-            var problems = await GetTransactionProblemsAsync(id);
+            List<ArrowRelation> results = null;
+            MetadataInfo metadata = null;
+            List<object> problems = null;
+
+            if (transaction.State == TransactionAsyncState.Completed || TransactionAsyncAbortReason.IntegrityConstraintViolation.Equals(transaction.AbortReason))
+            {
+                results = await GetTransactionResultsAsync(id);
+                metadata = await GetTransactionMetadataAsync(id);
+                problems = await GetTransactionProblemsAsync(id);
+            }
 
             return new TransactionAsyncResult(
                 transaction,
