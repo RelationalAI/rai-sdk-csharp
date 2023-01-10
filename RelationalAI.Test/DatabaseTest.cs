@@ -22,6 +22,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
             await engineFixture.CreateEngineWaitAsync();
+            Console.WriteLine($"=> using database: {Dbname}");
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
 

@@ -44,6 +44,8 @@ namespace RelationalAI.Test
                 semaphoreSlim.Release();
             }
 
+
+            Console.WriteLine($"=> using engine {_engine.Name}");
             return _engine;
 
         }

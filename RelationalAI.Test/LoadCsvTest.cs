@@ -32,6 +32,7 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+            Console.WriteLine($"=> using database: {Dbname}");
 
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);

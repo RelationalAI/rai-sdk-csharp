@@ -44,6 +44,7 @@ namespace RelationalAI.Test
             }
 
             var customHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(GetEnvironmentVariable("CUSTOM_HEADERS"));
+            Console.WriteLine($"=> using custom headers: {customHeaders}");
 
             var ctx = new Client.Context(config);
             var testClient = new Client(ctx);

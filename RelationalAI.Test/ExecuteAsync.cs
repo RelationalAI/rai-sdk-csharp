@@ -27,9 +27,11 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+            Console.WriteLine($"=> using database: {Dbname}");
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
+            Console.WriteLine($"=> transaction id: {rsp.Transaction.Id}");
 
             var results = new List<ArrowRelation>
             {

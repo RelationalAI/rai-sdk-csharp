@@ -26,6 +26,7 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+            Console.WriteLine($"=> using database: {Dbname}");
 
             var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
             Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
