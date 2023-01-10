@@ -45,7 +45,7 @@ namespace RelationalAI.Test
             }
 
 
-            Console.WriteLine($"=> using engine {_engine.Name}");
+            Console.WriteLine($"=> using engine: {_engine.Name}");
             return _engine;
 
         }
