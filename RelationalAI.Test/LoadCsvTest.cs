@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -19,10 +20,12 @@ namespace RelationalAI.Test
                                       "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
         private readonly EngineFixture engineFixture;
+        private readonly ITestOutputHelper testOutput;
 
-        public LoadCsvTests(EngineFixture fixture)
+        public LoadCsvTests(EngineFixture fixture, ITestOutputHelper output)
         {
             engineFixture = fixture;
+            testOutput = output;
         }
 
         [Fact]
@@ -32,7 +35,8 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
-            Console.WriteLine($"=> using database: {Dbname}");
+
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
 
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
@@ -104,6 +108,8 @@ namespace RelationalAI.Test
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
+
             var opts = new CsvOptions().WithHeaderRow(0);
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample_no_header", SampleNoHeader, opts);
             Assert.False(loadRsp.Aborted);
@@ -174,6 +180,8 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
+
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
@@ -238,6 +246,8 @@ namespace RelationalAI.Test
         public async Task LoadCsvWithSchemaTest()
         {
             var client = CreateClient();
+
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);

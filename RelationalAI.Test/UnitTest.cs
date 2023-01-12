@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -44,7 +45,6 @@ namespace RelationalAI.Test
             }
 
             var customHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(GetEnvironmentVariable("CUSTOM_HEADERS"));
-            Console.WriteLine($"=> using custom headers: {JsonConvert.SerializeObject(customHeaders)}");
 
             var ctx = new Client.Context(config);
             var testClient = new Client(ctx);

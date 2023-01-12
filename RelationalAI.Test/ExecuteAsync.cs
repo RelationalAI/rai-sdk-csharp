@@ -4,6 +4,7 @@ using System.IO;
 using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -13,11 +14,13 @@ namespace RelationalAI.Test
 
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
+        private readonly ITestOutputHelper testOutput;
         private readonly EngineFixture engineFixture;
 
-        public ExecuteAsyncTests(EngineFixture fixture)
+        public ExecuteAsyncTests(EngineFixture fixture, ITestOutputHelper output)
         {
             engineFixture = fixture;
+            testOutput = output;
         }
 
         [Fact]
@@ -27,11 +30,12 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
-            Console.WriteLine($"=> using database: {Dbname}");
+
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
-            Console.WriteLine($"=> transaction id: {rsp.Transaction.Id}");
+            testOutput.WriteLine($"transaction id: {rsp.Transaction.Id}");
 
             var results = new List<ArrowRelation>
             {
