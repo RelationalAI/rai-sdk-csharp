@@ -38,8 +38,8 @@
     </PackageReference>
     <PackageReference Include="HttpMultipartParser" Version="5.1.0" />
     <PackageReference Include="Microsoft.Data.Analysis" Version="0.19.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.19.0" />
-    <PackageReference Include="Google.Protobuf.Tools" Version="3.19.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.19.5" />
+    <PackageReference Include="Google.Protobuf.Tools" Version="3.19.5" />
   </ItemGroup>
 
   <Target Name="protogen" BeforeTargets="BeforeBuild">
