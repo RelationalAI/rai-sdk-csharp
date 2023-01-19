@@ -1,5 +1,7 @@
 # Changelog
 
+# v0.9.10-alpha
+* Bump up google protobuf version.
 # v0.9.9-alpha
 * Fix `GetOAuthClientResponse` deserialization issue
 # v0.9.8-alpha
