@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -23,47 +24,52 @@ namespace RelationalAI.Test
             var client = CreateClient();
             await engineFixture.CreateEngineWaitAsync();
 
-            await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await client
+                .Invoking(c => c.DeleteDatabaseAsync(Dbname))
+                .Should().ThrowAsync<HttpError>();
 
             var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, false);
-            Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal(DatabaseState.Created, createRsp.State);
+            createRsp.Name.Should().Be(Dbname);
+            createRsp.State.Should().Be(DatabaseState.Created);
 
             createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, true);
-            Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal(DatabaseState.Created, createRsp.State);
+            createRsp.Name.Should().Be(Dbname);
+            createRsp.State.Should().Be(DatabaseState.Created);
 
             var database = await client.GetDatabaseAsync(Dbname);
-            Assert.Equal(Dbname, database.Name);
-            Assert.Equal(DatabaseState.Created, database.State);
+            database.Name.Should().Be(Dbname);
+            database.State.Should().Be(DatabaseState.Created);
 
             var databases = await client.ListDatabasesAsync();
             database = databases.Find(db => db.Name == Dbname);
-            Assert.Equal(Dbname, database.Name);
-            Assert.Equal(DatabaseState.Created, database.State);
+            database.Name.Should().Be(Dbname);
+            database.State.Should().Be(DatabaseState.Created);
 
             databases = await client.ListDatabasesAsync(DatabaseState.Created);
             database = databases.Find(db => db.Name == Dbname);
-            Assert.Equal(Dbname, database.Name);
-            Assert.Equal(DatabaseState.Created, database.State);
+            database.Name.Should().Be(Dbname);
+            database.State.Should().Be(DatabaseState.Created);
 
-            await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
-                client.ListDatabasesAsync((DatabaseState)1000));
+            await client
+                .Invoking(c => c.ListDatabasesAsync((DatabaseState)1000))
+                .Should().ThrowAsync<ArgumentOutOfRangeException>();
 
             var edbs = await client.ListEdbsAsync(Dbname, engineFixture.Engine.Name);
             var edb = edbs.Find(item => item.Name.Equals("rel"));
-            Assert.NotNull(edb);
+            edb.Should().NotBeNull();
 
             var modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("rel/stdlib"));
-            Assert.NotNull(name);
+            name.Should().NotBeNull();
 
             var models = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
 
             var deleteRsp = await client.DeleteDatabaseAsync(Dbname);
-            Assert.Equal(Dbname, deleteRsp.Name);
+            deleteRsp.Name.Should().Be(Dbname);
 
-            await Assert.ThrowsAsync<HttpError>(async () => await client.GetDatabaseAsync(Dbname));
+            await client
+                .Invoking(c => c.GetDatabaseAsync(Dbname))
+                .Should().ThrowAsync<HttpError>();
         }
 
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
@@ -80,67 +86,70 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
+            await client
+                .Invoking(c => c.DeleteDatabaseAsync(Dbname))
+                .Should().ThrowAsync<HttpError>();
+
 
             // create a fresh database
             var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
-            Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal(DatabaseState.Created, createRsp.State);
+            createRsp.Name.Should().Be(Dbname);
+            createRsp.State.Should().Be(DatabaseState.Created);
 
             // load some data and model
             var loadRsp = await client.LoadJsonAsync(Dbname, engineFixture.Engine.Name, "test_data", TestJson);
-            Assert.False(loadRsp.Aborted);
-            Assert.Empty(loadRsp.Output);
-            Assert.Empty(loadRsp.Problems);
+            loadRsp.Aborted.Should().BeFalse();
+            loadRsp.Output.Should().HaveCount(0);
+            loadRsp.Problems.Should().HaveCount(0);
 
             var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
-            Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
-            Assert.Empty(resp.Problems);
+            resp.Transaction.State.Should().Be(TransactionAsyncState.Completed);
+            resp.Problems.Should().HaveCount(0);
 
             // clone database
             var databaseCloneName = $"{Dbname}-clone";
             createRsp = await client.CloneDatabaseAsync(databaseCloneName, engineFixture.Engine.Name, Dbname, true);
-            Assert.Equal(databaseCloneName, createRsp.Name);
-            Assert.Equal(DatabaseState.Created, createRsp.State);
+            createRsp.Name.Should().Be(databaseCloneName);
+            createRsp.State.Should().Be(DatabaseState.Created);
 
             // make sure the database exists
             var database = await client.GetDatabaseAsync(databaseCloneName);
-            Assert.Equal(databaseCloneName, database.Name);
-            Assert.Equal(DatabaseState.Created, database.State);
+            database.Name.Should().Be(databaseCloneName);
+            database.State.Should().Be(DatabaseState.Created);
 
             var databases = await client.ListDatabasesAsync();
             database = databases.Find(db => db.Name == databaseCloneName);
-            Assert.NotNull(database);
-            Assert.Equal(databaseCloneName, database.Name);
-            Assert.Equal(DatabaseState.Created, database.State);
+            database.Should().NotBeNull();
+            database.Name.Should().Be(databaseCloneName);
+            database.State.Should().Be(DatabaseState.Created);
 
             // make sure the data was cloned
             var rsp = await client.ExecuteV1Async(databaseCloneName, engineFixture.Engine.Name, "test_data", true);
 
             var rel = FindRelation(rsp.Output, ":name");
-            Assert.NotNull(rel);
+            rel.Should().NotBeNull();
 
             rel = FindRelation(rsp.Output, ":age");
-            Assert.NotNull(rel);
+            rel.Should().NotBeNull();
 
             rel = FindRelation(rsp.Output, ":height");
-            Assert.NotNull(rel);
+            rel.Should().NotBeNull();
 
             rel = FindRelation(rsp.Output, ":pets");
-            Assert.NotNull(rel);
+            rel.Should().NotBeNull();
 
             // make sure the model was cloned
             var modelNames = await client.ListModelsAsync(databaseCloneName, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("test_model"));
-            Assert.NotNull(name);
+            name.Should().NotBeNull();
 
             var model = await client.GetModelAsync(databaseCloneName, engineFixture.Engine.Name, "test_model");
-            Assert.Equal("test_model", model.Name);
-            Assert.Equal(TestModel["test_model"], model.Value);
+            model.Name.Should().Be("test_model");
+            model.Value.Should().Be(TestModel["test_model"]);
 
             // cleanup
             var deleteRsp = await client.DeleteDatabaseAsync(databaseCloneName);
-            Assert.Equal(databaseCloneName, deleteRsp.Name);
+            deleteRsp.Name.Should().Be(databaseCloneName);
         }
 
         public override async Task DisposeAsync()
