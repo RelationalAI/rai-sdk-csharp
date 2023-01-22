@@ -1,7 +1,6 @@
-using System;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -22,19 +21,19 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
 
-            Assert.Equal(EngineStates.Provisioned, engineFixture.Engine.State);
+            engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             var engine = await client.GetEngineAsync(engineFixture.Engine.Name);
-            Assert.Equal(engine.Name, engineFixture.Engine.Name);
-            Assert.Equal(EngineStates.Provisioned, engine.State);
+            engine.Name.Should().Be(engineFixture.Engine.Name);
+            engine.State.Should().Be(EngineStates.Provisioned);
 
             var engines = await client.ListEnginesAsync();
             engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
-            Assert.NotNull(engine);
+            engine.Should().NotBeNull();
 
             engines = await client.ListEnginesAsync(EngineStates.Provisioned);
             engine = engines.Find(item => item.Name.Equals(engineFixture.Engine.Name));
-            Assert.NotNull(engine);
+            engine.Should().NotBeNull();
         }
     }
 }
