@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -16,10 +17,12 @@ namespace RelationalAI.Test
                                       "\"pets\":[\"dog\",\"rabbit\"]}";
 
         private readonly EngineFixture engineFixture;
+        private readonly ITestOutputHelper testOutput;
 
-        public LoadJsonTests(EngineFixture fixture)
+        public LoadJsonTests(EngineFixture fixture, ITestOutputHelper output)
         {
             engineFixture = fixture;
+            testOutput = output;
         }
 
         [Fact]
@@ -29,6 +32,8 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+
+            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
 
             var loadRsp = await client.LoadJsonAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);

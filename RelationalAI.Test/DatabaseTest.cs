@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
     [Collection("RelationalAI.Test")]
     public class DatabaseTests : UnitTest
     {
+        private readonly ITestOutputHelper testOutput;
         private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
 
-        public DatabaseTests(EngineFixture fixture)
+        public DatabaseTests(EngineFixture fixture, ITestOutputHelper output)
         {
             engineFixture = fixture;
+            testOutput = output;
         }
 
         [Fact]
         public async Task DatabaseTest()
         {
             var client = CreateClient();
+
             await engineFixture.CreateEngineWaitAsync();
 
             await client
@@ -86,10 +90,10 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
+
             await client
                 .Invoking(c => c.DeleteDatabaseAsync(Dbname))
                 .Should().ThrowAsync<HttpError>();
-
 
             // create a fresh database
             var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
