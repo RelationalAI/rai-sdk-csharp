@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -52,6 +53,11 @@ namespace RelationalAI.Test
             {
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
+
+            // system diagnostics logging configuration
+            testClient.TraceSource.Listeners.Add(new ConsoleTraceListener());
+            testClient.TraceSource.Switch.ShouldTrace(TraceEventType.Verbose);
+
             return testClient;
         }
 

@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -37,11 +38,13 @@ namespace RelationalAI
         private const string RequestIdHeaderName = "X-Request-ID";
 
         private readonly Context _context;
+        private TraceSource _traceSource;
 
-        public Rest(Context context)
+        public Rest(Context context, TraceSource traceSource = null)
         {
             _context = context;
             HttpClient = new HttpClient();
+            _traceSource = traceSource ?? new TraceSource("RAI", SourceLevels.All);
         }
 
         public HttpClient HttpClient { get; set; }
