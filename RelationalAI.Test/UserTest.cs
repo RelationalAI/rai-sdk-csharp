@@ -12,19 +12,10 @@ namespace RelationalAI.Test
         public static string Uuid = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{Uuid}@example.com";
 
-        private readonly ITestOutputHelper testOutput;
-
-        public UserTest(ITestOutputHelper output)
-        {
-            testOutput = output;
-        }
-
         [Fact]
         public async Task TestUser()
         {
             var client = CreateClient();
-
-            testOutput.WriteLine($"user email: {UserEmail}");
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.FindUserAsync(UserEmail));
 

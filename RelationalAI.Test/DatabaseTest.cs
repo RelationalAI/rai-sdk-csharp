@@ -10,15 +10,13 @@ namespace RelationalAI.Test
     [Collection("RelationalAI.Test")]
     public class DatabaseTests : UnitTest
     {
-        private readonly ITestOutputHelper testOutput;
         private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
 
-        public DatabaseTests(EngineFixture fixture, ITestOutputHelper output)
+        public DatabaseTests(EngineFixture fixture)
         {
             engineFixture = fixture;
-            testOutput = output;
         }
 
         [Fact]

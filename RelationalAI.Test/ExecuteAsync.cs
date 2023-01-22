@@ -14,13 +14,11 @@ namespace RelationalAI.Test
 
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        private readonly ITestOutputHelper testOutput;
         private readonly EngineFixture engineFixture;
 
-        public ExecuteAsyncTests(EngineFixture fixture, ITestOutputHelper output)
+        public ExecuteAsyncTests(EngineFixture fixture)
         {
             engineFixture = fixture;
-            testOutput = output;
         }
 
         [Fact]
@@ -31,11 +29,8 @@ namespace RelationalAI.Test
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
-            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
-
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
-            testOutput.WriteLine($"transaction id: {rsp.Transaction.Id}");
 
             var results = new List<ArrowRelation>
             {

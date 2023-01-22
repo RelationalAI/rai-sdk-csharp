@@ -14,12 +14,10 @@ namespace RelationalAI.Test
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
 
         private readonly EngineFixture engineFixture;
-        private readonly ITestOutputHelper testOutput;
 
-        public ModelsTests(EngineFixture fixture, ITestOutputHelper output)
+        public ModelsTests(EngineFixture fixture)
         {
             engineFixture = fixture;
-            testOutput = output;
         }
 
         [Fact]
@@ -29,8 +27,6 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
-
-            testOutput.WriteLine($"database: {Dbname}, engine: {engineFixture.Engine.Name}");
 
             var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
             Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
