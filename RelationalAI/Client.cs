@@ -50,7 +50,7 @@ namespace RelationalAI
             set { _rest.HttpClient = value; }
         }
 
-        public async Task<Database> CreateDatabaseAsync(string database, string source = null, string engine = null, bool overwrite = false)
+        public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false, string source = null)
         {
             if (engine != null)
             {
