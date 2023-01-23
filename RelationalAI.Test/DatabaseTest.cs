@@ -155,6 +155,16 @@ namespace RelationalAI.Test
             {
                 await Console.Error.WriteLineAsync(e.ToString());
             }
+
+            try
+            {
+                await client.DeleteDatabaseAsync($"{Dbname}-clone");
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
         }
     }
 }
