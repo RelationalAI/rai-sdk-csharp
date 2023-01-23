@@ -50,12 +50,29 @@ namespace RelationalAI
             set { _rest.HttpClient = value; }
         }
 
-        public async Task<Database> CreateDatabaseAsync(string database, string engine = "", bool overwrite = false)
+        [Obsolete("This method is deprecated, engine is no longer required to create a database")]
+        public async Task<Database> CreateDatabaseV1Async(string database, string engine, bool overwrite = false)
         {
             var mode = CreateMode(null, overwrite);
             var transaction = new Transaction(_context.Region, database, engine, mode);
             await _rest.PostAsync(MakeUrl(PathTransaction), transaction.Payload(null), null, transaction.QueryParams());
             return await GetDatabaseAsync(database);
+        }
+
+        public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false)
+        {
+            if (engine != null)
+            {
+                return await CreateDatabaseV1Async(database, engine, overwrite);
+            }
+
+            var data = new Dictionary<string, string>
+            {
+                { "name", database }
+            };
+
+            string rsp = await _rest.PutAsync(MakeUrl(PathDatabase), data) as string;
+            return Json<CreateDatabaseResponse>.Deserialize(rsp).Database;
         }
 
         public async Task<Database> CloneDatabaseAsync(
