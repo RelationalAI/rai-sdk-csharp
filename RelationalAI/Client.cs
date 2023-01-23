@@ -59,7 +59,7 @@ namespace RelationalAI
             return await GetDatabaseAsync(database);
         }
 
-        public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false)
+        public async Task<Database> CreateDatabaseAsync(string database, string source = null, string engine = null, bool overwrite = false)
         {
             if (engine != null)
             {
@@ -70,6 +70,11 @@ namespace RelationalAI
             {
                 { "name", database }
             };
+
+            if (source != null)
+            {
+                data.Add("source_name", source);
+            }
 
             string rsp = await _rest.PutAsync(MakeUrl(PathDatabase), data) as string;
             return Json<CreateDatabaseResponse>.Deserialize(rsp).Database;
