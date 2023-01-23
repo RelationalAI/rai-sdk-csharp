@@ -50,12 +50,7 @@ namespace RelationalAI
             set { _rest.HttpClient = value; }
         }
 
-        public Task<Database> CreateDatabaseAsync(string database, string engine)
-        {
-            return CreateDatabaseAsync(database, engine, false);
-        }
-
-        public async Task<Database> CreateDatabaseAsync(string database, string engine, bool overwrite)
+        public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false)
         {
             var mode = CreateMode(null, overwrite);
             var transaction = new Transaction(_context.Region, database, engine, mode);

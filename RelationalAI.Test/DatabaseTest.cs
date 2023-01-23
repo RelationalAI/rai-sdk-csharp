@@ -25,11 +25,11 @@ namespace RelationalAI.Test
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
 
-            var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, false);
+            var createRsp = await client.CreateDatabaseAsync(Dbname);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
-            createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, true);
+            createRsp = await client.CreateDatabaseAsync(Dbname, overwrite: true);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
@@ -83,7 +83,7 @@ namespace RelationalAI.Test
             await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
 
             // create a fresh database
-            var createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+            var createRsp = await client.CreateDatabaseAsync(Dbname);
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 

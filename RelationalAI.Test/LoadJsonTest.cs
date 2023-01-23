@@ -28,7 +28,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
+            await client.CreateDatabaseAsync(Dbname);
 
             var loadRsp = await client.LoadJsonAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
