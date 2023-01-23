@@ -7,12 +7,13 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        public Client CreateClient()
+        public Client CreateClient(ITestOutputHelper testOutputHelper = null)
         {
             Dictionary<string, object> config;
 
@@ -55,7 +56,10 @@ namespace RelationalAI.Test
             }
 
             // system diagnostics logging configuration
-            testClient.TraceSource.Listeners.Add(new ConsoleTraceListener());
+            if (testOutputHelper != null)
+            {
+                testClient.TraceSource.Listeners.Add(new RAITestTraceListener(testOutputHelper));
+            }
             testClient.TraceSource.Switch.ShouldTrace(TraceEventType.Verbose);
 
             return testClient;

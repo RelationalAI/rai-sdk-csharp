@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -9,17 +10,19 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
+        private readonly ITestOutputHelper outputHelper;
         private readonly EngineFixture engineFixture;
 
-        public ExecuteTests(EngineFixture fixture)
+        public ExecuteTests(EngineFixture fixture, ITestOutputHelper output)
         {
+            outputHelper = output;
             engineFixture = fixture;
         }
 
         [Fact]
         public async Task ExecuteV1Test()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -49,7 +52,7 @@ namespace RelationalAI.Test
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             try
             {

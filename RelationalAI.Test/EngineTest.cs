@@ -1,24 +1,26 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
     [Collection("RelationalAI.Test")]
     public class EngineTests : UnitTest
     {
-
+        private readonly ITestOutputHelper outputHelper;
         private readonly EngineFixture engineFixture;
 
-        public EngineTests(EngineFixture fixture)
+        public EngineTests(EngineFixture fixture, ITestOutputHelper output)
         {
+            outputHelper = output;
             engineFixture = fixture;
         }
 
         [Fact]
         public async Task EngineTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
 
