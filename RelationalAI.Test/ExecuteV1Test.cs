@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
@@ -46,7 +47,7 @@ namespace RelationalAI.Test
                 new object[] {1L, 16L, 81L, 256L, 625L}
             };
 
-            columns[0].Should().Equal(expected[0]);
+            columns.Should().Equal(expected, (l, r) => l.SequenceEqual(r));
         }
 
         public override async Task DisposeAsync()
