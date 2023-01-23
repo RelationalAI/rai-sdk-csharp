@@ -25,6 +25,8 @@ namespace RelationalAI.Test
 
             await engineFixture.CreateEngineWaitAsync();
 
+            engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
+
             await client
                 .Invoking(c => c.DeleteDatabaseAsync(Dbname))
                 .Should().ThrowAsync<HttpError>();
