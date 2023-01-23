@@ -50,7 +50,7 @@ namespace RelationalAI
             set { _rest.HttpClient = value; }
         }
 
-        [Obsolete("This method is deprecated, engine is no longer required to create a database")]
+        [Obsolete("This method is deprecated, please use CreateDatabaseAsync: engine is no longer required to create a database")]
         public async Task<Database> CreateDatabaseV1Async(string database, string engine, bool overwrite = false)
         {
             var mode = CreateMode(null, overwrite);

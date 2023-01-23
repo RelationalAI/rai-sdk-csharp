@@ -29,10 +29,6 @@ namespace RelationalAI.Test
             Assert.Equal(Dbname, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
-            createRsp = await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name, overwrite: true);
-            Assert.Equal(Dbname, createRsp.Name);
-            Assert.Equal(DatabaseState.Created, createRsp.State);
-
             var database = await client.GetDatabaseAsync(Dbname);
             Assert.Equal(Dbname, database.Name);
             Assert.Equal(DatabaseState.Created, database.State);
