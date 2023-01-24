@@ -1,5 +1,6 @@
 # Changelog
-
+# v0.9.11-alpha
+* Fix common retry policy to not retry on `HttpError` with 4xx Status Codes, but only on 5xx.
 # v0.9.10-alpha
 * Bump up google protobuf version.
 # v0.9.9-alpha
