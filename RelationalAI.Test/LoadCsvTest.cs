@@ -31,7 +31,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample", Sample);
             Assert.False(loadRsp.Aborted);
@@ -101,7 +101,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var opts = new CsvOptions().WithHeaderRow(0);
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample_no_header", SampleNoHeader, opts);
@@ -174,7 +174,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var opts = new CsvOptions().WithDelim('|').WithQuoteChar('\'');
             var loadRsp = await client.LoadCsvAsync(Dbname, engineFixture.Engine.Name, "sample_alt_syntax", SampleAltSyntax, opts);
@@ -239,7 +239,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var schema = new Dictionary<string, string>
             {

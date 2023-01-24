@@ -26,7 +26,7 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
-            await client.CreateDatabaseAsync(Dbname);
+            await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
             var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
