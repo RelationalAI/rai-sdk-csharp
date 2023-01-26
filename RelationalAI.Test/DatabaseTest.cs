@@ -10,7 +10,9 @@ namespace RelationalAI.Test
     {
         private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{Uuid}";
+        private static readonly string Dbname = $"csharp-sdk-{Uuid}";
+
+        private static readonly string DatabaseCloneName = $"{Dbname}-clone";
 
         public DatabaseTests(EngineFixture fixture)
         {
@@ -98,24 +100,23 @@ namespace RelationalAI.Test
             Assert.Empty(resp.Problems);
 
             // clone database
-            var databaseCloneName = $"{Dbname}-clone";
-            createRsp = await client.CloneDatabaseAsync(databaseCloneName, engineFixture.Engine.Name, Dbname, true);
-            Assert.Equal(databaseCloneName, createRsp.Name);
+            createRsp = await client.CloneDatabaseAsync(DatabaseCloneName, engineFixture.Engine.Name, Dbname, true);
+            Assert.Equal(DatabaseCloneName, createRsp.Name);
             Assert.Equal(DatabaseState.Created, createRsp.State);
 
             // make sure the database exists
-            var database = await client.GetDatabaseAsync(databaseCloneName);
-            Assert.Equal(databaseCloneName, database.Name);
+            var database = await client.GetDatabaseAsync(DatabaseCloneName);
+            Assert.Equal(DatabaseCloneName, database.Name);
             Assert.Equal(DatabaseState.Created, database.State);
 
             var databases = await client.ListDatabasesAsync();
-            database = databases.Find(db => db.Name == databaseCloneName);
+            database = databases.Find(db => db.Name == DatabaseCloneName);
             Assert.NotNull(database);
-            Assert.Equal(databaseCloneName, database.Name);
+            Assert.Equal(DatabaseCloneName, database.Name);
             Assert.Equal(DatabaseState.Created, database.State);
 
             // make sure the data was cloned
-            var rsp = await client.ExecuteV1Async(databaseCloneName, engineFixture.Engine.Name, "test_data", true);
+            var rsp = await client.ExecuteV1Async(DatabaseCloneName, engineFixture.Engine.Name, "test_data", true);
 
             var rel = FindRelation(rsp.Output, ":name");
             Assert.NotNull(rel);
@@ -130,17 +131,17 @@ namespace RelationalAI.Test
             Assert.NotNull(rel);
 
             // make sure the model was cloned
-            var modelNames = await client.ListModelsAsync(databaseCloneName, engineFixture.Engine.Name);
+            var modelNames = await client.ListModelsAsync(DatabaseCloneName, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("test_model"));
             Assert.NotNull(name);
 
-            var model = await client.GetModelAsync(databaseCloneName, engineFixture.Engine.Name, "test_model");
+            var model = await client.GetModelAsync(DatabaseCloneName, engineFixture.Engine.Name, "test_model");
             Assert.Equal("test_model", model.Name);
             Assert.Equal(TestModel["test_model"], model.Value);
 
             // cleanup
-            var deleteRsp = await client.DeleteDatabaseAsync(databaseCloneName);
-            Assert.Equal(databaseCloneName, deleteRsp.Name);
+            var deleteRsp = await client.DeleteDatabaseAsync(DatabaseCloneName);
+            Assert.Equal(DatabaseCloneName, deleteRsp.Name);
         }
 
         public override async Task DisposeAsync()
@@ -155,6 +156,16 @@ namespace RelationalAI.Test
             {
                 await Console.Error.WriteLineAsync(e.ToString());
             }
+
+            try
+            {
+                await client.DeleteDatabaseAsync(DatabaseCloneName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
         }
     }
 }
