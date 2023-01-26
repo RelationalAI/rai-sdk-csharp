@@ -16,31 +16,37 @@ namespace RelationalAI
         public void Debug(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Verbose, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public void Error(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Error, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public void Fatal(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Critical, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public void Info(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Information, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public void Trace(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Verbose, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public void Warning(string message)
         {
             _traceSource.TraceEvent(TraceEventType.Warning, _loggerId, message);
+            _traceSource.Flush();
         }
 
         public int AddListener(TraceListener listener)

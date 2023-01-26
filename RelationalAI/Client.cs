@@ -42,8 +42,8 @@ namespace RelationalAI
         public Client(Context context)
         {
             _context = context;
-            _rest = new Rest(context);
-            _logger = LoggerFactory.GetRAITraceSourceLogger("RAI");
+            _logger = new RAITraceSourceLogger("RAI");
+            _rest = new Rest(context, _logger);
         }
 
         public HttpClient HttpClient
@@ -51,6 +51,8 @@ namespace RelationalAI
             get { return _rest.HttpClient; }
             set { _rest.HttpClient = value; }
         }
+
+        public IRAILogger Logger => _logger;
 
         public Task<Database> CreateDatabaseAsync(string database, string engine)
         {

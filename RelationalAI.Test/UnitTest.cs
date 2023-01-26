@@ -58,7 +58,7 @@ namespace RelationalAI.Test
             // Logging configuration
             if (testOutputHelper != null)
             {
-                var logger = LoggerFactory.GetRAITraceSourceLogger("RAI");
+                var logger = testClient.Logger as RAITraceSourceLogger;
                 logger.AddListener(new RAITestTraceListener(testOutputHelper));
                 logger.SwitchLogLevel(TraceEventType.Verbose);
             }
