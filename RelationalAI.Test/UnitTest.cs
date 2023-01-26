@@ -55,12 +55,13 @@ namespace RelationalAI.Test
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
 
-            // system diagnostics logging configuration
+            // Logging configuration
             if (testOutputHelper != null)
             {
-                testClient.TraceSource.Listeners.Add(new RAITestTraceListener(testOutputHelper));
+                var logger = LoggerFactory.GetRAITraceSourceLogger("RAI");
+                logger.AddListener(new RAITestTraceListener(testOutputHelper));
+                logger.SwitchLogLevel(TraceEventType.Verbose);
             }
-            testClient.TraceSource.Switch.ShouldTrace(TraceEventType.Verbose);
 
             return testClient;
         }
