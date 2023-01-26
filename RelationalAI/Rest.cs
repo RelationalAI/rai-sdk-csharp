@@ -37,11 +37,13 @@ namespace RelationalAI
         private const string RequestIdHeaderName = "X-Request-ID";
 
         private readonly Context _context;
+        private readonly IRAILogger _logger;
 
-        public Rest(Context context)
+        public Rest(Context context, IRAILogger logger)
         {
             _context = context;
             HttpClient = new HttpClient();
+            _logger = logger;
         }
 
         public HttpClient HttpClient { get; set; }

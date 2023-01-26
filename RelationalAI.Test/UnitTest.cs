@@ -1,17 +1,19 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        public Client CreateClient()
+        public Client CreateClient(ITestOutputHelper testOutputHelper = null)
         {
             Dictionary<string, object> config;
 
@@ -52,6 +54,15 @@ namespace RelationalAI.Test
             {
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
+
+            // Logging configuration
+            if (testOutputHelper != null)
+            {
+                var logger = testClient.Logger as RAITraceSourceLogger;
+                logger.AddListener(new RAITestTraceListener(testOutputHelper));
+                logger.SwitchLogLevel(TraceEventType.Verbose);
+            }
+
             return testClient;
         }
 

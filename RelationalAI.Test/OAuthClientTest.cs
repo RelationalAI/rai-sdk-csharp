@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -8,6 +9,12 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string OAuthClientName = $"csharp-sdk-{Uuid}";
+        private readonly ITestOutputHelper outputHelper;
+
+        public OAuthClientTests(ITestOutputHelper output)
+        {
+            outputHelper = output;
+        }
 
         [Fact]
         public async Task OAuthClientTest()

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -18,17 +19,19 @@ namespace RelationalAI.Test
                                       "\"cosmopolitan\",4,11.00,\"2020-03-03\"\n" +
                                       "\"bellini\",3,12.25,\"2020-04-04\"\n";
 
+        private readonly ITestOutputHelper outputHelper;
         private readonly EngineFixture engineFixture;
 
-        public LoadCsvTests(EngineFixture fixture)
+        public LoadCsvTests(EngineFixture fixture, ITestOutputHelper output)
         {
+            outputHelper = output;
             engineFixture = fixture;
         }
 
         [Fact]
         public async Task LoadCsvtTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -98,7 +101,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvNoHeaderTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -171,7 +174,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvAltSyntaxTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -236,7 +239,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task LoadCsvWithSchemaTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -316,7 +319,7 @@ namespace RelationalAI.Test
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
             try
             {
                 await client.DeleteDatabaseAsync(Dbname);

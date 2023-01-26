@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -12,17 +13,19 @@ namespace RelationalAI.Test
         public static string Dbname = $"csharp-sdk-{Uuid}";
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
 
+        private readonly ITestOutputHelper outputHelper;
         private readonly EngineFixture engineFixture;
 
-        public ModelsTests(EngineFixture fixture)
+        public ModelsTests(EngineFixture fixture, ITestOutputHelper output)
         {
+            outputHelper = output;
             engineFixture = fixture;
         }
 
         [Fact]
         public async Task ModelsTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -51,7 +54,7 @@ namespace RelationalAI.Test
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             try
             {

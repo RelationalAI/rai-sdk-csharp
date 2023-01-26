@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -10,11 +11,17 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string UserEmail = $"csharp-sdk-{Uuid}@example.com";
+        private readonly ITestOutputHelper outputHelper;
+
+        public UserTest(ITestOutputHelper output)
+        {
+            outputHelper = output;
+        }
 
         [Fact]
         public async Task TestUser()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.FindUserAsync(UserEmail));
 
@@ -59,7 +66,7 @@ namespace RelationalAI.Test
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             try
             {

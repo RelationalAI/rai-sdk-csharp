@@ -37,11 +37,13 @@ namespace RelationalAI
         private const string PathOAuthClients = "/oauth-clients";
         private readonly Rest _rest;
         private readonly Context _context;
+        private IRAILogger _logger;
 
         public Client(Context context)
         {
             _context = context;
-            _rest = new Rest(context);
+            _logger = new RAITraceSourceLogger("RAI");
+            _rest = new Rest(context, _logger);
         }
 
         public HttpClient HttpClient
@@ -50,6 +52,8 @@ namespace RelationalAI
             set { _rest.HttpClient = value; }
         }
 
+        public IRAILogger Logger => _logger;
+
         public Task<Database> CreateDatabaseAsync(string database, string engine)
         {
             return CreateDatabaseAsync(database, engine, false);
@@ -57,6 +61,7 @@ namespace RelationalAI
 
         public async Task<Database> CreateDatabaseAsync(string database, string engine, bool overwrite)
         {
+            _logger.Debug($"creating database {database}");
             var mode = CreateMode(null, overwrite);
             var transaction = new Transaction(_context.Region, database, engine, mode);
             await _rest.PostAsync(MakeUrl(PathTransaction), transaction.Payload(null), null, transaction.QueryParams());
@@ -111,6 +116,7 @@ namespace RelationalAI
 
         public async Task<Engine> CreateEngineAsync(string engine, string size = "XS")
         {
+            _logger.Debug($"creating engine {engine} with size {size}");
             var data = new Dictionary<string, string>
             {
                 { "region", _context.Region },
@@ -532,6 +538,7 @@ namespace RelationalAI
             if (rsp is string s)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(s);
+                _logger.Debug($"transaction id {txn.Id}");
                 return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
@@ -741,6 +748,7 @@ namespace RelationalAI
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
+            _logger.Debug($"transaction id {transactionResult.Id}");
             var metadataProto = _rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;

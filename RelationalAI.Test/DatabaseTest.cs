@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -9,20 +10,22 @@ namespace RelationalAI.Test
     public class DatabaseTests : UnitTest
     {
         private readonly EngineFixture engineFixture;
+        private readonly ITestOutputHelper outputHelper;
         public static string Uuid = Guid.NewGuid().ToString();
         private static readonly string Dbname = $"csharp-sdk-{Uuid}";
 
         private static readonly string DatabaseCloneName = $"{Dbname}-clone";
 
-        public DatabaseTests(EngineFixture fixture)
+        public DatabaseTests(EngineFixture fixture, ITestOutputHelper output)
         {
+            outputHelper = output;
             engineFixture = fixture;
         }
 
         [Fact]
         public async Task DatabaseTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
             await engineFixture.CreateEngineWaitAsync();
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
@@ -79,7 +82,7 @@ namespace RelationalAI.Test
         [Fact]
         public async Task DatabaseCloneTest()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             await engineFixture.CreateEngineWaitAsync();
             await Assert.ThrowsAsync<HttpError>(async () => await client.DeleteDatabaseAsync(Dbname));
@@ -146,7 +149,7 @@ namespace RelationalAI.Test
 
         public override async Task DisposeAsync()
         {
-            var client = CreateClient();
+            var client = CreateClient(outputHelper);
 
             try
             {
