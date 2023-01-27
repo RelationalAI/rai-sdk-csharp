@@ -78,7 +78,7 @@ namespace RelationalAI.Test
 
             // v2 database tests
             createRsp = await client.CreateDatabaseAsync(Dbname);
-            createdRsp.Name.Should().Be(Dbname);
+            createRsp.Name.Should().Be(Dbname);
             createRsp.State.Should().Be(DatabaseState.Created);
 
             deleteRsp = await client.DeleteDatabaseAsync(Dbname);
