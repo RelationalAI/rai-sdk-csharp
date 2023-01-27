@@ -11,7 +11,9 @@ namespace RelationalAI.Test
     {
         private readonly EngineFixture engineFixture;
         public static string Uuid = Guid.NewGuid().ToString();
-        public static string Dbname = $"csharp-sdk-{Uuid}";
+        private static readonly string Dbname = $"csharp-sdk-{Uuid}";
+
+        private static readonly string DatabaseCloneName = $"{Dbname}-clone";
 
         public DatabaseTests(EngineFixture fixture)
         {
@@ -73,6 +75,14 @@ namespace RelationalAI.Test
             await client
                 .Invoking(c => c.GetDatabaseAsync(Dbname))
                 .Should().ThrowAsync<HttpError>();
+
+            // v2 database tests
+            createRsp = await client.CreateDatabaseAsync(Dbname);
+            createdRsp.Name.Should().Be(Dbname);
+            createRsp.State.Should().Be(DatabaseState.Created);
+
+            deleteRsp = await client.DeleteDatabaseAsync(Dbname);
+            Assert.Equal(Dbname, deleteRsp.Name);
         }
 
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
@@ -127,7 +137,7 @@ namespace RelationalAI.Test
             database.State.Should().Be(DatabaseState.Created);
 
             // make sure the data was cloned
-            var rsp = await client.ExecuteV1Async(databaseCloneName, engineFixture.Engine.Name, "test_data", true);
+            var rsp = await client.ExecuteV1Async(DatabaseCloneName, engineFixture.Engine.Name, "test_data", true);
 
             var rel = FindRelation(rsp.Output, ":name");
             rel.Should().NotBeNull();
@@ -142,7 +152,7 @@ namespace RelationalAI.Test
             rel.Should().NotBeNull();
 
             // make sure the model was cloned
-            var modelNames = await client.ListModelsAsync(databaseCloneName, engineFixture.Engine.Name);
+            var modelNames = await client.ListModelsAsync(DatabaseCloneName, engineFixture.Engine.Name);
             var name = modelNames.Find(item => item.Equals("test_model"));
             name.Should().NotBeNull();
 
@@ -167,6 +177,16 @@ namespace RelationalAI.Test
             {
                 await Console.Error.WriteLineAsync(e.ToString());
             }
+
+            try
+            {
+                await client.DeleteDatabaseAsync(DatabaseCloneName);
+            }
+            catch (Exception e)
+            {
+                await Console.Error.WriteLineAsync(e.ToString());
+            }
+
         }
     }
 }
