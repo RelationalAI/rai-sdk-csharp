@@ -66,6 +66,15 @@ namespace RelationalAI.Test
             Assert.Equal(Dbname, deleteRsp.Name);
 
             await Assert.ThrowsAsync<HttpError>(async () => await client.GetDatabaseAsync(Dbname));
+
+            // v2 database tests
+            createRsp = await client.CreateDatabaseAsync(Dbname);
+            Assert.Equal(Dbname, createRsp.Name);
+            Assert.Equal(DatabaseState.Created, createRsp.State);
+
+            deleteRsp = await client.DeleteDatabaseAsync(Dbname);
+            Assert.Equal(Dbname, deleteRsp.Name);
+
         }
 
         private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
