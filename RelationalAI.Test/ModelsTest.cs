@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xunit;
 
 namespace RelationalAI.Test
@@ -25,28 +26,32 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
+            engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
+
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var resp = await client.LoadModelsWaitAsync(Dbname, engineFixture.Engine.Name, TestModel);
-            Assert.Equal(TransactionAsyncState.Completed, resp.Transaction.State);
-            Assert.Empty(resp.Problems);
+            resp.Transaction.State.Should().Be(TransactionAsyncState.Completed);
+            resp.Problems.Should().HaveCount(0);
 
             var model = await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model");
-            Assert.Equal("test_model", model.Name);
-            Assert.Equal(TestModel["test_model"], model.Value);
+            model.Name.Should().Be("test_model");
+            model.Value.Should().Be(TestModel["test_model"]);
 
             var modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             var modelName = modelNames.Find(item => item.Equals("test_model"));
 
             var deleteRsp = await client.DeleteModelsAsync(Dbname, engineFixture.Engine.Name, new List<string> { "test_model" });
-            Assert.Equal(TransactionAsyncState.Completed, deleteRsp.Transaction.State);
-            Assert.Empty(deleteRsp.Problems);
+            deleteRsp.Transaction.State.Should().Be(TransactionAsyncState.Completed);
+            deleteRsp.Problems.Should().HaveCount(0);
 
-            await Assert.ThrowsAsync<HttpError>(async () => await client.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model"));
+            await client
+                .Invoking(c => c.GetModelAsync(Dbname, engineFixture.Engine.Name, "test_model"))
+                .Should().ThrowAsync<HttpError>();
 
             modelNames = await client.ListModelsAsync(Dbname, engineFixture.Engine.Name);
             modelName = modelNames.Find(item => item.Equals("test_model"));
-            Assert.Null(modelName);
+            modelName.Should().BeNull();
         }
 
         public override async Task DisposeAsync()

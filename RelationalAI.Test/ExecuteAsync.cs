@@ -4,6 +4,7 @@ using System.IO;
 using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
+using FluentAssertions;
 
 namespace RelationalAI.Test
 {
@@ -26,6 +27,8 @@ namespace RelationalAI.Test
             var client = CreateClient();
 
             await engineFixture.CreateEngineWaitAsync();
+            engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
+
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
             var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
@@ -43,9 +46,9 @@ namespace RelationalAI.Test
 
             var problems = new List<object>();
 
-            Assert.Equal(results, rsp.Results);
-            Assert.Equal(metadata.ToString(), rsp.Metadata.ToString());
-            Assert.Equal(problems, rsp.Problems);
+            rsp.Results.Should().Equal(results);
+            rsp.Metadata.ToString().Should().Be(metadata.ToString());
+            rsp.Problems.Should().Equal(problems);
         }
 
         public override async Task DisposeAsync()
