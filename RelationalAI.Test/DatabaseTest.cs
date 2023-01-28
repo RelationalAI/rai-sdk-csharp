@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -15,7 +16,7 @@ namespace RelationalAI.Test
 
         private static readonly string DatabaseCloneName = $"{Dbname}-clone";
 
-        public DatabaseTests(EngineFixture fixture)
+        public DatabaseTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }

@@ -5,6 +5,7 @@ using Relationalai.Protocol;
 using Xunit;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -16,7 +17,7 @@ namespace RelationalAI.Test
         public static string Dbname = $"csharp-sdk-{Uuid}";
         private readonly EngineFixture engineFixture;
 
-        public ExecuteAsyncTests(EngineFixture fixture)
+        public ExecuteAsyncTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }

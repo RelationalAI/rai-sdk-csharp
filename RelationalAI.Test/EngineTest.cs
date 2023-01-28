@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -9,7 +10,7 @@ namespace RelationalAI.Test
     {
         private readonly EngineFixture engineFixture;
 
-        public EngineTests(EngineFixture fixture)
+        public EngineTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }

@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -12,6 +13,15 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
+        public UnitTest() {}
+
+        public UnitTest(ITestOutputHelper testOutputHelper)
+        {
+            RAILoggerManager.LoggerFactory.AddLog4Net();
+            // override the default log4net appender
+            // to use xunit TestOutputHelper
+            _ = new RAITestLogger(testOutputHelper);
+        }
         public Client CreateClient()
         {
             Dictionary<string, object> config;

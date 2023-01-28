@@ -2,6 +2,7 @@ using System;
 using System.CommandLine;
 using System.CommandLine.NamingConventionBinder;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using RelationalAI;
 
 namespace RelationalAI.Examples
