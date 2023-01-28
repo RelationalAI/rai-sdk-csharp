@@ -13,7 +13,8 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        public UnitTest() {}
+        public UnitTest()
+        { }
 
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
