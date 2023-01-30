@@ -3,6 +3,14 @@ using System.Threading.Tasks;
 using System.Threading;
 using Xunit;
 using RelationalAI;
+using log4net.Appender;
+using Xunit.Abstractions;
+using log4net.Layout;
+using log4net.Core;
+using log4net.Repository;
+using log4net;
+using log4net.Config;
+using System.Reflection;
 
 namespace RelationalAI.Test
 {
@@ -63,6 +71,52 @@ namespace RelationalAI.Test
         // This class has no code, and is never created. Its purpose is simply
         // to be the place to apply [CollectionDefinition] and all the
         // ICollectionFixture<> interfaces.
+    }
+
+
+    // log4net custom appender
+    public class TestOutputAppender : AppenderSkeleton
+    {
+        private readonly ITestOutputHelper _outputHelper;
+        public TestOutputAppender(string name, ITestOutputHelper outputHelper)
+        {
+            Name = name;
+            _outputHelper = outputHelper;
+            Layout = new PatternLayout("%date [%thread] %-5level %logger - %message%newline");
+        }
+
+        protected override void Append(LoggingEvent loggingEvent)
+        {
+            if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
+            {
+                _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
+            }
+        }
+    }
+
+    public class RAITestLog4netConfiguration : IDisposable
+    {
+        private readonly IAppenderAttachable _attachable;
+        private readonly TestOutputAppender _appender;
+
+        public RAITestLog4netConfiguration(string name, ITestOutputHelper outputHelper)
+        {
+            ILoggerRepository repo = LogManager.GetRepository(Assembly.GetExecutingAssembly());
+            XmlConfigurator.Configure(repo);
+            _attachable = ((log4net.Repository.Hierarchy.Hierarchy)repo).Root;
+
+            _appender = new TestOutputAppender(name, outputHelper);
+            LogicalThreadContext.Properties["appender"] = name;
+            if (_appender != null)
+            {
+                _attachable.AddAppender(_appender);
+            }
+        }
+
+        public void Dispose()
+        {
+            _attachable.RemoveAppender(_appender);
+        }
     }
 
 }

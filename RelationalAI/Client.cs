@@ -257,6 +257,7 @@ namespace RelationalAI
 
         public async Task<User> CreateUserAsync(string email, List<Role> roles = null)
         {
+            _logger.LogInformation($"Create user email: {email}");
             var uniqueRoles = new HashSet<string>();
             roles?.ForEach(r => uniqueRoles.Add(r.Value()));
             var data = new Dictionary<string, object>

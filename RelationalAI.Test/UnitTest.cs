@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -19,10 +20,12 @@ namespace RelationalAI.Test
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
             RAILoggerManager.LoggerFactory.AddLog4Net();
+
             // override the default log4net appender
             // to use xunit TestOutputHelper
-            _ = new RAITestLogger(testOutputHelper);
+            _ = new RAITestLoggerConfiguration($"{Thread.CurrentThread.ManagedThreadId}", testOutputHelper);
         }
+
         public Client CreateClient()
         {
             Dictionary<string, object> config;
@@ -64,6 +67,7 @@ namespace RelationalAI.Test
             {
                 httpClient.DefaultRequestHeaders.Add(header.Key, header.Value);
             }
+
             return testClient;
         }
 
