@@ -94,12 +94,12 @@ namespace RelationalAI.Test
         }
     }
 
-    public class RAITestLog4netConfiguration : IDisposable
+    public class RAITestLog4NetConfiguration : IDisposable
     {
         private readonly IAppenderAttachable _attachable;
         private readonly TestOutputAppender _appender;
 
-        public RAITestLog4netConfiguration(string name, ITestOutputHelper outputHelper)
+        public RAITestLog4NetConfiguration(string name, ITestOutputHelper outputHelper)
         {
             ILoggerRepository repo = LogManager.GetRepository(Assembly.GetExecutingAssembly());
             XmlConfigurator.Configure(repo);

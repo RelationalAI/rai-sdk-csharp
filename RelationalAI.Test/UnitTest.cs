@@ -23,7 +23,7 @@ namespace RelationalAI.Test
 
             // override the default log4net appender
             // to use xunit TestOutputHelper
-            _ = new RAITestLoggerConfiguration($"{Thread.CurrentThread.ManagedThreadId}", testOutputHelper);
+            _ = new RAITestLog4NetConfiguration($"{Thread.CurrentThread.ManagedThreadId}", testOutputHelper);
         }
 
         public Client CreateClient()
