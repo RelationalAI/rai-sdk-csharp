@@ -30,6 +30,8 @@ namespace RelationalAI.Test
             }
             _semaphore.Release();
 
+            // Add related test output helper as
+            // a new appender to log4net
             _log4NetProvider.AddTestOutputHelperAppender(testOutputHelper);
         }
 

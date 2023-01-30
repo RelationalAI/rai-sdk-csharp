@@ -9,8 +9,6 @@ using System.Collections.Concurrent;
 using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository;
-using log4net.Config;
-using Newtonsoft.Json;
 
 namespace RelationalAI.Test
 {
@@ -78,12 +76,12 @@ namespace RelationalAI.Test
     internal class RAITestOutputAppender : AppenderSkeleton
     {
         private readonly ITestOutputHelper _outputHelper;
-        public RAITestOutputAppender(string name, string layout, ITestOutputHelper outputHelper)
+
+        public RAITestOutputAppender(ITestOutputHelper outputHelper)
         {
-            Name = name;
-            //Layout = Layout;
             _outputHelper = outputHelper;
-            Layout = new PatternLayout("%date [%thread] %-5level %logger - %message%newline");
+            Name = GetTestContext(outputHelper).TestCase.TestMethod.Method.Name;
+            Layout = new PatternLayout("%date [%property{appender}] [%thread] %-5level %logger - %message%newline");
         }
 
         protected override void Append(log4net.Core.LoggingEvent loggingEvent)
@@ -92,6 +90,13 @@ namespace RelationalAI.Test
             {
                 _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
             }
+        }
+
+        protected ITest GetTestContext(ITestOutputHelper outputHelper)
+        {
+            return (ITest)outputHelper.GetType()
+                .GetField("test", BindingFlags.Instance | BindingFlags.NonPublic)
+                .GetValue(outputHelper);
         }
     }
 
@@ -118,17 +123,13 @@ namespace RelationalAI.Test
 
         public void AddTestOutputHelperAppender(ITestOutputHelper outputHelper)
         {
-            var name = $"{Thread.CurrentThread.ManagedThreadId}";
-
-            var config = XmlConfigurator.ConfigureAndWatch(_loggerRepository, new System.IO.FileInfo("log4net.config"));
-            //Console.WriteLine(JsonConvert.SerializeObject(config));
             _attachable = ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
 
-            var appender = new RAITestOutputAppender(name, "", outputHelper);
-            log4net.LogicalThreadContext.Properties["appender"] = name;
+            var appender = new RAITestOutputAppender(outputHelper);
             if (appender != null)
             {
-                _appenders.GetOrAdd(name, appender);
+                log4net.LogicalThreadContext.Properties["appender"] = appender.Name;
+                _appenders.GetOrAdd(appender.Name, appender);
                 _attachable.AddAppender(appender);
             }
         }
@@ -145,5 +146,4 @@ namespace RelationalAI.Test
             _defaultLog4NetProvider.Dispose();
         }
     }
-
 }
