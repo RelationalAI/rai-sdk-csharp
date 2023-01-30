@@ -2,15 +2,15 @@ using System;
 using System.Threading.Tasks;
 using System.Threading;
 using Xunit;
-using RelationalAI;
-using log4net.Appender;
 using Xunit.Abstractions;
-using log4net.Layout;
-using log4net.Core;
-using log4net.Repository;
-using log4net;
-using log4net.Config;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
+using System.Collections.Concurrent;
+using log4net.Appender;
+using log4net.Layout;
+using log4net.Repository;
+using log4net.Config;
+using Newtonsoft.Json;
 
 namespace RelationalAI.Test
 {
@@ -75,17 +75,18 @@ namespace RelationalAI.Test
 
 
     // log4net custom appender
-    public class TestOutputAppender : AppenderSkeleton
+    internal class RAITestOutputAppender : AppenderSkeleton
     {
         private readonly ITestOutputHelper _outputHelper;
-        public TestOutputAppender(string name, ITestOutputHelper outputHelper)
+        public RAITestOutputAppender(string name, string layout, ITestOutputHelper outputHelper)
         {
             Name = name;
+            //Layout = Layout;
             _outputHelper = outputHelper;
             Layout = new PatternLayout("%date [%thread] %-5level %logger - %message%newline");
         }
 
-        protected override void Append(LoggingEvent loggingEvent)
+        protected override void Append(log4net.Core.LoggingEvent loggingEvent)
         {
             if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
             {
@@ -94,28 +95,54 @@ namespace RelationalAI.Test
         }
     }
 
-    public class RAITestLog4NetConfiguration : IDisposable
+    // log4net custom provider
+    internal class RAILog4NetProvider : ILoggerProvider
     {
-        private readonly IAppenderAttachable _attachable;
-        private readonly TestOutputAppender _appender;
+        private readonly ILoggerProvider _defaultLog4NetProvider;
+        private readonly ILoggerRepository _loggerRepository;
+        private log4net.Core.IAppenderAttachable _attachable;
+        private ConcurrentDictionary<string, RAITestOutputAppender> _appenders;
 
-        public RAITestLog4NetConfiguration(string name, ITestOutputHelper outputHelper)
+
+        public RAILog4NetProvider()
         {
-            ILoggerRepository repo = LogManager.GetRepository(Assembly.GetExecutingAssembly());
-            XmlConfigurator.Configure(repo);
-            _attachable = ((log4net.Repository.Hierarchy.Hierarchy)repo).Root;
+            _defaultLog4NetProvider = new Log4NetProvider();
+            _loggerRepository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
+            _appenders = new ConcurrentDictionary<string, RAITestOutputAppender>();
+        }
 
-            _appender = new TestOutputAppender(name, outputHelper);
-            LogicalThreadContext.Properties["appender"] = name;
-            if (_appender != null)
+        public ILogger CreateLogger(string categoryName)
+        {
+            return _defaultLog4NetProvider.CreateLogger(categoryName);
+        }
+
+        public void AddTestOutputHelperAppender(ITestOutputHelper outputHelper)
+        {
+            var name = $"{Thread.CurrentThread.ManagedThreadId}";
+
+            var config = XmlConfigurator.ConfigureAndWatch(_loggerRepository, new System.IO.FileInfo("log4net.config"));
+            //Console.WriteLine(JsonConvert.SerializeObject(config));
+            _attachable = ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
+
+            var appender = new RAITestOutputAppender(name, "", outputHelper);
+            log4net.LogicalThreadContext.Properties["appender"] = name;
+            if (appender != null)
             {
-                _attachable.AddAppender(_appender);
+                _appenders.GetOrAdd(name, appender);
+                _attachable.AddAppender(appender);
             }
         }
 
         public void Dispose()
         {
-            _attachable.RemoveAppender(_appender);
+            // cleanup appenders
+            _attachable = _attachable ?? ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
+            foreach (var appender in _appenders)
+            {
+                _attachable.RemoveAppender(appender.Value);
+            }
+
+            _defaultLog4NetProvider.Dispose();
         }
     }
 

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -14,16 +13,24 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
+        // Instantiate a single log4NetProvider for all tests
+        private static RAILog4NetProvider _log4NetProvider;
+        private static SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+
         public UnitTest()
         { }
 
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
-            RAILoggerManager.LoggerFactory.AddLog4Net();
+            _semaphore.Wait();
+            if (_log4NetProvider == null)
+            {
+                _log4NetProvider = new RAILog4NetProvider();
+                RAILoggerManager.LoggerFactory.AddProvider(_log4NetProvider);
+            }
+            _semaphore.Release();
 
-            // override the default log4net appender
-            // to use xunit TestOutputHelper
-            _ = new RAITestLog4NetConfiguration($"{Thread.CurrentThread.ManagedThreadId}", testOutputHelper);
+            _log4NetProvider.AddTestOutputHelperAppender(testOutputHelper);
         }
 
         public Client CreateClient()
