@@ -81,7 +81,7 @@ namespace RelationalAI.Test
         {
             _outputHelper = outputHelper;
             Name = GetTestContext(outputHelper).TestCase.TestMethod.Method.Name;
-            Layout = new PatternLayout("%date [%property{appender}] [%thread] %-5level %logger - %message%");
+            Layout = new PatternLayout("%date [%property{appender}] [%thread] %-5level %logger - %message");
         }
 
         protected override void Append(log4net.Core.LoggingEvent loggingEvent)
