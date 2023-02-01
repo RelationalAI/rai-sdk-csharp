@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -22,7 +23,7 @@ namespace RelationalAI.Test
 
         private readonly EngineFixture engineFixture;
 
-        public LoadCsvTests(EngineFixture fixture)
+        public LoadCsvTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }

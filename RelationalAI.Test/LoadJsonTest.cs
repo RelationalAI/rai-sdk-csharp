@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -19,7 +20,7 @@ namespace RelationalAI.Test
 
         private readonly EngineFixture engineFixture;
 
-        public LoadJsonTests(EngineFixture fixture)
+        public LoadJsonTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }
