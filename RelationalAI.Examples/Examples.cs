@@ -1,5 +1,4 @@
 using System.CommandLine;
-using Microsoft.Extensions.Logging;
 
 namespace RelationalAI.Examples
 {
@@ -7,8 +6,6 @@ namespace RelationalAI.Examples
     {
         public static int Main(string[] args)
         {
-            // Initiate log4net logger provider
-            RAILoggerManager.LoggerFactory.AddLog4Net();
             // setup the example commands CLI
             return BuildCommandLine().Invoke(args);
         }

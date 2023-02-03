@@ -40,11 +40,11 @@ namespace RelationalAI
         private readonly Context _context;
         private readonly ILogger _logger;
 
-        public Client(Context context)
+        public Client(Context context, ILogger logger = null)
         {
             _context = context;
-            _rest = new Rest(context);
-            _logger = RAILoggerManager.LoggerFactory.CreateLogger($"client");
+            _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
+            _rest = new Rest(context, _logger);
         }
 
         public HttpClient HttpClient

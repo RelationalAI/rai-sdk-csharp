@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Xunit;
 using Xunit.Abstractions;
@@ -13,26 +13,14 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        // Instantiate a single log4NetProvider for all tests
-        private static RAILog4NetProvider _log4NetProvider;
-        private static SemaphoreSlim _semaphore = new SemaphoreSlim(1);
+        private readonly ITestOutputHelper _outputHelper;
 
         public UnitTest()
         { }
 
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
-            _semaphore.Wait();
-            if (_log4NetProvider == null)
-            {
-                _log4NetProvider = new RAILog4NetProvider();
-                RAILoggerManager.LoggerFactory.AddProvider(_log4NetProvider);
-            }
-            _semaphore.Release();
-
-            // Add related test output helper as
-            // a new appender to log4net
-            _log4NetProvider.AddTestOutputHelperAppender(testOutputHelper);
+            _outputHelper = testOutputHelper;
         }
 
         public Client CreateClient()
@@ -70,7 +58,19 @@ namespace RelationalAI.Test
             var customHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(GetEnvironmentVariable("CUSTOM_HEADERS"));
 
             var ctx = new Client.Context(config);
-            var testClient = new Client(ctx);
+
+            Client testClient;
+            if (_outputHelper != null)
+            {
+                var loggerFactory = new LoggerFactory();
+                loggerFactory.AddProvider(new RAILog4NetProvider(_outputHelper));
+                testClient = new Client(ctx, loggerFactory.CreateLogger("RAI-SDK"));
+            }
+            else
+            {
+                testClient = new Client(ctx);
+            }
+
             var httpClient = testClient.HttpClient;
             foreach (var header in customHeaders)
             {

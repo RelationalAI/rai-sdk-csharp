@@ -106,14 +106,20 @@ namespace RelationalAI.Test
         private readonly ILoggerProvider _defaultLog4NetProvider;
         private readonly ILoggerRepository _loggerRepository;
         private log4net.Core.IAppenderAttachable _attachable;
-        private ConcurrentDictionary<string, RAITestOutputAppender> _appenders;
 
 
-        public RAILog4NetProvider()
+        public RAILog4NetProvider(ITestOutputHelper outputHelper)
         {
             _defaultLog4NetProvider = new Log4NetProvider();
             _loggerRepository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
-            _appenders = new ConcurrentDictionary<string, RAITestOutputAppender>();
+            _attachable = ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
+
+            var appender = new RAITestOutputAppender(outputHelper);
+            if (appender != null)
+            {
+                log4net.LogicalThreadContext.Properties["appender"] = appender.Name;
+                _attachable.AddAppender(appender);
+            }
         }
 
         public ILogger CreateLogger(string categoryName)
@@ -121,28 +127,10 @@ namespace RelationalAI.Test
             return _defaultLog4NetProvider.CreateLogger(categoryName);
         }
 
-        public void AddTestOutputHelperAppender(ITestOutputHelper outputHelper)
-        {
-            _attachable = ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
-
-            var appender = new RAITestOutputAppender(outputHelper);
-            if (appender != null)
-            {
-                log4net.LogicalThreadContext.Properties["appender"] = appender.Name;
-                _appenders.GetOrAdd(appender.Name, appender);
-                _attachable.AddAppender(appender);
-            }
-        }
-
         public void Dispose()
         {
             // cleanup appenders
             _attachable = _attachable ?? ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
-            foreach (var appender in _appenders)
-            {
-                _attachable.RemoveAppender(appender.Value);
-            }
-
             _defaultLog4NetProvider.Dispose();
         }
     }
