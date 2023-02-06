@@ -127,7 +127,6 @@ namespace RelationalAI.Test
         public void Dispose()
         {
             // cleanup appenders
-            _attachable = _attachable ?? ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
             _defaultLog4NetProvider.Dispose();
         }
     }

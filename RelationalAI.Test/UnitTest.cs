@@ -13,14 +13,15 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        private readonly ITestOutputHelper _outputHelper;
+        private readonly ILogger _logger;
 
         public UnitTest()
         { }
 
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
-            _outputHelper = testOutputHelper;
+
+            _logger = (new RAILog4NetProvider(testOutputHelper)).CreateLogger("RAI-SDK");
         }
 
         public Client CreateClient()
@@ -60,11 +61,9 @@ namespace RelationalAI.Test
             var ctx = new Client.Context(config);
 
             Client testClient;
-            if (_outputHelper != null)
+            if (_logger != null)
             {
-                var loggerFactory = new LoggerFactory();
-                loggerFactory.AddProvider(new RAILog4NetProvider(_outputHelper));
-                testClient = new Client(ctx, loggerFactory.CreateLogger("RAI-SDK"));
+                testClient = new Client(ctx, _logger);
             }
             else
             {
