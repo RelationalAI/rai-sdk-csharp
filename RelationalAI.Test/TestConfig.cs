@@ -85,11 +85,10 @@ namespace RelationalAI.Test
 
         protected override void Append(log4net.Core.LoggingEvent loggingEvent)
         {
-            /*if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
+            if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
             {
                 _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
-            }*/
-            _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
+            }
         }
 
         protected ITest GetTestContext(ITestOutputHelper outputHelper)
@@ -108,12 +107,15 @@ namespace RelationalAI.Test
         private log4net.Core.IAppenderAttachable _attachable;
 
 
-        public RAILog4NetProvider(ITestOutputHelper outputHelper)
+        public RAILog4NetProvider()
         {
             _defaultLog4NetProvider = new Log4NetProvider();
             _loggerRepository = log4net.LogManager.GetRepository(Assembly.GetExecutingAssembly());
             _attachable = ((log4net.Repository.Hierarchy.Hierarchy)_loggerRepository).Root;
+        }
 
+        public void AddRAITestOutputAppender(ITestOutputHelper outputHelper)
+        {
             var appender = new RAITestOutputAppender(outputHelper);
             if (appender != null)
             {
@@ -130,7 +132,7 @@ namespace RelationalAI.Test
         public void Dispose()
         {
             // cleanup appenders
-            //_defaultLog4NetProvider.Dispose();
+            _defaultLog4NetProvider.Dispose();
         }
     }
 }

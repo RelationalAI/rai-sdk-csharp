@@ -13,15 +13,14 @@ namespace RelationalAI.Test
 {
     public class UnitTest : IAsyncLifetime
     {
-        private readonly ILoggerProvider _loggerProvider;
+        private static readonly RAILog4NetProvider _loggerProvider = new RAILog4NetProvider();
 
         public UnitTest()
         { }
 
         public UnitTest(ITestOutputHelper testOutputHelper)
         {
-
-            _loggerProvider = new RAILog4NetProvider(testOutputHelper);
+            _loggerProvider.AddRAITestOutputAppender(testOutputHelper);
         }
 
         public Client CreateClient()
