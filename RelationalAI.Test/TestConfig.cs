@@ -85,10 +85,11 @@ namespace RelationalAI.Test
 
         protected override void Append(log4net.Core.LoggingEvent loggingEvent)
         {
-            if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
+            /*if (log4net.LogicalThreadContext.Properties["appender"].Equals(Name))
             {
                 _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
-            }
+            }*/
+            _outputHelper.WriteLine(RenderLoggingEvent(loggingEvent));
         }
 
         protected ITest GetTestContext(ITestOutputHelper outputHelper)
