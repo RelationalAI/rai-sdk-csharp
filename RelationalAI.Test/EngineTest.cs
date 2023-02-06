@@ -20,7 +20,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
 
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 

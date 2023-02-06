@@ -5,7 +5,6 @@ using Xunit;
 using Xunit.Abstractions;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
-using System.Collections.Concurrent;
 using log4net.Appender;
 using log4net.Layout;
 using log4net.Repository;
@@ -33,15 +32,13 @@ namespace RelationalAI.Test
             }
         }
 
-        public async Task<Engine> CreateEngineWaitAsync()
+        public async Task<Engine> CreateEngineWaitAsync(Client client)
         {
             try
             {
                 if (_engine == null)
                 {
                     await semaphoreSlim.WaitAsync();
-                    var ut = new UnitTest();
-                    var client = ut.CreateClient();
                     _engine = await client.CreateEngineWaitAsync(engineName);
                 }
             }

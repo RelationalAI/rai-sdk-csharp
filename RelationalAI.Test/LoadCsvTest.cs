@@ -33,7 +33,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
@@ -103,7 +103,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -174,7 +174,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -237,7 +237,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);

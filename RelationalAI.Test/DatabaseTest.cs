@@ -26,7 +26,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
 
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
@@ -99,7 +99,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
 
             await client
                 .Invoking(c => c.DeleteDatabaseAsync(Dbname))
