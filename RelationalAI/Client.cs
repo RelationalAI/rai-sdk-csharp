@@ -20,6 +20,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
@@ -37,11 +38,13 @@ namespace RelationalAI
         private const string PathOAuthClients = "/oauth-clients";
         private readonly Rest _rest;
         private readonly Context _context;
+        private readonly ILogger _logger;
 
-        public Client(Context context)
+        public Client(Context context, ILogger logger = null)
         {
             _context = context;
-            _rest = new Rest(context);
+            _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
+            _rest = new Rest(context, _logger);
         }
 
         public HttpClient HttpClient
@@ -52,6 +55,7 @@ namespace RelationalAI
 
         public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false, string source = null)
         {
+            _logger.LogInformation($"CreateDatabase: {database}");
             if (engine != null)
             {
                 return await CreateDatabaseV1Async(database, engine, overwrite);
@@ -119,6 +123,7 @@ namespace RelationalAI
 
         public async Task<Engine> CreateEngineAsync(string engine, string size = "XS")
         {
+            _logger.LogInformation($"CreateEngine: {engine}, size: {size}");
             var data = new Dictionary<string, string>
             {
                 { "region", _context.Region },
@@ -233,6 +238,7 @@ namespace RelationalAI
 
         public async Task<OAuthClientEx> GetOAuthClientAsync(string id)
         {
+            _logger.LogInformation($"GetOAuthClient id: {id}");
             var resp = await GetResourceAsync($"{PathOAuthClients}/{id}");
             return Json<GetOAuthClientResponse>.Deserialize(resp).Client;
         }
@@ -251,6 +257,7 @@ namespace RelationalAI
 
         public async Task<User> CreateUserAsync(string email, List<Role> roles = null)
         {
+            _logger.LogInformation($"Create user email: {email}");
             var uniqueRoles = new HashSet<string>();
             roles?.ForEach(r => uniqueRoles.Add(r.Value()));
             var data = new Dictionary<string, object>
@@ -540,6 +547,7 @@ namespace RelationalAI
             if (rsp is string s)
             {
                 var txn = Json<TransactionAsyncCompactResponse>.Deserialize(s);
+                _logger.LogInformation($"Transaction id: {txn.Id}, state: {txn.State}");
                 return new TransactionAsyncResult(txn, new List<ArrowRelation>(), null, new List<object>());
             }
 
@@ -757,6 +765,7 @@ namespace RelationalAI
             }
 
             var transactionResult = Json<TransactionAsyncCompactResponse>.Deserialize(_rest.ReadString(transaction.Data));
+            _logger.LogInformation($"Transaction id: {transactionResult.Id}, state: {transactionResult.State}");
             var metadataProto = _rest.ReadMetadataProtobuf(metadata.Data);
 
             List<object> problemsResult = null;

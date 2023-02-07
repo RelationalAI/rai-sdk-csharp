@@ -27,6 +27,7 @@ using Apache.Arrow;
 using Apache.Arrow.Ipc;
 using HttpMultipartParser;
 using Microsoft.Data.Analysis;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Relationalai.Protocol;
 
@@ -38,10 +39,13 @@ namespace RelationalAI
 
         private readonly Context _context;
 
-        public Rest(Context context)
+        private readonly ILogger _logger;
+
+        public Rest(Context context, ILogger logger)
         {
             _context = context;
             HttpClient = new HttpClient();
+            _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
         }
 
         public HttpClient HttpClient { get; set; }

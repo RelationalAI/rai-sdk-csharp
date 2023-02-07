@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -15,7 +16,7 @@ namespace RelationalAI.Test
 
         private static readonly string DatabaseCloneName = $"{Dbname}-clone";
 
-        public DatabaseTests(EngineFixture fixture)
+        public DatabaseTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }
@@ -25,7 +26,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
 
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
@@ -98,7 +99,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
 
             await client
                 .Invoking(c => c.DeleteDatabaseAsync(Dbname))

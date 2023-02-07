@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace RelationalAI.Test
 {
@@ -22,7 +23,7 @@ namespace RelationalAI.Test
 
         private readonly EngineFixture engineFixture;
 
-        public LoadCsvTests(EngineFixture fixture)
+        public LoadCsvTests(EngineFixture fixture, ITestOutputHelper output) : base(output)
         {
             engineFixture = fixture;
         }
@@ -32,7 +33,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
@@ -102,7 +103,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -173,7 +174,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
@@ -236,7 +237,7 @@ namespace RelationalAI.Test
         {
             var client = CreateClient();
 
-            await engineFixture.CreateEngineWaitAsync();
+            await engineFixture.CreateEngineWaitAsync(client);
             engineFixture.Engine.State.Should().Be(EngineStates.Provisioned);
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
