@@ -115,11 +115,8 @@ namespace RelationalAI.Test
         public void AddRAITestOutputAppender(ITestOutputHelper outputHelper)
         {
             var appender = new RAITestOutputAppender(outputHelper);
-            if (appender != null)
-            {
-                log4net.LogicalThreadContext.Properties["appender"] = appender.Name;
-                _attachable.AddAppender(appender);
-            }
+            log4net.LogicalThreadContext.Properties["appender"] = appender.Name;
+            _attachable.AddAppender(appender);
         }
 
         public ILogger CreateLogger(string categoryName)
