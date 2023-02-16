@@ -96,7 +96,7 @@ namespace RelationalAI
 
         public async Task<List<Database>> ListDatabasesAsync(DatabaseState? state = null)
         {
-            _logger.LogInformation("ListDatabases" + state == null ? "" : $"state {state}");
+            _logger.LogInformation("ListDatabases" + (state == null ? string.Empty : $"state {state}"));
             var parameters = new Dictionary<string, string>();
             if (state != null)
             {
@@ -195,7 +195,7 @@ namespace RelationalAI
 
         public async Task<OAuthClient> CreateOAuthClientAsync(string name, List<Permission> permissions = null)
         {
-            _logger.LogInformation($"CreateOAuthClient {name}" + permissions == null ? "" : $", permissions {JsonConvert.SerializeObject(permissions)}");
+            _logger.LogInformation($"CreateOAuthClient {name}" + (permissions == null ? string.Empty : $", permissions {JsonConvert.SerializeObject(permissions)}"));
             var uniquePermissions = new HashSet<string>();
             permissions?.ForEach(p => uniquePermissions.Add(p.Value()));
             var data = new Dictionary<string, object>
@@ -238,7 +238,7 @@ namespace RelationalAI
 
         public async Task<User> CreateUserAsync(string email, List<Role> roles = null)
         {
-            _logger.LogInformation($"CreateUser: email {email}" + roles == null ? "" : $", roles {JsonConvert.SerializeObject(roles)}");
+            _logger.LogInformation($"CreateUser: email {email}" + (roles == null ? string.Empty : $", roles {JsonConvert.SerializeObject(roles)}"));
             var uniqueRoles = new HashSet<string>();
             roles?.ForEach(r => uniqueRoles.Add(r.Value()));
             var data = new Dictionary<string, object>
@@ -252,7 +252,7 @@ namespace RelationalAI
 
         public async Task<User> UpdateUserAsync(string id, UserStatus status = UserStatus.None, List<Role> roles = null)
         {
-            _logger.LogInformation($"UpdateUserAsync: id {id}, user status {status}" + roles == null ? "" : $", roles {JsonConvert.SerializeObject(roles)}");
+            _logger.LogInformation($"UpdateUserAsync: id {id}, user status {status}" + (roles == null ? string.Empty : $", roles {JsonConvert.SerializeObject(roles)}"));
             return await UpdateUserAsyncInternal(id, status, roles);
         }
 
