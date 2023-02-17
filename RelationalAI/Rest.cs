@@ -327,20 +327,20 @@ namespace RelationalAI
 
             // Get the result back or throws an exception.
             var response = await HttpClient.SendAsync(request);
+
+            string contentType = response.Content.Headers.ContentType.MediaType;
+            var userAgent = response.RequestMessage.Headers.TryGetValues("User-Agent", out var values) ? values.FirstOrDefault() : string.Empty;
+            var requestId = response.Headers.TryGetValues("X-Request-ID", out values) ? values.FirstOrDefault() : string.Empty;
+
+            _logger.LogDebug($"{response.RequestMessage.Method} HTTP/{response.Version} {contentType}" +
+                $" {response.RequestMessage.RequestUri} {(int)response.StatusCode} {userAgent} {requestId}");
+
             var content = await response.Content.ReadAsByteArrayAsync();
 
             if ((int)response.StatusCode >= 400)
             {
-                string requestId = string.Empty;
-                if (response.Headers.TryGetValues("X-Request-ID", out IEnumerable<string> values))
-                {
-                    requestId = values.First();
-                }
-
                 throw new HttpError((int)response.StatusCode, $"(request id: {requestId})\n{ReadString(content)}");
             }
-
-            var contentType = response.Content.Headers.ContentType.MediaType;
 
             return contentType.ToLower() switch
             {
