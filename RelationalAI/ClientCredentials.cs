@@ -23,6 +23,7 @@ namespace RelationalAI
         private const string DefaultClientCredentialsUrl = "https://login.relationalai.com/oauth/token";
         private string _clientId;
         private string _clientSecret;
+        private string _audience;
         private string _clientCredentialsUrl = DefaultClientCredentialsUrl;
 
         public ClientCredentials(string clientId, string clientSecret)
@@ -31,10 +32,11 @@ namespace RelationalAI
             ClientSecret = clientSecret;
         }
 
-        public ClientCredentials(string clientId, string clientSecret, string clientCredentialsUrl)
+        public ClientCredentials(string clientId, string clientSecret, string clientCredentialsUrl, string audience)
             : this(clientId, clientSecret)
         {
             ClientCredentialsUrl = clientCredentialsUrl;
+            Audience = audience;
         }
 
         public string ClientId
@@ -55,6 +57,13 @@ namespace RelationalAI
         {
             get => _clientCredentialsUrl;
             set => _clientCredentialsUrl = !string.IsNullOrEmpty(value) ? value : DefaultClientCredentialsUrl;
+        }
+
+        public string Audience
+        {
+            get => _audience;
+            set => _audience = !string.IsNullOrEmpty(value) ? value :
+                throw new ArgumentException("Audience cannot be null or empty");
         }
 
         public AccessToken AccessToken { get; set; }
