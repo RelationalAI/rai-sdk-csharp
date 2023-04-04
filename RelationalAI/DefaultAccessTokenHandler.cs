@@ -20,7 +20,6 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace RelationalAI
@@ -32,34 +31,40 @@ namespace RelationalAI
     public class DefaultAccessTokenHandler : IAccessTokenHandler
     {
         private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1);
+        private readonly Rest _rest;
+        private readonly string _cacheName;
 
-        public Rest Rest { get; set; }
-
-        public ILogger Logger { get; set; }
+        public DefaultAccessTokenHandler(Rest rest, string cacheName = "tokens.json")
+        {
+            _rest = rest;
+            _cacheName = cacheName;
+        }
 
         public async Task<AccessToken> GetAccessTokenAsync(ClientCredentials creds)
         {
             var token = ReadAccessToken(creds);
             if (token != null && !token.IsExpired)
             {
-                return token;
+                creds.AccessToken = token;
+                return creds.AccessToken;
             }
 
-            token = await Rest.RequestAccessTokenAsync(creds);
+            token = await _rest.RequestAccessTokenAsync(creds);
             if (token != null)
             {
+                creds.AccessToken = token;
                 await WriteAccessTokenAsync(creds, token);
             }
 
-            return token;
+            return creds.AccessToken;
         }
 
-        private string CacheName()
+        private string CachePath()
         {
             var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
             var home = Environment.GetEnvironmentVariable(envHome);
 
-            return Path.Join(home, ".rai", "tokens.json");
+            return Path.Join(home, ".rai", _cacheName);
         }
 
         private AccessToken ReadAccessToken(ClientCredentials creds)
@@ -78,13 +83,12 @@ namespace RelationalAI
         {
             try
             {
-                var data = File.ReadAllText(CacheName());
+                var data = File.ReadAllText(CachePath());
                 var cache = JsonConvert.DeserializeObject<Dictionary<string, AccessToken>>(data);
                 return cache;
             }
-            catch (IOException ex)
+            catch (IOException)
             {
-                Logger.LogWarning("Failed to read token cache: ", ex);
             }
 
             return new Dictionary<string, AccessToken>();
@@ -107,11 +111,10 @@ namespace RelationalAI
                     dict.Add(creds.ClientId, token);
                 }
 
-                File.WriteAllText(CacheName(), JsonConvert.SerializeObject(dict));
+                File.WriteAllText(CachePath(), JsonConvert.SerializeObject(dict));
             }
-            catch (IOException ex)
+            catch (IOException)
             {
-                Logger.LogWarning("Failed to write token to cache: ", ex);
             }
             finally
             {

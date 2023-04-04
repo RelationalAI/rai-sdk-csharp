@@ -24,12 +24,12 @@ namespace RelationalAI
         [JsonProperty("expires_in")]
         private int _expiresIn;
 
-        public AccessToken(string token, int expiresIn, string scope)
+        public AccessToken(string token, long createdOn, int expiresIn, string scope)
         {
             Token = token;
-            _expiresIn = expiresIn;
             Scope = scope;
-            CreatedOn = new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds();
+            CreatedOn = createdOn;
+            _expiresIn = expiresIn;
         }
 
         [JsonProperty("access_token", Required = Required.Always)]
@@ -47,6 +47,11 @@ namespace RelationalAI
             set => _expiresIn = value > 0 ? value : throw new ArgumentException("ExpiresIn should be greater than 0 ");
         }
 
-        public bool IsExpired => (DateTime.Now - DateTimeOffset.FromUnixTimeSeconds(CreatedOn)).TotalSeconds >= _expiresIn - 5; // Anticipate access token expiration by 5 seconds
+        public double ExpiresOn
+        {
+            get => CreatedOn + _expiresIn;
+        }
+
+        public bool IsExpired => new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= ExpiresOn - 5; // Anticipate access token expiration by 5 seconds
     }
 }

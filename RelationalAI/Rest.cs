@@ -41,21 +41,16 @@ namespace RelationalAI
 
         private readonly ILogger _logger;
 
-        public Rest(Context context, ILogger logger, IAccessTokenHandler accessTokenHandler)
+        public Rest(Context context, ILogger logger)
         {
             _context = context;
             HttpClient = new HttpClient();
             _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
-
-            // Init AccessTokenHandler
-            AccessTokenHandler = accessTokenHandler ?? new DefaultAccessTokenHandler();
-            AccessTokenHandler.Rest = this;
-            AccessTokenHandler.Logger = _logger;
         }
 
         public HttpClient HttpClient { get; set; }
 
-        public IAccessTokenHandler AccessTokenHandler { get; set; }
+        internal IAccessTokenHandler AccessTokenHandler { get; set; }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
         {
@@ -195,7 +190,7 @@ namespace RelationalAI
                 throw new InvalidResponseException("Unexpected access token response format", resp);
             }
 
-            return new AccessToken(result["access_token"], int.Parse(result["expires_in"]), result["scope"]);
+            return new AccessToken(result["access_token"], new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(), int.Parse(result["expires_in"]), result["scope"]);
         }
 
         private static HttpContent EncodeContent(object body)

@@ -44,19 +44,14 @@ namespace RelationalAI
         {
             _context = context;
             _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
-            _rest = new Rest(context, _logger, accessTokenHandler);
+            _rest = new Rest(context, _logger);
+            _rest.AccessTokenHandler = accessTokenHandler ?? new DefaultAccessTokenHandler(_rest);
         }
 
         public HttpClient HttpClient
         {
             get { return _rest.HttpClient; }
             set { _rest.HttpClient = value; }
-        }
-
-        public IAccessTokenHandler AccessTokenHandler
-        {
-            get { return _rest.AccessTokenHandler; }
-            set { _rest.AccessTokenHandler = value; }
         }
 
         public async Task<Database> CreateDatabaseAsync(string database, string engine = null, bool overwrite = false, string source = null)
