@@ -12,19 +12,19 @@ namespace RelationalAI.Test
         [Fact]
         public async Task DefaultAccessTokenHandlerTestAsync()
         {
-            var accessToken = new AccessToken("test_access_token", new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(), 60, "test_access_token_scope");
-            var creds = new ClientCredentials("test_client_id", "test_client_secret")
-            {
-                AccessToken = accessToken
-            };
+            var ctx = CreateContext(GetConfig());
+            var creds = ctx.Credentials as ClientCredentials;
+            var rest = new Rest(ctx, null);
 
-            var accessTokenHandler = new DefaultAccessTokenHandler(null, "test_tokens.json");
-
-            // Get Private methods using System.Reflection
-            MethodInfo writeAccessTokenAsync = accessTokenHandler.GetType().GetMethod("WriteAccessTokenAsync", BindingFlags.NonPublic | BindingFlags.Instance);
-            writeAccessTokenAsync.Invoke(accessTokenHandler, new object[2] { creds, creds.AccessToken });
-
+            var accessTokenHandler = new DefaultAccessTokenHandler(rest, "test_tokens.json");
             var token = await accessTokenHandler.GetAccessTokenAsync(creds);
+            token.Should().BeEquivalentTo(creds.AccessToken);
+
+            // check if the cached token is the same as the fetched token
+            // set rest to null to force fetching the cached token
+            accessTokenHandler = new DefaultAccessTokenHandler(null, "test_tokens.json");
+            var cachedToken = await accessTokenHandler.GetAccessTokenAsync(creds);
+            token.Should().BeEquivalentTo(cachedToken);
             token.Should().BeEquivalentTo(creds.AccessToken);
         }
     }

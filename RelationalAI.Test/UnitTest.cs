@@ -25,7 +25,7 @@ namespace RelationalAI.Test
             _logger = _loggerProvider.CreateLogger("RAI-SDK");
         }
 
-        public Client CreateClient()
+        public Dictionary<string, object> GetConfig()
         {
             Dictionary<string, object> config;
 
@@ -57,9 +57,19 @@ namespace RelationalAI.Test
                 config = Config.Read(new MemoryStream(Encoding.UTF8.GetBytes(configStr)));
             }
 
-            var customHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(GetEnvironmentVariable("CUSTOM_HEADERS"));
+            return config;
+        }
 
-            var ctx = new Client.Context(config);
+        public Client.Context CreateContext(Dictionary<string, object> config)
+        {
+            return new Client.Context(config);
+        }
+
+        public Client CreateClient()
+        {
+            var customHeaders = JsonConvert.DeserializeObject<Dictionary<string, string>>(GetEnvironmentVariable("CUSTOM_HEADERS"));
+            var config = GetConfig();
+            var ctx = CreateContext(config);
 
             Client testClient;
             if (_logger != null)
