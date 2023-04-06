@@ -45,7 +45,7 @@ namespace RelationalAI
             _context = context;
             _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
             _rest = new Rest(context, _logger);
-            _rest.AccessTokenHandler = accessTokenHandler ?? new DefaultAccessTokenHandler(_rest);
+            _rest.AccessTokenHandler = accessTokenHandler ?? new DefaultAccessTokenHandler(_rest, logger: _logger);
         }
 
         public HttpClient HttpClient

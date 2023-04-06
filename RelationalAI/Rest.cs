@@ -41,7 +41,7 @@ namespace RelationalAI
 
         private readonly ILogger _logger;
 
-        public Rest(Context context, ILogger logger)
+        public Rest(Context context, ILogger logger = null)
         {
             _context = context;
             HttpClient = new HttpClient();

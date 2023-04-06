@@ -14,7 +14,7 @@ namespace RelationalAI.Test
     public class UnitTest : IAsyncLifetime
     {
         private static readonly RAILog4NetProvider _loggerProvider = new RAILog4NetProvider();
-        private readonly ILogger _logger;
+        protected readonly ILogger _logger;
 
         public UnitTest()
         { }

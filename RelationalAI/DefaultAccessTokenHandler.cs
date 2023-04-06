@@ -20,6 +20,7 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
 namespace RelationalAI
@@ -32,12 +33,14 @@ namespace RelationalAI
     {
         private static readonly SemaphoreSlim SemaphoreSlim = new SemaphoreSlim(1);
         private readonly Rest _rest;
-        private readonly string _cacheName;
+        private readonly ILogger _logger;
+        private readonly string _cachePath;
 
-        public DefaultAccessTokenHandler(Rest rest, string cacheName = "tokens.json")
+        public DefaultAccessTokenHandler(Rest rest, string cachePath = null, ILogger logger = null)
         {
             _rest = rest;
-            _cacheName = cacheName;
+            _cachePath = cachePath ?? DefaultCachePath();
+            _logger = logger ?? new LoggerFactory().CreateLogger("RAI-SDK");
         }
 
         public async Task<AccessToken> GetAccessTokenAsync(ClientCredentials creds)
@@ -59,12 +62,12 @@ namespace RelationalAI
             return creds.AccessToken;
         }
 
-        private string CachePath()
+        private string DefaultCachePath()
         {
             var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
             var home = Environment.GetEnvironmentVariable(envHome);
 
-            return Path.Join(home, ".rai", _cacheName);
+            return Path.Join(home, ".rai", "tokens.json");
         }
 
         private AccessToken ReadAccessToken(ClientCredentials creds)
@@ -83,12 +86,13 @@ namespace RelationalAI
         {
             try
             {
-                var data = File.ReadAllText(CachePath());
+                var data = File.ReadAllText(_cachePath);
                 var cache = JsonConvert.DeserializeObject<Dictionary<string, AccessToken>>(data);
                 return cache;
             }
-            catch (IOException)
+            catch (IOException ex)
             {
+                _logger.LogInformation($"Unable to read from local cache, fallback to memory-based cache. {ex.Message}");
             }
 
             return new Dictionary<string, AccessToken>();
@@ -111,10 +115,11 @@ namespace RelationalAI
                     dict.Add(creds.ClientId, token);
                 }
 
-                File.WriteAllText(CachePath(), JsonConvert.SerializeObject(dict));
+                File.WriteAllText(_cachePath, JsonConvert.SerializeObject(dict));
             }
-            catch (IOException)
+            catch (IOException ex)
             {
+                _logger.LogWarning($"Unable to write to local cache. {ex.Message}");
             }
             finally
             {
