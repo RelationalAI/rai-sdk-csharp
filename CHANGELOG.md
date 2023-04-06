@@ -1,5 +1,10 @@
 # Changelog
 
+# main
+* Add `IAccessTokenHandler` interface to implement custom access Auth0 token handlers.
+* `Client` class consturctor extended to accept custom access token handlers implementations.
+* Add `DefaultAccessTokenHandler` to cache Auth0 tokens locally.
+
 # v0.9.12-alpha
 * Add support to v2 `CreateDatabase`.
 # v0.9.11-alpha
