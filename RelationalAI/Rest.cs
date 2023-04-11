@@ -41,7 +41,7 @@ namespace RelationalAI
 
         private readonly ILogger _logger;
 
-        public Rest(Context context, ILogger logger)
+        public Rest(Context context, ILogger logger = null)
         {
             _context = context;
             HttpClient = new HttpClient();
@@ -49,6 +49,8 @@ namespace RelationalAI
         }
 
         public HttpClient HttpClient { get; set; }
+
+        internal IAccessTokenHandler AccessTokenHandler { get; set; }
 
         public static string EncodeQueryString(Dictionary<string, string> parameters)
         {
@@ -122,7 +124,7 @@ namespace RelationalAI
                 }
             }
 
-            var accessToken = await GetAccessTokenAsync(GetHost(url));
+            var accessToken = await GetAccessTokenAsync();
             caseInsensitiveHeaders.Add("Authorization", $"Bearer {accessToken}");
             return await RequestHelperAsync(method, url, data, caseInsensitiveHeaders, parameters);
         }
@@ -163,6 +165,34 @@ namespace RelationalAI
             return MetadataInfo.Parser.ParseFrom(data);
         }
 
+        public async Task<AccessToken> RequestAccessTokenAsync(ClientCredentials creds)
+        {
+            // Form the API request body.
+            var data = new Dictionary<string, string>
+            {
+                { "client_id", creds.ClientId },
+                { "client_secret", creds.ClientSecret },
+                { "audience", creds.Audience },
+                { "grant_type", "client_credentials" }
+            };
+            var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
+            if (!(resp is string stringResponse))
+            {
+                throw new InvalidResponseException(
+                    $"Unexpected response type, expected a string but received {resp.GetType().Name}",
+                    resp);
+            }
+
+            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
+
+            if (result == null)
+            {
+                throw new InvalidResponseException("Unexpected access token response format", resp);
+            }
+
+            return new AccessToken(result["access_token"], new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds(), int.Parse(result["expires_in"]), result["scope"]);
+        }
+
         private static HttpContent EncodeContent(object body)
         {
             if (body == null)
@@ -177,11 +207,6 @@ namespace RelationalAI
             }
 
             return new ByteArrayContent(Encoding.UTF8.GetBytes(s));
-        }
-
-        private static string GetHost(string url)
-        {
-            return new Uri(url).Host;
         }
 
         private static string GetUserAgent()
@@ -272,7 +297,7 @@ namespace RelationalAI
             return output;
         }
 
-        private async Task<string> GetAccessTokenAsync(string host)
+        private async Task<string> GetAccessTokenAsync()
         {
             if (!(_context.Credentials is ClientCredentials creds))
             {
@@ -281,38 +306,10 @@ namespace RelationalAI
 
             if (creds.AccessToken == null || creds.AccessToken.IsExpired)
             {
-                creds.AccessToken = await RequestAccessTokenAsync(host, creds);
+                creds.AccessToken = await AccessTokenHandler.GetAccessTokenAsync(creds);
             }
 
             return creds.AccessToken.Token;
-        }
-
-        private async Task<AccessToken> RequestAccessTokenAsync(string host, ClientCredentials creds)
-        {
-            // Form the API request body.
-            var data = new Dictionary<string, string>
-            {
-                { "client_id", creds.ClientId },
-                { "client_secret", creds.ClientSecret },
-                { "audience", $"https://{host}" },
-                { "grant_type", "client_credentials" }
-            };
-            var resp = await RequestHelperAsync("POST", creds.ClientCredentialsUrl, data);
-            if (!(resp is string stringResponse))
-            {
-                throw new InvalidResponseException(
-                    $"Unexpected response type, expected a string but received {resp.GetType().Name}",
-                    resp);
-            }
-
-            var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(stringResponse);
-
-            if (result == null)
-            {
-                throw new InvalidResponseException("Unexpected access token response format", resp);
-            }
-
-            return new AccessToken(result["access_token"], int.Parse(result["expires_in"]));
         }
 
         private async Task<object> RequestHelperAsync(

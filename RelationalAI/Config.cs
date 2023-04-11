@@ -66,9 +66,16 @@ namespace RelationalAI
             var clientId = GetIniValue(data, profile, "client_id", null);
             var clientSecret = GetIniValue(data, profile, "client_secret", null);
             var clientCredentialsUrl = GetIniValue(data, profile, "client_credentials_url", null);
+            var audience = GetIniValue(data, profile, "audience", null);
             if (clientId != null && clientSecret != null)
             {
-                return new ClientCredentials(clientId, clientSecret, clientCredentialsUrl);
+                if (string.IsNullOrEmpty(audience))
+                {
+                    var host = GetIniValue(data, profile, "host", null);
+                    audience = $"https://{host}";
+                }
+
+                return new ClientCredentials(clientId, clientSecret, clientCredentialsUrl, audience);
             }
 
             return null;
