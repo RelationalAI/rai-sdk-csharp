@@ -36,9 +36,9 @@ namespace RelationalAI.Test
         {
             try
             {
+                await semaphoreSlim.WaitAsync();
                 if (_engine == null)
                 {
-                    await semaphoreSlim.WaitAsync();
                     _engine = await client.CreateEngineWaitAsync(engineName);
                 }
             }
