@@ -17,7 +17,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -64,8 +63,7 @@ namespace RelationalAI
 
         private string DefaultCachePath()
         {
-            var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
-            var home = Environment.GetEnvironmentVariable(envHome);
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             return Path.Join(home, ".rai", "tokens.json");
         }

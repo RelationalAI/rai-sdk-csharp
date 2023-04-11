@@ -1,9 +1,7 @@
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using FluentAssertions;
-using Microsoft.Extensions.Logging;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,8 +12,7 @@ namespace RelationalAI.Test
     {
         private string TestCachePath()
         {
-            var envHome = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "HOMEPATH" : "HOME";
-            var home = Environment.GetEnvironmentVariable(envHome);
+            var home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
 
             return Path.Join(home, ".rai", "test_tokens.json");
         }
