@@ -51,5 +51,7 @@ runs:
         CLIENT_CREDENTIALS_URL: ${{ inputs.client_credentials_url }}
         HOST: ${{ inputs.rai_host }}
         CUSTOM_HEADERS: ${{ inputs.custom_headers }}
-      run: dotnet test --logger "console;verbosity=detailed"
+      run: |
+        mkdir ~/.rai
+        dotnet test --logger "console;verbosity=detailed"
       shell: bash

@@ -19,7 +19,6 @@ jobs:
 
       - name: Dotnet linter
         run: |
-          mkdir ~/.rai
           dotnet tool install -g dotnet-format
           dotnet format . --check
 
