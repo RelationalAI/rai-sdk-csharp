@@ -13,6 +13,7 @@ jobs:
         os:
           - ubuntu-latest
           - windows-latest
+          - windows-2019
 
     steps:
       - uses: actions/checkout@v3
