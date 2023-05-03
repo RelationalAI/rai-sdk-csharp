@@ -38,7 +38,7 @@ namespace RelationalAI.Test
             {
                 _engine = await client.GetEngineAsync(engineName);
             }
-            catch(HttpError e)
+            catch (HttpError e)
             {
                 if (e.StatusCode != 404)
                 {
