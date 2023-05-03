@@ -36,17 +36,33 @@ namespace RelationalAI.Test
         {
             try
             {
-                await semaphoreSlim.WaitAsync();
-                if (_engine == null)
+                _engine = await client.GetEngineAsync(engineName);
+            }
+            catch(HttpError e)
+            {
+                if (e.StatusCode != 404)
                 {
-                    _engine = await client.CreateEngineWaitAsync(engineName);
+                    throw e;
+                }
+
+                try
+                {
+                    await semaphoreSlim.WaitAsync();
+                    if (_engine == null)
+                    {
+                        _engine = await client.CreateEngineWaitAsync(engineName);
+                    }
+                }
+                finally
+                {
+                    semaphoreSlim.Release();
                 }
             }
-            finally
-            {
-                semaphoreSlim.Release();
-            }
 
+            if (_engine.State != "PROVISIONED")
+            {
+                throw new Exception($"engine ${_engine.Name} is not in a usable state ${_engine.State}\n");
+            }
 
             return _engine;
         }
