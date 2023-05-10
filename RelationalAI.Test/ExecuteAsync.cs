@@ -43,7 +43,7 @@ namespace RelationalAI.Test
                 new ArrowRelation("/:output/Int64/Int64/Int64/Int64", new List<object> {1L, 16L, 81L, 256L, 625L} )
             };
 
-            var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("../../../metadata.pb"));
+            var metadata = MetadataInfo.Parser.ParseFrom(File.ReadAllBytes("metadata.pb"));
 
             var problems = new List<object>();
 
