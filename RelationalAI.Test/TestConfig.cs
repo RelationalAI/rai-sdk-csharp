@@ -45,7 +45,8 @@ namespace RelationalAI.Test
                     }
 
                     return Engine;
-                } catch(HttpError ex)
+                }
+                catch (HttpError ex)
                 {
                     if (ex.StatusCode != 404)
                     {
