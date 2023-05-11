@@ -162,7 +162,7 @@ namespace RelationalAI
             {
                 var resp = await Policy
                     .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
-                    .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
+                    .RetryWithTimeout(startTime, 0.1, 120, 1)
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
                 if (resp.State != EngineStates.Provisioned)
