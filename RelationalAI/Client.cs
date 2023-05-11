@@ -171,7 +171,8 @@ namespace RelationalAI
                 }
 
                 return resp;
-            } catch (TimeoutRejectedException ex)
+            }
+            catch (TimeoutRejectedException ex)
             {
                 _logger.LogWarning(ex, "Timeout occured when creating engine {engine}.", engine);
                 throw new EngineProvisionFailedException(await GetEngineAsync(engine));
