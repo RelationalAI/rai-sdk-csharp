@@ -24,6 +24,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Polly;
+using Polly.Timeout;
 using Relationalai.Protocol;
 
 namespace RelationalAI
@@ -157,17 +158,24 @@ namespace RelationalAI
         {
             var startTime = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             await CreateEngineAsync(engine, size);
-            var resp = await Policy
+            try
+            {
+                var resp = await Policy
                     .HandleResult<Engine>(e => !EngineStates.IsTerminalState(e.State, EngineStates.Provisioned))
                     .RetryWithTimeout(startTime, 0.1, 120, 10 * 60)
                     .ExecuteAsync(() => GetEngineAsync(engine));
 
-            if (resp.State != EngineStates.Provisioned)
-            {
-                throw new EngineProvisionFailedException(resp);
-            }
+                if (resp.State != EngineStates.Provisioned)
+                {
+                    throw new EngineProvisionFailedException(resp);
+                }
 
-            return resp;
+                return resp;
+            } catch (TimeoutRejectedException ex)
+            {
+                _logger.LogWarning(ex, "Timeout occured when creating engine {engine}.", engine);
+                throw new EngineProvisionFailedException(await GetEngineAsync(engine));
+            }
         }
 
         public async Task<Engine> GetEngineAsync(string engine)
