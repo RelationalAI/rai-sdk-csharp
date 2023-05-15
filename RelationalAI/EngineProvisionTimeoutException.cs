@@ -23,7 +23,7 @@ namespace RelationalAI
     {
         public EngineProvisionTimeoutException(string engine)
             : base($"Engine with name `{engine}` provisioning timeout")
-            {
-            }
+        {
+        }
     }
 }
