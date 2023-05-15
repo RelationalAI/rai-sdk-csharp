@@ -30,7 +30,7 @@ namespace RelationalAI
         }
 
         public EngineProvisionFailedException(string engine)
-            : base($"Engine with name `engine` failed to provision")
+            : base($"Engine with name {engine} failed to provision")
         { }
 
         /// <summary>
