@@ -76,19 +76,5 @@ namespace RelationalAI.Test
 
             return handlerMock;
         }
-
-        public override async Task DisposeAsync()
-        {
-            var client = CreateClient();
-
-            try
-            {
-                await client.DeleteDatabaseAsync(Dbname);
-            }
-            catch (Exception e)
-            {
-                await Console.Error.WriteLineAsync(e.ToString());
-            }
-        }
     }
 }
