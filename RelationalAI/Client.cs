@@ -167,15 +167,14 @@ namespace RelationalAI
 
                 if (resp.State != EngineStates.Provisioned)
                 {
-                    throw new EngineProvisionFailedException(resp);
+                    throw new EngineProvisionFailedException(engine);
                 }
 
                 return resp;
             }
-            catch (TimeoutRejectedException ex)
+            catch (TimeoutRejectedException)
             {
-                _logger.LogWarning(ex, "Timeout occured when creating engine {engine}.", engine);
-                throw new EngineProvisionFailedException(await GetEngineAsync(engine));
+                throw new EngineProvisionTimeoutException(engine);
             }
         }
 

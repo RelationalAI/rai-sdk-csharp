@@ -14,28 +14,15 @@
  * limitations under the License.
  */
 
-using System;
-
 namespace RelationalAI
 {
     /// <summary>
-    /// Represents error thrown when engine requested to provision failed to get provisioned.
+    /// Represents error thrown when engine requested to provision timeout.
     /// </summary>
-    public class EngineProvisionFailedException : Exception
+    public class EngineProvisionTimeoutException : EngineProvisionFailedException
     {
-        public EngineProvisionFailedException(Engine engine)
-            : base($"Engine with name `{engine.Name}` failed to provision")
-        {
-            Engine = engine;
-        }
-
-        public EngineProvisionFailedException(string engine)
+        public EngineProvisionTimeoutException(string engine)
             : base($"Engine with name `engine` failed to provision")
         { }
-
-        /// <summary>
-        /// Gets the name of the engine that failed to provision.
-        /// </summary>
-        public Engine Engine { get; }
     }
 }
