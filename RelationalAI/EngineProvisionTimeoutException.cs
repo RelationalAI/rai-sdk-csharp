@@ -22,7 +22,8 @@ namespace RelationalAI
     public class EngineProvisionTimeoutException : EngineProvisionFailedException
     {
         public EngineProvisionTimeoutException(string engine)
-            : base($"Engine with name {engine} failed to provision")
-        { }
+            : base($"Engine with name `{engine}` failed to provision")
+            {
+            }
     }
 }
