@@ -1,5 +1,9 @@
 # Changelog
 
+# v0.9.14-alpha
+* Fix failing tests with `engine already exists`.
+* Add `EngineProvisionTimeoutException` thrown from `CreateEngineWaitAsync` when requested engine timeout to provision.
+
 # v0.9.13-alpha
 * Add `IAccessTokenHandler` interface to implement custom access Auth0 token handlers.
 * `Client` class consturctor extended to accept custom access token handlers implementations.

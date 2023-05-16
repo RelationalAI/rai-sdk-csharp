@@ -13,7 +13,6 @@ namespace RelationalAI.Test
 {
     public class EngineFixture : IDisposable
     {
-        private Engine _engine;
         private readonly string engineName = "sdk-csharp-" + Guid.NewGuid().ToString();
         // Semaphore is used to lock the CreateEngine function so that only one test creates the engine.
         private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
@@ -37,9 +36,27 @@ namespace RelationalAI.Test
             try
             {
                 await semaphoreSlim.WaitAsync();
-                if (_engine == null)
+                try
                 {
-                    _engine = await client.CreateEngineWaitAsync(engineName);
+                    Engine = await client.GetEngineAsync(engineName);
+                    if (Engine.State != "PROVISIONED")
+                    {
+                        throw new EngineProvisionFailedException(Engine);
+                    }
+
+                    return Engine;
+                }
+                catch (HttpError ex)
+                {
+                    if (ex.StatusCode != 404)
+                    {
+                        throw ex;
+                    }
+                }
+
+                if (Engine == null)
+                {
+                    Engine = await client.CreateEngineWaitAsync(engineName);
                 }
             }
             finally
@@ -48,16 +65,10 @@ namespace RelationalAI.Test
             }
 
 
-            return _engine;
+            return Engine;
         }
 
-        public Engine Engine
-        {
-            get
-            {
-                return _engine;
-            }
-        }
+        public Engine Engine { get; private set; }
     }
 
     [CollectionDefinition("RelationalAI.Test")]
