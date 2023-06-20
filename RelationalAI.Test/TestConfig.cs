@@ -13,7 +13,7 @@ namespace RelationalAI.Test
 {
     public class EngineFixture : IDisposable
     {
-        private readonly string engineName = "sdk-csharp-" + Guid.NewGuid().ToString();
+        private readonly string engineName = "sdk-csharp-" + Environment.GetEnvironmentVariable("RunId");
         // Semaphore is used to lock the CreateEngine function so that only one test creates the engine.
         private static readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1);
 
