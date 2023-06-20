@@ -54,6 +54,6 @@ runs:
         RunId: ${{ github.run_id	}}
         RunnerOS: ${{ matrix.os }}
       run: |
-        mkdir ~/.rai
+        mkdir -p ~/.rai
         dotnet test --logger "console;verbosity=detailed"
       shell: bash
