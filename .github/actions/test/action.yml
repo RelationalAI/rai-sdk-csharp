@@ -52,7 +52,7 @@ runs:
         HOST: ${{ inputs.rai_host }}
         CUSTOM_HEADERS: ${{ inputs.custom_headers }}
         RunId: ${{ github.run_id	}}
-        RunnerOS: ${{runner.os}}
+        RunnerOS: ${{ matrix.os }}
       run: |
         mkdir ~/.rai
         dotnet test --logger "console;verbosity=detailed"
