@@ -41,7 +41,6 @@ jobs:
 
       - name: TestOnRegular
         id: runonregular
-        continue-on-error: true
         if: steps.runonspot.outcome != 'success'
         uses: ./.github/actions/test
         with:
