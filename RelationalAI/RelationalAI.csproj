@@ -2,7 +2,9 @@
 
   <PropertyGroup>
     <Version>0.9.13-alpha</Version>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <!-- <TargetFramework>netcoreapp3.1</TargetFramework> -->
+    <TargetFramework>net7.0</TargetFramework> 
+
     <PackageId>RAI</PackageId>
     <Authors>RelationalAI</Authors>
     <Company>RelationalAI</Company>

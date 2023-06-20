@@ -1,13 +1,49 @@
 using System.CommandLine;
+using System;
+using System.Collections.Generic;
 
 namespace RelationalAI.Examples
 {
     public class Examples
     {
-        public static int Main(string[] args)
+        public static void Main(string[] args)
         {
-            // setup the example commands CLI
-            return BuildCommandLine().Invoke(args);
+            GetListRun();
+            
+            //return BuildCommandLine().Invoke(args);
+
+            Console.Read();
+        }
+
+        private static void GetListRun(DatabaseState? state = null, string profile = "latest")//,string profile = "latest-engine") //string profile = "dev1")//string profile = "latest-engine")
+        {
+            var config = Config.Read("", profile);
+            var context = new Client.Context(config);
+            var client = new Client(context);
+            for(int i = 1; i < 10; i++)
+            {
+                try
+                {
+                    var res = client.CreateEngineAsync("wei-fullengine-xl","XL").Result;
+                                    //var res1 = client.CreateEngineAsync("wei-spot-test").Result;
+
+                    //var test =  client.CreateDatabaseAsync("weitest10","wei-benchmark-test").Result;
+                    //var test2 = client.ListEnginesAsync().Result;
+                    //var index = i + 100000;
+                    //string query = $"def insert:integers = range[1, {index}, 1] def output = count[integers]";
+                    //query = "def output = {1;2;3}";
+
+                    //var test =  client.ExecuteWaitAsync("Test2", "wei-test-m1", query).Result;
+
+                    //Console.WriteLine("test:" + i);
+        
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("exception");
+                }
+            }
+
         }
 
         private static RootCommand BuildCommandLine()

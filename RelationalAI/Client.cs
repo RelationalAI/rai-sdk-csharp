@@ -131,7 +131,20 @@ namespace RelationalAI
                 { "name", engine },
                 { "size", size.ToString() }
             };
-            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data) as string;
+
+            //var engine_spec = "{\"experimentalFeatures\":{\"distributed\":{\"workers\":8},\"tlsType\":\"mbedtls\",\"useTransientContainer\":\"true\"}}";
+
+            //var engine_spec = "{\"experimentalFeatures\":{\"poolDesignation\":\"cpuenforced\",\"tlsType\":\"mbedtls\",\"useTransientContainer\":\"true\"}}";
+
+            // var engine_spec = "{\"resources\":{\"memory\":\"20Gi\", \"cpu\":\"3\"}}";
+
+            //var engine_spec = "{\"experimentalFeatures\":{\"useSpotEngines\": true}}";
+
+            var engine_spec = "{\"experimentalFeatures\":{\"useFullNodeForBigEngines\": true}}";
+
+
+            //var engine_spec = "{\"experimentalFeatures\":{\"tlsType\":\"mbedtls\",\"useTransientContainer\":\"true\"}}";
+            var resp = await _rest.PutAsync(MakeUrl(PathEngine), data, headers: new Dictionary<string, string>() {{"x-rai-parameter-engine-spec",engine_spec}}) as string;
             return Json<CreateEngineResponse>.Deserialize(resp).Engine;
         }
 
