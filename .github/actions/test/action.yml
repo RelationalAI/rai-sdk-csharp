@@ -44,7 +44,27 @@ runs:
       run: dotnet build
       shell: bash
 
-    - name: Test
+    - name: Test in spot
+      id: runonspot
+      continue-on-error: true
+      if: always()
+      env:
+        CLIENT_ID: ${{ inputs.client_id }}
+        CLIENT_SECRET: ${{ inputs.client_secret }}
+        CLIENT_CREDENTIALS_URL: ${{ inputs.client_credentials_url }}
+        HOST: ${{ inputs.rai_host }}
+        CUSTOM_HEADERS: ${{ inputs.custom_headers }}
+        RunId: ${{ github.run_id	}}
+        RunnerOS: ${{ matrix.os }}
+      run: |
+        mkdir ~/.rai
+        dotnet test --logger "console;verbosity=detailed"
+        testABC
+      shell: bash
+
+    - name: Test in normal
+      if: steps.runonspot.outcome != 'success'
+      id: runonnormal
       env:
         CLIENT_ID: ${{ inputs.client_id }}
         CLIENT_SECRET: ${{ inputs.client_secret }}
