@@ -29,7 +29,20 @@ jobs:
           dotnet tool install -g dotnet-format
           dotnet format . --check
 
-      - name: Test
+      - name: TestOnSpot
+        id: runonspot
+        continue-on-error: true
+        if: always()
+        uses: ./.github/actions/test
+        with:
+          client_id: test
+          client_secret: ${{ secrets.CLIENT_SECRET }}
+          client_credentials_url: ${{ secrets.CLIENT_CREDENTIALS_URL }}
+
+      - name: TestOnRegular
+        id: runonregular
+        continue-on-error: true
+        if: steps.runonspot.outcome != 'success'
         uses: ./.github/actions/test
         with:
           client_id: ${{ secrets.CLIENT_ID }}
