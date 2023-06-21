@@ -52,6 +52,6 @@ runs:
         HOST: ${{ inputs.rai_host }}
         CUSTOM_HEADERS: ${{ inputs.custom_headers }}
       run: |
-        mkdir ~/.rai
+        mkdir -p ~/.rai
         dotnet test --logger "console;verbosity=detailed"
       shell: bash
