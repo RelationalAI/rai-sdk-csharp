@@ -52,6 +52,6 @@ namespace RelationalAI
             get => CreatedOn + _expiresIn;
         }
 
-        public bool IsExpired => new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= ExpiresOn - 5; // Anticipate access token expiration by 5 seconds
+        public bool IsExpired => new DateTimeOffset(DateTime.Now).ToUnixTimeSeconds() >= ExpiresOn - 60; // Anticipate access token expiration by 60 seconds
     }
 }
