@@ -1,5 +1,8 @@
 # Changelog
 
+# v0.9.15-alpha
+* Increased the auth token expiration buffer from 5s to 60s.
+
 # v0.9.14-alpha
 * Fix failing tests with `engine already exists`.
 * Add `EngineProvisionTimeoutException` thrown from `CreateEngineWaitAsync` when requested engine timeout to provision.
