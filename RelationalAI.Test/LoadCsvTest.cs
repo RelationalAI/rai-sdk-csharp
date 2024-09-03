@@ -42,7 +42,7 @@ namespace RelationalAI.Test
             loadRsp.Output.Should().HaveCount(0);
             loadRsp.Problems.Should().HaveCount(0);
 
-            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output {sample}");
 
             var rel = FindRelation(rsp.Output, ":date");
             rel.Should().NotBeNull();
@@ -114,7 +114,7 @@ namespace RelationalAI.Test
             loadRsp.Output.Should().HaveCount(0);
             loadRsp.Problems.Should().HaveCount(0);
 
-            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output = sample_no_header");
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output {sample_no_header}");
 
             var rel = FindRelation(rsp.Output, ":COL1");
             rel.Should().NotBeNull();
@@ -185,7 +185,7 @@ namespace RelationalAI.Test
             loadRsp.Output.Should().HaveCount(0);
             loadRsp.Problems.Should().HaveCount(0);
 
-            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output = sample_alt_syntax");
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output {sample_alt_syntax}");
 
             var rel = FindRelation(rsp.Output, ":date");
             rel.Should().NotBeNull();
@@ -256,7 +256,7 @@ namespace RelationalAI.Test
             loadRsp.Output.Should().HaveCount(0);
             loadRsp.Problems.Should().HaveCount(0);
 
-            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output = sample");
+            var rsp = await client.ExecuteV1Async(Dbname, engineFixture.Engine.Name, "def output {sample}");
 
             var rel = FindRelation(rsp.Output, ":date");
             rel.Should().NotBeNull();

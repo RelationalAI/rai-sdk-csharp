@@ -402,8 +402,8 @@ namespace RelationalAI
             foreach (var model in models)
             {
                 var inputName = $"input_{randInt}_{index}";
-                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
-                $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
+                queries.Add($"def delete[:rel, :catalog, :model, \"{model.Key}\"]: rel[:catalog, :model, \"{model.Key}\"] \n" +
+                $"def insert[:rel, :catalog, :model, \"{model.Key}\"]: {inputName}");
                 queriesInputs.Add(inputName, model.Value);
 
                 index++;
@@ -425,8 +425,8 @@ namespace RelationalAI
             foreach (var model in models)
             {
                 var inputName = $"input_{randInt}_{index}";
-                queries.Add($"def delete:rel:catalog:model[\"{model.Key}\"] = rel:catalog:model[\"{model.Key}\"] \n" +
-                $"def insert:rel:catalog:model[\"{model.Key}\"] = {inputName}");
+                queries.Add($"def delete[:rel, :catalog, :model, \"{model.Key}\"]: rel[:catalog, :model, \"{model.Key}\"] \n" +
+                $"def insert[:rel, :catalog, :model, \"{model.Key}\"]: {inputName}");
                 queriesInputs.Add(inputName, model.Value);
 
                 index++;
@@ -438,7 +438,7 @@ namespace RelationalAI
         public async Task<List<string>> ListModelsAsync(string database, string engine)
         {
             var outName = $"models_{new Random().Next(int.MaxValue)}";
-            var query = $"def output:{outName}[name] = rel:catalog:model(name, _)";
+            var query = $"def output(:{outName}, name): rel(:catalog, :model, name, _)";
 
             var models = new List<string>();
             var resp = await ExecuteWaitAsync(database, engine, query);
@@ -458,7 +458,7 @@ namespace RelationalAI
         public async Task<Model> GetModelAsync(string database, string engine, string name)
         {
             var outName = $"model_{new Random().Next(int.MaxValue)}";
-            var query = $"def output:{outName} = rel:catalog:model[\"{name}\"]";
+            var query = $"def output[:{outName}]: rel[:catalog, :model, \"{name}\"]";
 
             var resp = await ExecuteWaitAsync(database, engine, query);
 
@@ -478,7 +478,7 @@ namespace RelationalAI
             var queries = new List<string>();
             foreach (var model in models)
             {
-                queries.Add($"def delete:rel:catalog:model[\"{model}\"] = rel:catalog:model[\"{model}\"]");
+                queries.Add($"def delete[:rel, :catalog, :model, \"{model}\"]: rel[:catalog, :model, \"{model}\"]");
             }
 
             return await ExecuteWaitAsync(database, engine, string.Join('\n', queries), false);
@@ -613,8 +613,8 @@ namespace RelationalAI
         private static string GenLoadJson(string relation)
         {
             var builder = new StringBuilder();
-            builder.Append("\ndef config:data = data\n");
-            builder.AppendFormat("def insert:{0} = load_json[config]\n", relation);
+            builder.Append("\ndef config[:data]: data\n");
+            builder.AppendFormat("def insert[:{0}]: load_json[config]\n", relation);
             return builder.ToString();
         }
 
@@ -628,8 +628,8 @@ namespace RelationalAI
             }
 
             var config = schema.Aggregate(
-                "def config:schema = {",
-                (current, entry) => current + $"\n    :{entry.Key}, \"{entry.Value}\";");
+                "def config[:schema]: {",
+                (current, entry) => current + $"\n    (:{entry.Key}, \"{entry.Value}\");");
 
             builder.Append(config);
             builder.Append("\n}\n");
@@ -670,7 +670,7 @@ namespace RelationalAI
             }
 
             var lit = GenLiteral(value);
-            var def = $"def config:syntax:{name} = {lit}\n";
+            var def = $"def config[:syntax, :{name}]: {lit}\n";
             builder.Append(def);
         }
 
@@ -692,8 +692,8 @@ namespace RelationalAI
             var builder = new StringBuilder();
             GenSchemaConfig(builder, options);
             GenSyntaxConfig(builder, options);
-            builder.Append("\n def config:data = data\n");
-            builder.AppendFormat("def insert:{0} = load_csv[config]\n", relation);
+            builder.Append("\n def config[:data]: data\n");
+            builder.AppendFormat("def insert[:{0}]: load_csv[config]\n", relation);
 
             return builder.ToString();
         }
