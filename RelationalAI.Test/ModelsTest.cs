@@ -12,7 +12,7 @@ namespace RelationalAI.Test
     {
         public static string Uuid = Guid.NewGuid().ToString();
         public static string Dbname = $"csharp-sdk-{Uuid}";
-        private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
+        private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R {(\"hello\", \"world\")}" } };
 
         private readonly EngineFixture engineFixture;
 

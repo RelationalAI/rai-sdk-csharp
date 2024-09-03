@@ -88,7 +88,7 @@ namespace RelationalAI.Test
             Assert.Equal(Dbname, deleteRsp.Name);
         }
 
-        private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R = \"hello\", \"world\"" } };
+        private readonly Dictionary<string, string> TestModel = new Dictionary<string, string> { { "test_model", "def R {(\"hello\", \"world\")}" } };
 
         private const string TestJson = "{" +
                                         "\"name\":\"Amira\",\n" +
