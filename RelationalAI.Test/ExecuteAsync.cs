@@ -32,7 +32,7 @@ namespace RelationalAI.Test
 
             await client.CreateDatabaseAsync(Dbname, engineFixture.Engine.Name);
 
-            var query = "x, x^2, x^3, x^4 from x in {1; 2; 3; 4; 5}";
+            var query = "def output(x, x2, x3, x4): {1; 2; 3; 4; 5}(x) and x2 = x^2 and x3 = x^3 and x4 = x^4";
             var rsp = await client.ExecuteWaitAsync(Dbname, engineFixture.Engine.Name, query, true);
 
             var results = new List<ArrowRelation>
