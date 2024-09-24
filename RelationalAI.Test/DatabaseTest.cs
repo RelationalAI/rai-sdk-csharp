@@ -140,7 +140,7 @@ namespace RelationalAI.Test
             database.State.Should().Be(DatabaseState.Created);
 
             // make sure the data was cloned
-            var rsp = await client.ExecuteV1Async(DatabaseCloneName, engineFixture.Engine.Name, "test_data", true);
+            var rsp = await client.ExecuteV1Async(DatabaseCloneName, engineFixture.Engine.Name, "def output {test_data}", true);
 
             var rel = FindRelation(rsp.Output, ":name");
             rel.Should().NotBeNull();
