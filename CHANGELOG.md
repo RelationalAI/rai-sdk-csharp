@@ -1,5 +1,8 @@
 # Changelog
 
+# Unreleased
+* Updated package configuration to publish README to nuget.org with the next release.
+
 # v0.9.15-alpha
 * Increased the auth token expiration buffer from 5s to 60s.
 
