@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Version>0.9.15-alpha</Version>
-    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Version>0.9.16-alpha</Version>
+    <TargetFramework>net8.0</TargetFramework>
     <PackageId>RAI</PackageId>
     <Authors>RelationalAI</Authors>
     <Company>RelationalAI</Company>
